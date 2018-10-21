@@ -1,2 +1,5 @@
 Flask
 flask-restplus
+sqlalchemy
+psycopg2-binary
+pytest
