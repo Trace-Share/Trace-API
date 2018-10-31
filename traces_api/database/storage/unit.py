@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from traces_api.database.model.unit import ModelUnit
 
 
@@ -17,13 +15,7 @@ class StorageUnit:
         unit = self.session.query(ModelUnit).filter(ModelUnit.id_unit == id_unit).one()
         return unit
 
-    def save_unit(self):
-        unit = ModelUnit(
-            creation_time=datetime.now(),
-            last_update_time=datetime.now(),
-            uploaded_file_location="abc",
-            id_author=2
-        )
+    def save_unit(self, unit):
         self.session.add(unit)
         self.session.commit()
         return unit

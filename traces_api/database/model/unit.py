@@ -9,7 +9,7 @@ class ModelUnit(Base):
     id_unit = Column(Integer(), primary_key=True, autoincrement=True)
     creation_time = Column(DateTime, nullable=False)
     last_update_time = Column(DateTime, nullable=False)
-    anotation = Column(String(255))
+    annotation = Column(String(255))
     ip_mac_mapping = Column(String(255))
     uploaded_file_location = Column(String(255), nullable=False)
     id_author = Column(Integer(), nullable=False)
