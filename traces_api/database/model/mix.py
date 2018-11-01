@@ -53,7 +53,7 @@ class ModelMixFileGeneration(Base):
     id_mix = Column(
         Integer(),
         ForeignKey('mix.id_mix', ondelete="CASCADE", onupdate="RESTRICT"),
-        primary_key=True
+        index=True
     )
     creation_time = Column(DateTime, nullable=False)
     file_location = Column(String(255), nullable=False)

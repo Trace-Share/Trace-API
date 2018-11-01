@@ -7,7 +7,8 @@ from traces_api.database.tools import recreate_database
 
 @pytest.fixture()
 def database_url():
-    return "postgresql://root:example@localhost/traces"
+    return "sqlite://"
+    # return "postgresql://root:example@localhost/traces"
 
 
 @pytest.fixture(scope="function")
@@ -17,4 +18,7 @@ def sqlalchemy_session(database_url):
 
     recreate_database(engine)
 
-    return session
+    try:
+        yield session
+    finally:
+        session.close()

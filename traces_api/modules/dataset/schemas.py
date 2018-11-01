@@ -1,4 +1,6 @@
-from flask_restplus import fields
+import werkzeug.datastructures
+
+from flask_restplus import fields, reqparse
 
 from traces_api.api.restplus import api
 
@@ -6,7 +8,7 @@ from traces_api.api.restplus import api
 unit_id = fields.Integer(example=112, description="ID of newly created unit", required=True)
 
 ip_original = fields.String(example="1.2.3.4", description="IP address", required=True)
-ip_replacement = fields.String(example="172.0.0.0", description="IP address", required=True)
+ip_replacement = fields.String(example="172.16.0.0", description="IP address", required=True)
 ip_pair = api.model("IPPair", dict(
     original=ip_original,
     replacement=ip_replacement
@@ -25,19 +27,23 @@ mac_pair = api.model("MacPair", dict(
     replacement=mac
 ))
 
-label_field = api.model("Label", dict(
-    name=fields.String()
-))
+label_field = fields.String(name="Label", example="IMPORTANT")
 
 
 # Unit step 1
 
-unit_step1_fields = api.model("UnitStep1", dict(
-    file=fields.String(required=True),
-))
+unit_step1_fields = reqparse.RequestParser()
+unit_step1_fields.add_argument(
+    'file',
+    type=werkzeug.datastructures.FileStorage,
+    location='files',
+    required=True,
+    help='PCAP file'
+)
+
 
 unit_step1_response = api.model("UnitStep1Response", dict(
-    unit_id=unit_id,
+    id_unit=unit_id,
     analytics_data=fields.String(),
 ))
 
@@ -45,21 +51,22 @@ unit_step1_response = api.model("UnitStep1Response", dict(
 # Unit step 2
 
 unit_step2_fields = api.model("UnitStep2", dict(
-    unit_id=unit_id,
-    name=fields.String(description="Name of dataset", example="My dataset", required=True),
+    id_unit=unit_id,
+    name=fields.String(description="Name of unit", example="My unit", required=True),
     description=fields.String(),
-    labels=fields.List(fields.Nested(label_field)),
+    labels=fields.List(label_field),
 ))
 
 
 # Unit step 3
+
 unit_step3_fields = api.model("UnitStep3", dict(
-    unit_id=unit_id,
+    id_unit=unit_id,
     ip_mapping=fields.List(fields.Nested(ip_pair), required=True),
     mac_mapping=fields.List(fields.Nested(mac_pair), required=True),
     ips=ips,
 ))
 
 unit_step3_response = api.model("UnitStep3Response", dict(
-    annotated_unit_id=fields.Integer(example=156, description="ID of newly created annotated unit based on unit", required=True)
+    id_annotated_unit=fields.Integer(example=156, description="ID of newly created annotated unit based on unit", required=True)
 ))

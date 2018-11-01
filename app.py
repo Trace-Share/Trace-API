@@ -1,14 +1,13 @@
 import sqlalchemy
+import sqlalchemy.orm
 
-from sqlalchemy.orm import sessionmaker
 from flask import Flask, Blueprint
+from flask_injector import FlaskInjector
 
 from traces_api.api.restplus import api
 from traces_api.database.tools import recreate_database
 
 from traces_api.modules.dataset.controller import ns as dataset_namespace
-
-app = Flask(__name__)
 
 
 def create_engine(url):
@@ -17,18 +16,9 @@ def create_engine(url):
 
 
 def setup_database(engine):
-    session = sessionmaker(bind=engine)()
+    session = sqlalchemy.orm.sessionmaker(bind=engine)()
 
     return session
-
-
-def init_app(flask_app):
-    blueprint = Blueprint('api', __name__)
-    api.init_app(blueprint)
-
-    api.add_namespace(dataset_namespace)
-
-    flask_app.register_blueprint(blueprint)
 
 
 def setup_databasea(url):
@@ -40,8 +30,46 @@ def setup_databasea(url):
     return session
 
 
-if __name__ == "__main__":
-    setup_databasea("postgresql://root:example@localhost/traces")
+class FlaskApp:
 
-    init_app(app)
+    def __init__(self, session):
+        self._session = session
+
+    @staticmethod
+    def init_app(flask_app):
+        blueprint = Blueprint('api', __name__)
+        api.init_app(blueprint)
+
+        api.add_namespace(dataset_namespace)
+
+        flask_app.register_blueprint(blueprint)
+
+    def configure(self, binder):
+        from traces_api.modules.dataset.service import UnitService
+        from traces_api.modules.annotated_unit.service import AnnotatedUnitService
+        from traces_api.storage import FileStorage
+
+        binder.bind(UnitService, to=UnitService(self._session, AnnotatedUnitService(self._session)))
+        binder.bind(AnnotatedUnitService, to=AnnotatedUnitService(self._session))
+        binder.bind(FileStorage, to=FileStorage(storage_folder="storage/units"))
+
+    def create_app(self):
+        app = Flask(__name__)
+        self.init_app(app)
+
+        FlaskInjector(app=app, modules=[self.configure])
+
+        return app
+
+
+def run():
+    # session = setup_databasea("postgresql://root:example@localhost/traces")
+    session = setup_databasea("sqlite://")
+
+    app = FlaskApp(session).create_app()
     app.run(debug=True)
+
+
+if __name__ == "__main__":
+    run()
+
