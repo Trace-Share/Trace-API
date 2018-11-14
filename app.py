@@ -69,8 +69,8 @@ class FlaskApp:
 
 
 def run():
-    session = setup_databasea("postgresql://root:example@localhost/traces")
-    # session = setup_databasea("sqlite://")
+    # session = setup_databasea("postgresql://root:example@localhost/traces")
+    session = setup_databasea("sqlite://")
 
     app = FlaskApp(session).create_app()
     app.run(debug=True)
