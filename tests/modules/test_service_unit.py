@@ -1,4 +1,5 @@
 import pytest
+from unittest import mock
 
 from traces_api.modules.dataset.service import UnitService, UnitDoesntExists
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
@@ -6,11 +7,11 @@ from traces_api.modules.annotated_unit.service import AnnotatedUnitService
 
 @pytest.fixture()
 def service_unit(sqlalchemy_session):
-    return UnitService(sqlalchemy_session, AnnotatedUnitService(sqlalchemy_session))
+    return UnitService(sqlalchemy_session, AnnotatedUnitService(sqlalchemy_session), mock.Mock())
 
 
 def test_service_unit(service_unit):
-    unit1 = service_unit.create_unit_step1("/abc/dce.dat", author=5)
+    unit1, _ = service_unit.create_unit_step1("/abc/dce.dat", author=5)
     unit2 = service_unit._get_unit(unit1.id_unit)
 
     assert unit2.id_unit == unit1.id_unit

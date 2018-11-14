@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from traces_api.database.model.annotated_unit import ModelAnnotatedUnit
+from traces_api.database.model.annotated_unit import ModelAnnotatedUnit, ModelAnnotatedUnitLabel
 
 
 class AnnotatedUnitService:
@@ -16,7 +16,9 @@ class AnnotatedUnitService:
             creation_time=datetime.now(),
             stats=None,
             ip_mapping="TODO",
-            file_location=file_location
+            file_location=file_location,
+            labels=[ModelAnnotatedUnitLabel(label=l) for l in labels]
         )
+
         self._session.add(annotated_unit)
         return annotated_unit

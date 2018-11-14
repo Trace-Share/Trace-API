@@ -9,10 +9,10 @@ from .schemas import unit_step3_fields, unit_step3_response
 from .service import UnitService
 from .service import Mapping, IPDetails
 
-ns = api.namespace("dataset", description="Dataset")
+ns = api.namespace("unit", description="Unit")
 
 
-@ns.route("/unit/step1")
+@ns.route("/step1")
 class UnitSaveStep1(Resource):
 
     @inject
@@ -25,17 +25,17 @@ class UnitSaveStep1(Resource):
     @api.marshal_with(unit_step1_response)
     def post(self):
         args = unit_step1_fields.parse_args()
-        file_name = self._file_storage.save_file(args["file"], "application/vnd.tcpdump.pcap")
+        file_name = self._file_storage.save_file(args["file"], ["application/vnd.tcpdump.pcap"])
 
-        unit = self._service_unit.create_unit_step1(file_name, author=7)
+        unit, analytical_data = self._service_unit.create_unit_step1(file_name, author=7)
 
         return dict(
             id_unit=unit.id_unit,
-            analytics_data=None
+            analytical_data=analytical_data
         )
 
 
-@ns.route("/unit/step2")
+@ns.route("/step2")
 class UnitSaveStep2(Resource):
 
     @inject
@@ -54,7 +54,7 @@ class UnitSaveStep2(Resource):
         return {}
 
 
-@ns.route("/unit/step3")
+@ns.route("/step3")
 class UnitSaveStep2(Resource):
 
     @inject
@@ -65,8 +65,6 @@ class UnitSaveStep2(Resource):
     @api.expect(unit_step3_fields)
     @api.marshal_with(unit_step3_response)
     def post(self):
-        print(request.json)
-
         ip_mapping = Mapping()
         for ip in request.json["ip_mapping"]:
             ip_mapping.add_pair(ip["original"], ip["replacement"])
@@ -83,6 +81,7 @@ class UnitSaveStep2(Resource):
                 request.json["ips"]["target_nodes"],
                 request.json["ips"]["intermediate_nodes"],
                 request.json["ips"]["source_nodes"]
-            )
+            ),
+            timestamp=request.json["timestamp"]
         )
         return dict(id_annotated_unit=id_annotated_unit.id_annotated_unit)

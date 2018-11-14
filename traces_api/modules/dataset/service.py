@@ -4,6 +4,7 @@ from datetime import datetime
 
 from traces_api.database.model.unit import ModelUnit
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
+from traces_api.tools import TraceAnalyzer
 
 
 class UnitDoesntExists(Exception):
@@ -39,15 +40,16 @@ class UnitServiceAbstract:
     def create_unit_step2(self, id_unit, name, description=None, labels=None):
         raise NotImplementedError()
 
-    def create_unit_step3(self, id_unit, ip_mapping, mac_mapping, ips):
+    def create_unit_step3(self, id_unit, ip_mapping, mac_mapping, ips, timestamp):
         raise NotImplementedError()
 
 
 class UnitService(UnitServiceAbstract):
 
-    def __init__(self, session, annotated_unit_service: AnnotatedUnitService):
+    def __init__(self, session, annotated_unit_service: AnnotatedUnitService, trace_analyzer: TraceAnalyzer):
         self._session = session
         self._annotated_unit_service = annotated_unit_service
+        self._trace_analyzer = trace_analyzer
 
     def _get_unit(self, id_unit) -> ModelUnit:
         """
@@ -72,7 +74,7 @@ class UnitService(UnitServiceAbstract):
 
         self._save_unit(unit)
         self._session.commit()
-        return unit
+        return unit, self._trace_analyzer.get_pcap_dump_information("storage/units/"+unit.uploaded_file_location)
 
     def create_unit_step2(self, id_unit, name, description=None, labels=None):
         unit = self._get_unit(id_unit)
@@ -86,7 +88,7 @@ class UnitService(UnitServiceAbstract):
         self._session.commit()
         return unit
 
-    def create_unit_step3(self, id_unit, ip_mapping, mac_mapping, ip_details):
+    def create_unit_step3(self, id_unit, ip_mapping, mac_mapping, ip_details, timestamp):
         unit = self._get_unit(id_unit)
         if not unit:
             raise UnitDoesntExists()
@@ -99,7 +101,7 @@ class UnitService(UnitServiceAbstract):
             id_author=unit.id_author,
             stats=None,  #todo
             ip_mapping=ip_mapping,
-            file_location="/to/do",
+            file_location="to/do",
             labels=unit_annotation["labels"]
         )
 

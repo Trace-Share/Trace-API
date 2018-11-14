@@ -7,8 +7,8 @@ from traces_api.database.tools import recreate_database
 
 @pytest.fixture()
 def database_url():
-    return "sqlite://"
-    # return "postgresql://root:example@localhost/traces"
+    # return "sqlite://"
+    return "postgresql://root:example@localhost/traces"
 
 
 @pytest.fixture(scope="function")
@@ -22,3 +22,9 @@ def sqlalchemy_session(database_url):
         yield session
     finally:
         session.close()
+
+
+@pytest.fixture
+def file_hydra_1_binary():
+    with open("tests/fixtures/hydra-1_tasks.pcap", "rb") as f:
+        return f.read()

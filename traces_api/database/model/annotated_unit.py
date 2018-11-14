@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 
 from traces_api.database import Base
 
@@ -15,6 +16,8 @@ class ModelAnnotatedUnit(Base):
     stats = Column(String(4096))
     ip_mapping = Column(String(255), nullable=False)
     file_location = Column(String(255), nullable=False)
+
+    labels = relationship("ModelAnnotatedUnitLabel")
 
 
 class ModelAnnotatedUnitLabel(Base):

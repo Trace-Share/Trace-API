@@ -8,6 +8,8 @@ from traces_api.api.restplus import api
 from traces_api.database.tools import recreate_database
 
 from traces_api.modules.dataset.controller import ns as dataset_namespace
+from traces_api.modules.annotated_unit.controller import ns as annotated_unit_namespace
+from traces_api.tools import TraceAnalyzer
 
 
 def create_engine(url):
@@ -41,6 +43,7 @@ class FlaskApp:
         api.init_app(blueprint)
 
         api.add_namespace(dataset_namespace)
+        api.add_namespace(annotated_unit_namespace)
 
         flask_app.register_blueprint(blueprint)
 
@@ -49,7 +52,9 @@ class FlaskApp:
         from traces_api.modules.annotated_unit.service import AnnotatedUnitService
         from traces_api.storage import FileStorage
 
-        binder.bind(UnitService, to=UnitService(self._session, AnnotatedUnitService(self._session)))
+        unit_service = UnitService(self._session, AnnotatedUnitService(self._session), TraceAnalyzer())
+
+        binder.bind(UnitService, to=unit_service)
         binder.bind(AnnotatedUnitService, to=AnnotatedUnitService(self._session))
         binder.bind(FileStorage, to=FileStorage(storage_folder="storage/units"))
 
@@ -63,8 +68,8 @@ class FlaskApp:
 
 
 def run():
-    # session = setup_databasea("postgresql://root:example@localhost/traces")
-    session = setup_databasea("sqlite://")
+    session = setup_databasea("postgresql://root:example@localhost/traces")
+    # session = setup_databasea("sqlite://")
 
     app = FlaskApp(session).create_app()
     app.run(debug=True)
