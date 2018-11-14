@@ -5,6 +5,7 @@ from datetime import datetime
 from traces_api.database.model.unit import ModelUnit
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
 from traces_api.tools import TraceAnalyzer
+from traces_api.storage import FileStorage
 
 
 class UnitDoesntExists(Exception):
@@ -34,7 +35,7 @@ class IPDetails:
 
 class UnitServiceAbstract:
 
-    def create_unit_step1(self, file_path, author):
+    def create_unit_step1(self, file, author):
         raise NotImplementedError()
 
     def create_unit_step2(self, id_unit, name, description=None, labels=None):
@@ -46,10 +47,11 @@ class UnitServiceAbstract:
 
 class UnitService(UnitServiceAbstract):
 
-    def __init__(self, session, annotated_unit_service: AnnotatedUnitService, trace_analyzer: TraceAnalyzer):
+    def __init__(self, session, annotated_unit_service: AnnotatedUnitService, file_storage: FileStorage, trace_analyzer: TraceAnalyzer):
         self._session = session
         self._annotated_unit_service = annotated_unit_service
         self._trace_analyzer = trace_analyzer
+        self._file_storage = file_storage
 
     def _get_unit(self, id_unit) -> ModelUnit:
         """
@@ -64,7 +66,9 @@ class UnitService(UnitServiceAbstract):
         self._session.add(unit)
         return unit
 
-    def create_unit_step1(self, file_path, author):
+    def create_unit_step1(self, file, author):
+        file_path = self._file_storage.save_file(file, ["application/vnd.tcpdump.pcap"])
+
         unit = ModelUnit(
             creation_time=datetime.now(),
             last_update_time=datetime.now(),

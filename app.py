@@ -52,11 +52,12 @@ class FlaskApp:
         from traces_api.modules.annotated_unit.service import AnnotatedUnitService
         from traces_api.storage import FileStorage
 
-        unit_service = UnitService(self._session, AnnotatedUnitService(self._session), TraceAnalyzer())
+        unit_service = UnitService(
+            self._session, AnnotatedUnitService(self._session), FileStorage(storage_folder="storage/units"), TraceAnalyzer()
+        )
 
         binder.bind(UnitService, to=unit_service)
         binder.bind(AnnotatedUnitService, to=AnnotatedUnitService(self._session))
-        binder.bind(FileStorage, to=FileStorage(storage_folder="storage/units"))
 
     def create_app(self):
         app = Flask(__name__)
