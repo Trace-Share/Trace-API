@@ -27,18 +27,13 @@ def compare_list_dict(list_1, list_2):
     return sl1 == sl2
 
 
-def test_analyzer_get_pairs_mac_ip_invalid_input(analyzer):
+def test_analyzer_analyze_invalid_input(analyzer):
     with pytest.raises(TraceAnalyzerError):
-        analyzer.get_pairs_mac_ip("/tmp/NON_EXISTING_FILE____")
-
-
-def test_analyzer_get_tcp_conversations_invalid_input(analyzer):
-    with pytest.raises(TraceAnalyzerError):
-        analyzer.get_pairs_mac_ip("/tmp/NON_EXISTING_FILE____")
+        analyzer.analyze("/tmp/NON_EXISTING_FILE____")
 
 
 def test_analyzer_get_pairs_mac_ip(analyzer, hydra_1_file):
-    response = analyzer.get_pairs_mac_ip(hydra_1_file)
+    response = analyzer.analyze(hydra_1_file)["pairs_mac_ip"]
 
     expected = [{'MAC': '08:00:27:bd:c2:37', 'IP': '240.125.0.2'},
                 {'MAC': '08:00:27:90:8f:c4', 'IP': '240.0.1.2'},
@@ -49,7 +44,7 @@ def test_analyzer_get_pairs_mac_ip(analyzer, hydra_1_file):
 
 
 def test_analyzer_get_tcp_conversations(analyzer, hydra_1_file):
-    response = analyzer.get_tcp_conversations(hydra_1_file)
+    response = analyzer.analyze(hydra_1_file)["tcp_conversations"]
 
     assert len(response) == 61
 
@@ -84,6 +79,6 @@ def test_normalizer(analyzer, normalizer, hydra_1_file):
                     {'MAC': '08:00:27:90:8f:c4', 'IP': '172.16.0.1'},
                     {'MAC': '00:00:00:00:00:00', 'IP': '172.16.0.3'},
                     {'MAC': '08:00:27:90:8f:c4', 'IP': '172.16.0.1'}]
-        response = analyzer.get_pairs_mac_ip(f.name)
+        response = analyzer.analyze(f.name)
 
-        compare_list_dict(response, expected)
+        compare_list_dict(response["pairs_mac_ip"], expected)

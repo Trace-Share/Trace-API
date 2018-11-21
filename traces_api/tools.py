@@ -17,47 +17,25 @@ class TraceNormalizerError(Exception):
 
 class TraceAnalyzer:
 
-    def get_tcp_conversations(self, filepath):
-        cmd = subprocess.Popen('python3 {}/trace-analyzer/trace-analyzer.py -f "{}" -t'.format(EXT_FOLDER, filepath), shell=True, stdout=subprocess.PIPE)
-        cmd.wait(timeout=10)
+    def analyze(self, filepath):
+        cmd = subprocess.Popen('python3 {}/trace-analyzer/trace-analyzer.py -f "{}" -tcp -q'.format(EXT_FOLDER, filepath), shell=True, stdout=subprocess.PIPE)
+
+        stdout, stderr = cmd.communicate()
+
         if cmd.returncode != 0:
             raise TraceAnalyzerError("error_code: %s" % cmd.returncode)
 
-        stdout = list(cmd.stdout)
+        parts = re.split(b"\n", stdout)
+        try:
+            out = dict(
+                tcp_conversations=json.loads(parts[0].decode()),
+                pairs_mac_ip=json.loads(parts[1].decode()),
+                capture_info=json.loads(parts[2].decode()),
+            )
+        except json.decoder.JSONDecodeError:
+            raise TraceAnalyzerError()
 
-        for line in stdout:
-            m = re.match(b"^\x1b\[37m(?P<name>.*)\x1b\[0m\s*$", line)
-            if m:
-                data = json.loads(m.group("name"))
-                if not data:
-                    raise TraceAnalyzerError(stdout)
-                return data
-
-        raise TraceAnalyzerError()
-
-    def get_pairs_mac_ip(self, filepath):
-        cmd = subprocess.Popen('python3 {}/trace-analyzer/trace-analyzer.py -f "{}" -p'.format(EXT_FOLDER, filepath), shell=True, stdout=subprocess.PIPE)
-        cmd.wait(timeout=10)
-        if cmd.returncode != 0:
-            raise TraceAnalyzerError("error_code: %s" % cmd.returncode)
-
-        stdout = list(cmd.stdout)
-
-        for line in stdout:
-            m = re.match(b"^\x1b\[37m(?P<name>.*)\x1b\[0m\s*$", line)
-            if m:
-                data = json.loads(m.group("name"))
-                if not data:
-                    raise TraceAnalyzerError(stdout)
-                return data
-
-        raise TraceAnalyzerError()
-
-    def get_pcap_dump_information(self, filename):
-        return dict(
-            tcp_conversations=self.get_tcp_conversations(filename),
-            pairs_mac_ip=self.get_pairs_mac_ip(filename),
-        )
+        return out
 
 
 class TraceNormalizer:
@@ -86,8 +64,8 @@ if __name__ == "__main__":
     hydra_test_file = os.path.dirname(os.path.realpath(__file__)) + "/../tests/fixtures/hydra-1_tasks.pcap"
 
     ta = TraceAnalyzer()
-    # print(ta.get_tcp_conversations(hydra_test_file))
-    print(ta.get_pairs_mac_ip(hydra_test_file))
+    # print(ta.analyze(hydra_test_file)["tcp_conversations"])
+    print(ta.analyze(hydra_test_file)["pairs_mac_ip"])
 
     tn = TraceNormalizer()
     configuration = dict(
@@ -102,4 +80,4 @@ if __name__ == "__main__":
     )
     tn.normalize(hydra_test_file, "/tmp/hydra-1_tasks.pcap.converted", configuration)
 
-    print(ta.get_pairs_mac_ip("/tmp/hydra-1_tasks.pcap.converted"))
+    print(ta.analyze("/tmp/hydra-1_tasks.pcap.converted")["pairs_mac_ip"])
