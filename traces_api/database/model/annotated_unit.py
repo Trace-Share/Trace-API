@@ -1,3 +1,4 @@
+import json
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
@@ -26,8 +27,8 @@ class ModelAnnotatedUnit(Base):
             description=self.description,
             id_author=self.id_author,
             creation_time=self.creation_time,
-            stats=self.stats,
-            ip_details=self.ip_details,
+            stats=json.loads(self.stats) if self.stats else None,
+            ip_details=json.loads(self.ip_details) if self.ip_details else None,
             file_location=self.file_location,
             labels=[label.label for label in self.labels],
         )

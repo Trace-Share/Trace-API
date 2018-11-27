@@ -29,6 +29,8 @@ label_field = fields.String(name="Label", example="IMPORTANT")
 
 id_annotated_unit = fields.Integer(example=156, description="ID of annotated unit", required=True)
 
+id_author = fields.Integer(example=251, description="ID of user that creates this entitiy")
+
 analytical_data = fields.Nested(api.model("AnalyticalData", dict(
     tcp_conversations=fields.List(fields.Nested(api.model("TCPConversations", {
         "IP A": fields.String(),
@@ -47,4 +49,29 @@ analytical_data = fields.Nested(api.model("AnalyticalData", dict(
         "IP": ip_original,
         "MAC": mac,
     }))),
+    capture_info=fields.List(fields.Nested(api.model("CaptureInfo", {
+        "File name": fields.String(),
+        "File type": fields.String(),
+        "File encapsulation": fields.String(),
+        "File timestamp precision": fields.String(),
+        "Packet size limit": fields.String(),
+        "Number of packets": fields.String(),
+        "File size": fields.String(),
+        "Capture duration": fields.String(),
+        "First packet time": fields.String(),
+        "Last packet time": fields.String(),
+        "Data byte rate": fields.String(),
+        "Data bit rate": fields.String(),
+        "Average packet size": fields.String(),
+        "Average packet rate": fields.String(),
+        "SHA256": fields.String(),
+        "RIPEMD160": fields.String(),
+        "SHA1": fields.String(),
+        "Strict time order": fields.String(),
+        "Capture application": fields.String(),
+        "Number of interfaces in file": fields.String(),
+    }))),
+
+
+
 )))

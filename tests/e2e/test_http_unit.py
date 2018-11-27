@@ -17,7 +17,7 @@ def test_step1(client, file_hydra_1_binary):
     assert r.status_code == 200
     assert r.json["id_unit"] > 0
 
-    assert (r.json["analytical_data"].keys()) == {"pairs_mac_ip", "tcp_conversations"}
+    assert (r.json["analytical_data"].keys()) == {"pairs_mac_ip", "tcp_conversations", "capture_info"}
     assert compare_list_dict(r.json["analytical_data"]["pairs_mac_ip"],
                              [{'IP': '240.0.1.2', 'MAC': '08:00:27:90:8f:c4'},
                               {'IP': '240.125.0.2', 'MAC': '08:00:27:bd:c2:37'},

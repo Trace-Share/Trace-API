@@ -68,3 +68,23 @@ class AnnotatedUnitService:
         """
         ann_unit = self._session.query(ModelAnnotatedUnit).filter(ModelAnnotatedUnit.id_annotated_unit == id_annotated_unit).first()
         return ann_unit
+
+    def download_annotated_unit(self, id_annotated_unit):
+        """
+        Return absolute file location of annotated unit
+
+        :param id_annotated_unit:
+        :return: absolute path
+        """
+        ann_unit = self.get_annotated_unit(id_annotated_unit)
+
+        return self._file_storage.get_absolute_file_path(ann_unit.file_location)
+
+    def get_annotated_units(self):
+        """
+        Get all annotated units
+
+        :return: list of annotated units
+        """
+        ann_units = self._session.query(ModelAnnotatedUnit).all()
+        return ann_units
