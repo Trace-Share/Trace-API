@@ -16,8 +16,27 @@ class TraceNormalizerError(Exception):
 
 
 class TraceAnalyzer:
+    """
+    Analyze captured traffic dump
+
+    This class uses external tool - trace-analyzer
+    More information about this tool you can find here:
+        https://github.com/CSIRT-MU/Trace-Share/tree/master/trace-analyzer
+    """
 
     def analyze(self, filepath):
+        """
+        Analyze captured traffic dump
+
+        Tool is able to extract this information from captured traffuc dump:
+        - tcp conversations
+        - ip paris
+        - mac pairs
+        - other capture informations
+
+        :param filepath: path to file to be analyzed
+        :return: dict that contains analyzed information
+        """
         cmd = subprocess.Popen('python3 {}/trace-analyzer/trace-analyzer.py -f "{}" -tcp -q'.format(EXT_FOLDER, filepath), shell=True, stdout=subprocess.PIPE)
 
         stdout, stderr = cmd.communicate()
@@ -39,6 +58,15 @@ class TraceAnalyzer:
 
 
 class TraceNormalizer:
+    """
+    Normalize captured traffic dump
+
+    Tool is able to replace IP and mac addresses and reset timestamps in capture to epoch time.
+
+    This class uses external tool - trace-normalizer
+    More information about this tool you can find here:
+        https://github.com/CSIRT-MU/Trace-Share/tree/master/trace-normalizer
+    """
 
     def normalize(self, target_file_location, output_file_location, configuration):
 
@@ -54,10 +82,34 @@ class TraceNormalizer:
                     .format(EXT_FOLDER, target_file_location, output_file_location, configuration_file),
             shell=True, stdout=subprocess.PIPE)
 
-            cmd.wait(timeout=10)
+            stdout, stderr = cmd.communicate()
 
             if cmd.returncode != 0:
                 raise TraceNormalizerError("error_code: %s" % cmd.returncode)
+
+    @staticmethod
+    def prepare_configuration(ip_mapping, mac_mapping, timestamp):
+        """
+        Prepare configuration dict with given parameters
+
+        :param ip_mapping:
+        :param mac_mapping:
+        :param timestamp:
+        :return: configuration dict
+        """
+        configuration = {}
+        if ip_mapping:
+            configuration["IP"] = [dict(original=original, new=replacement) for original, replacement in
+                                   ip_mapping.data]
+
+        if mac_mapping:
+            configuration["MAC"] = [dict(original=original, new=replacement) for original, replacement in
+                                    mac_mapping.data]
+
+        if timestamp:
+            configuration["timestamp"] = timestamp
+
+        return configuration
 
 
 if __name__ == "__main__":

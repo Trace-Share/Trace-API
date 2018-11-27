@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
 from traces_api.database import Base
@@ -13,11 +13,24 @@ class ModelAnnotatedUnit(Base):
     description = Column(String(4096), nullable=False)
     id_author = Column(Integer(), nullable=False)
     creation_time = Column(DateTime, nullable=False)
-    stats = Column(String(4096))
-    ip_mapping = Column(String(255), nullable=False)
+    stats = Column(Text())
+    ip_details = Column(Text(), nullable=False)
     file_location = Column(String(255), nullable=False)
 
     labels = relationship("ModelAnnotatedUnitLabel")
+
+    def dict(self):
+        return dict(
+            id_annotated_unit = self.id_annotated_unit,
+            name=self.name,
+            description=self.description,
+            id_author=self.id_author,
+            creation_time=self.creation_time,
+            stats=self.stats,
+            ip_details=self.ip_details,
+            file_location=self.file_location,
+            labels=[label.label for label in self.labels],
+        )
 
 
 class ModelAnnotatedUnitLabel(Base):

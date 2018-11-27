@@ -20,11 +20,7 @@ class AnnUnitGet(Resource):
 
     @api.marshal_with(ann_unit_details_response)
     def get(self, id_annotated_unit):
-        print(request.json)
-        # unit = self._service_unit.create_unit_step1(file_name, author=7)
+        ann_unit = self._service_unit.get_annotated_unit(id_annotated_unit)
 
-        # return dict(
-        #     id_unit=unit.id_unit,
-        #     analytical_data=None
-        # )
+        return ann_unit.dict()
 

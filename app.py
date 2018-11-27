@@ -9,7 +9,7 @@ from traces_api.database.tools import recreate_database
 
 from traces_api.modules.dataset.controller import ns as dataset_namespace
 from traces_api.modules.annotated_unit.controller import ns as annotated_unit_namespace
-from traces_api.tools import TraceAnalyzer
+from traces_api.tools import TraceAnalyzer, TraceNormalizer
 
 
 def create_engine(url):
@@ -52,12 +52,14 @@ class FlaskApp:
         from traces_api.modules.annotated_unit.service import AnnotatedUnitService
         from traces_api.storage import FileStorage
 
+        annotated_unit_service = AnnotatedUnitService(self._session, FileStorage(storage_folder="storage/ann_units"), TraceAnalyzer(), TraceNormalizer())
+
         unit_service = UnitService(
-            self._session, AnnotatedUnitService(self._session), FileStorage(storage_folder="storage/units"), TraceAnalyzer()
+            self._session, annotated_unit_service, FileStorage(storage_folder="storage/units"), TraceAnalyzer()
         )
 
         binder.bind(UnitService, to=unit_service)
-        binder.bind(AnnotatedUnitService, to=AnnotatedUnitService(self._session))
+        binder.bind(AnnotatedUnitService, to=annotated_unit_service)
 
     def create_app(self):
         app = Flask(__name__)

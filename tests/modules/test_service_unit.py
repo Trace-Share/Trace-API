@@ -4,13 +4,16 @@ from unittest import mock
 from traces_api.modules.dataset.service import UnitService, UnitDoesntExists
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
 from traces_api.storage import FileStorage
+from traces_api.tools import TraceNormalizer, TraceAnalyzer
 
 import werkzeug.datastructures
 
 
 @pytest.fixture()
 def service_unit(sqlalchemy_session):
-    return UnitService(sqlalchemy_session, AnnotatedUnitService(sqlalchemy_session), FileStorage(storage_folder="storage/units"), mock.Mock())
+    annotated_service = AnnotatedUnitService(sqlalchemy_session, FileStorage(storage_folder="storage/ann_units"), TraceAnalyzer(), TraceNormalizer())
+
+    return UnitService(sqlalchemy_session, annotated_service, FileStorage(storage_folder="storage/units"), mock.Mock())
 
 
 def test_service_unit(service_unit):

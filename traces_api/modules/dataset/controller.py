@@ -42,7 +42,7 @@ class UnitSaveStep2(Resource):
 
     @api.expect(unit_step2_fields)
     def post(self):
-        unit = self._service_unit.create_unit_step2(
+        self._service_unit.create_unit_step2(
             id_unit=request.json["id_unit"],
             name=request.json["name"],
             description=request.json["description"],

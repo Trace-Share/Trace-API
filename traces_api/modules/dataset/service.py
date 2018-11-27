@@ -13,35 +13,116 @@ class UnitDoesntExists(Exception):
 
 
 class Mapping:
+    """
+    Class that holds information about mapping
+    """
 
     def __init__(self):
         self._data = []
 
     def add_pair(self, original, replacement):
-        self._data = (original, replacement)
+        """
+        Add new pair to mapping table
+
+        :param original: Current value that will be replaced
+        :param replacement: New value
+        """
+        self._data.append((original, replacement))
 
     @property
     def data(self):
+        """
+        Access saved pairs
+
+        :return: list that contains tuples (ORIGINAL_VALUE, NEW_VALUE)
+        """
         return self._data
 
 
 class IPDetails:
+    """
+    Class that separate ips into 3 groups
+
+    Groups:
+    - Target nodes
+    - Intermediate nodes
+    - Source nodes
+    """
 
     def __init__(self, target_nodes, intermediate_nodes, source_nodes):
+        """
+        :param target_nodes: list ips
+        :param intermediate_nodes: list ips
+        :param source_nodes: list ips
+        """
         self.target_nodes = target_nodes
         self.intermediate_nodes = intermediate_nodes
         self.source_nodes = source_nodes
 
+    def dict(self):
+        """
+        Convert class to dict
+        :return: dict
+        """
+        return dict(
+            target_nodes=self.target_nodes,
+            intermediate_nodes=self.intermediate_nodes,
+            source_nodes=self.source_nodes,
+        )
+
 
 class UnitServiceAbstract:
+    """
+    This class allows to create unit and transform it into annotated unit.
+    """
 
     def create_unit_step1(self, file, author):
+        """
+        Create unit step 1
+
+        In this step uploaded unit is saved.
+        This method returns analyzed data from uploaded unit and unit_id.
+
+        :param file: Uploaded file
+        :param author: Author ID
+        :return: tuple - unit, analyzed data
+        """
         raise NotImplementedError()
 
     def create_unit_step2(self, id_unit, name, description=None, labels=None):
+        """
+        Create unit step 2
+
+        This method allows user to provide additional information to unit
+        Add name, description, labels to unit.
+
+        :param id_unit: ID of existing unit
+        :param name: Name of unit
+        :param description: Description of unit
+        :param labels: list of labels
+        :return: unit
+        """
+
         raise NotImplementedError()
 
     def create_unit_step3(self, id_unit, ip_mapping, mac_mapping, ips, timestamp):
+        """
+        Create unit step 3
+
+        Final step when processing unit.
+        Workflow:
+        - unit is normalised using ip, mac mappings
+        - all timestamps in unit are reset to epoch time
+        - new annotated unit is created based on unit
+
+        :param id_unit: ID of existing unit
+        :param ip_mapping: list that contains dicts {"original": ORIGINAL_IP, "replacement": REPLACEMENT_IP}
+        :param mac_mapping: list that contains dicts {"original": ORIGINAL_MAC, "replacement": REPLACEMENT_MAC}
+        :param ips:
+        :param timestamp: base timestamp
+        :return:
+        """
+
         raise NotImplementedError()
 
 
@@ -55,15 +136,12 @@ class UnitService(UnitServiceAbstract):
 
     def _get_unit(self, id_unit) -> ModelUnit:
         """
+        Take unit from database using id_unit
 
-        :param id_unit:
-        :return:
+        :param id_unit: ID of existing unit
+        :return: unit
         """
         unit = self._session.query(ModelUnit).filter(ModelUnit.id_unit == id_unit).first()
-        return unit
-
-    def _save_unit(self, unit):
-        self._session.add(unit)
         return unit
 
     def create_unit_step1(self, file, author):
@@ -76,7 +154,7 @@ class UnitService(UnitServiceAbstract):
             id_author=author
         )
 
-        self._save_unit(unit)
+        self._session.add(unit)
         self._session.commit()
         return unit, self._trace_analyzer.analyze("storage/units/"+unit.uploaded_file_location)
 
@@ -88,7 +166,7 @@ class UnitService(UnitServiceAbstract):
         annotation = dict(name=name, description=description, labels=labels)
         unit.annotation = json.dumps(annotation)
 
-        self._save_unit(unit)
+        self._session.add(unit)
         self._session.commit()
         return unit
 
@@ -103,9 +181,11 @@ class UnitService(UnitServiceAbstract):
             name=unit_annotation["name"],
             description=unit_annotation["description"],
             id_author=unit.id_author,
-            stats=None,  #todo
             ip_mapping=ip_mapping,
-            file_location="to/do",
+            mac_mapping=mac_mapping,
+            timestamp=timestamp,
+            ip_details=ip_details,
+            unit_file_location=self._file_storage.get_absolute_file_path(unit.uploaded_file_location),
             labels=unit_annotation["labels"]
         )
 
