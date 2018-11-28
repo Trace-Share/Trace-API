@@ -24,7 +24,7 @@ class UnitSaveStep1(Resource):
     def post(self):
         args = unit_step1_fields.parse_args()
 
-        unit, analytical_data = self._service_unit.create_unit_step1(args["file"], author=7)
+        unit, analytical_data = self._service_unit.create_unit_step1(args["file"])
 
         return dict(
             id_unit=unit.id_unit,
@@ -52,7 +52,7 @@ class UnitSaveStep2(Resource):
 
 
 @ns.route("/step3")
-class UnitSaveStep2(Resource):
+class UnitSaveStep3(Resource):
 
     @inject
     def __init__(self, service_unit: UnitService, *args, **kwargs):

@@ -76,7 +76,7 @@ class UnitServiceAbstract:
     This class allows to create unit and transform it into annotated unit.
     """
 
-    def create_unit_step1(self, file, author):
+    def create_unit_step1(self, file):
         """
         Create unit step 1
 
@@ -84,7 +84,6 @@ class UnitServiceAbstract:
         This method returns analyzed data from uploaded unit and unit_id.
 
         :param file: Uploaded file
-        :param author: Author ID
         :return: tuple - unit, analyzed data
         """
         raise NotImplementedError()
@@ -144,14 +143,13 @@ class UnitService(UnitServiceAbstract):
         unit = self._session.query(ModelUnit).filter(ModelUnit.id_unit == id_unit).first()
         return unit
 
-    def create_unit_step1(self, file, author):
+    def create_unit_step1(self, file):
         file_path = self._file_storage.save_file(file, ["application/vnd.tcpdump.pcap"])
 
         unit = ModelUnit(
             creation_time=datetime.now(),
             last_update_time=datetime.now(),
-            uploaded_file_location=file_path,
-            id_author=author
+            uploaded_file_location=file_path
         )
 
         self._session.add(unit)
@@ -180,7 +178,6 @@ class UnitService(UnitServiceAbstract):
         annotated_unit = self._annotated_unit_service.create_annotated_unit(
             name=unit_annotation["name"],
             description=unit_annotation["description"],
-            id_author=unit.id_author,
             ip_mapping=ip_mapping,
             mac_mapping=mac_mapping,
             timestamp=timestamp,

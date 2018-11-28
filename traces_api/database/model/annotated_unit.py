@@ -12,7 +12,6 @@ class ModelAnnotatedUnit(Base):
     id_annotated_unit = Column(Integer(), primary_key=True, autoincrement=True)
     name = Column(String(64), nullable=False)
     description = Column(String(4096), nullable=False)
-    id_author = Column(Integer(), nullable=False)
     creation_time = Column(DateTime, nullable=False)
     stats = Column(Text())
     ip_details = Column(Text(), nullable=False)
@@ -25,7 +24,6 @@ class ModelAnnotatedUnit(Base):
             id_annotated_unit = self.id_annotated_unit,
             name=self.name,
             description=self.description,
-            id_author=self.id_author,
             creation_time=self.creation_time,
             stats=json.loads(self.stats) if self.stats else None,
             ip_details=json.loads(self.ip_details) if self.ip_details else None,

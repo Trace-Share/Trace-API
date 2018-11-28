@@ -10,7 +10,6 @@ class ModelMix(Base):
     id_mix = Column(Integer(), primary_key=True, autoincrement=True)
     name = Column(String(64), nullable=False)
     description = Column(String(4096), nullable=False)
-    id_author = Column(Integer(), nullable=False)
     creation_time = Column(DateTime, nullable=False)
     stats = Column(String(4096))
 

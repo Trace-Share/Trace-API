@@ -12,4 +12,3 @@ class ModelUnit(Base):
     annotation = Column(String(255))
     ip_mac_mapping = Column(String(255))
     uploaded_file_location = Column(String(255), nullable=False)
-    id_author = Column(Integer(), nullable=False)

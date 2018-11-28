@@ -29,8 +29,6 @@ label_field = fields.String(name="Label", example="IMPORTANT")
 
 id_annotated_unit = fields.Integer(example=156, description="ID of annotated unit", required=True)
 
-id_author = fields.Integer(example=251, description="ID of user that creates this entitiy")
-
 analytical_data = fields.Nested(api.model("AnalyticalData", dict(
     tcp_conversations=fields.List(fields.Nested(api.model("TCPConversations", {
         "IP A": fields.String(),

@@ -3,13 +3,12 @@ from flask_restplus import fields
 from traces_api.api.restplus import api
 
 
-from traces_api.schemas import id_annotated_unit, label_field, ips, id_author, analytical_data
+from traces_api.schemas import id_annotated_unit, label_field, ips, analytical_data
 
 
 ann_unit_basic = dict(
     id_annotated_unit=id_annotated_unit,
     name=fields.String(description="Name of annotated unit", example="My annotated unit", required=True),
-    id_author=id_author,
     labels=fields.List(label_field),
 )
 
