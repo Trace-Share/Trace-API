@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from sqlalchemy import desc
 
 from traces_api.database.model.annotated_unit import ModelAnnotatedUnit, ModelAnnotatedUnitLabel
 
@@ -78,11 +79,27 @@ class AnnotatedUnitService:
 
         return self._file_storage.get_absolute_file_path(ann_unit.file_location)
 
-    def get_annotated_units(self):
+    def get_annotated_units(self, limit=100, page=0, name=None, labels=None, description=None):
         """
         Get all annotated units
 
         :return: list of annotated units
         """
-        ann_units = self._session.query(ModelAnnotatedUnit).all()
+        q = self._session.query(ModelAnnotatedUnit)
+
+        if name:
+            q = q.filter(ModelAnnotatedUnit.name.like("%{}%".format(name)))
+
+        if description:
+            q = q.filter(ModelAnnotatedUnit.description.like("%{}%".format(description)))
+
+        if labels:
+            q = q.outerjoin(ModelAnnotatedUnitLabel)
+            for label in labels:
+                q = q.filter(ModelAnnotatedUnitLabel.label == label)
+
+        q = q.order_by(desc(ModelAnnotatedUnit.creation_time))
+        q = q.offset(page*limit).limit(limit)
+
+        ann_units = q.all()
         return ann_units

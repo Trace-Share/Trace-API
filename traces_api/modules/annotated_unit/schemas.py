@@ -22,5 +22,15 @@ ann_unit.update(dict(
 
 ann_unit_details_response = api.model("AnnotatedUnitDetailsResponse", ann_unit)
 
+ann_unit_find = api.model("AnnotatedUnitDetails", dict(
+    limit=fields.Integer(description="Limit number of rows", example=25, default=100),
+    page=fields.Integer(description="Number of page to return, counting from 0 (used in pagination)", example=0),
+    labels=fields.List(label_field),
+    name=fields.String(description="Filter rows by name - fulltext"),
+    description=fields.String(description="Filter rows by description - fulltext")
+))
+
 ann_unit_find_response = api.model("AnnotatedUnitFindResponse",
                                    dict(data=fields.List(fields.Nested(api.model("AnnUnitBasic", ann_unit_basic)))))
+
+

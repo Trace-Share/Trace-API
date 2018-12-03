@@ -1,9 +1,9 @@
-from flask import send_file
+from flask import send_file, request
 from flask_restplus import Resource
 from flask_injector import inject
 
 from traces_api.api.restplus import api
-from .schemas import ann_unit_details_response, ann_unit_find_response
+from .schemas import ann_unit_details_response, ann_unit_find_response, ann_unit_find
 from .service import AnnotatedUnitService
 
 ns = api.namespace("annotated_unit", description="AnnotatedUnit")
@@ -42,6 +42,7 @@ class AnnUnitDownload(Resource):
             file_location,
             mimetype="application/vnd.tcpdump.pcap",
             attachment_filename='file.pcap',
+            as_attachment=True,
             cache_timeout=0
         )
 
@@ -53,10 +54,8 @@ class AnnUnitFind(Resource):
         super().__init__(*args, **kwargs)
         self._service_ann_unit = service_ann_unit
 
-    # @api.expect(ann_unit_find)
+    @api.expect(ann_unit_find)
     @api.marshal_with(ann_unit_find_response)
     def post(self):
-
-        data = self._service_ann_unit.get_annotated_units()
-
+        data = self._service_ann_unit.get_annotated_units(**request.json)
         return dict(data=[d.dict() for d in data])
