@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
+from sqlalchemy.orm import relationship
 
 from traces_api.database import Base
 
@@ -12,6 +13,17 @@ class ModelMix(Base):
     description = Column(String(4096), nullable=False)
     creation_time = Column(DateTime, nullable=False)
     stats = Column(String(4096))
+
+    labels = relationship("ModelMixLabel")
+
+    def dict(self):
+        return dict(
+            id_mix=self.id_mix,
+            name=self.name,
+            description=self.description,
+            creation_time=self.creation_time,
+            labels=[label.label for label in self.labels],
+        )
 
 
 class ModelMixLabel(Base):

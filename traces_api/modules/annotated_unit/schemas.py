@@ -22,7 +22,7 @@ ann_unit.update(dict(
 
 ann_unit_details_response = api.model("AnnotatedUnitDetailsResponse", ann_unit)
 
-ann_unit_find = api.model("AnnotatedUnitDetails", dict(
+ann_unit_find = api.model("AnnotatedUnitsFind", dict(
     limit=fields.Integer(description="Limit number of rows", example=25, default=100),
     page=fields.Integer(description="Number of page to return, counting from 0 (used in pagination)", example=0),
     labels=fields.List(label_field),

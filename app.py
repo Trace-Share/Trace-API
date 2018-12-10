@@ -9,6 +9,8 @@ from traces_api.database.tools import recreate_database
 
 from traces_api.modules.dataset.controller import ns as dataset_namespace
 from traces_api.modules.annotated_unit.controller import ns as annotated_unit_namespace
+from traces_api.modules.mix.controller import ns as mix_namespace
+
 from traces_api.tools import TraceAnalyzer, TraceNormalizer
 
 
@@ -44,12 +46,14 @@ class FlaskApp:
 
         api.add_namespace(dataset_namespace)
         api.add_namespace(annotated_unit_namespace)
+        api.add_namespace(mix_namespace)
 
         flask_app.register_blueprint(blueprint)
 
     def configure(self, binder):
         from traces_api.modules.dataset.service import UnitService
         from traces_api.modules.annotated_unit.service import AnnotatedUnitService
+        from traces_api.modules.mix.service import MixService
         from traces_api.storage import FileStorage
 
         annotated_unit_service = AnnotatedUnitService(self._session, FileStorage(storage_folder="storage/ann_units"), TraceAnalyzer(), TraceNormalizer())
@@ -58,8 +62,13 @@ class FlaskApp:
             self._session, annotated_unit_service, FileStorage(storage_folder="storage/units"), TraceAnalyzer()
         )
 
+        mix_service = MixService(
+            self._session, FileStorage(storage_folder="storage/ann_units"), TraceAnalyzer(), TraceNormalizer()
+        )
+
         binder.bind(UnitService, to=unit_service)
         binder.bind(AnnotatedUnitService, to=annotated_unit_service)
+        binder.bind(MixService, to=mix_service)
 
     def create_app(self):
         app = Flask(__name__)
