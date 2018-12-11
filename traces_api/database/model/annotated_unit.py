@@ -21,7 +21,7 @@ class ModelAnnotatedUnit(Base):
 
     def dict(self):
         return dict(
-            id_annotated_unit = self.id_annotated_unit,
+            id_annotated_unit=self.id_annotated_unit,
             name=self.name,
             description=self.description,
             creation_time=self.creation_time,

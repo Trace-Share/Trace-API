@@ -3,7 +3,7 @@ from flask_restplus import fields
 from traces_api.api.restplus import api
 
 
-from traces_api.schemas import label_field, ips, analytical_data, id_annotated_unit
+from traces_api.schemas import label_field, mac_pair, ip_pair
 
 
 mix_basic = dict(
@@ -14,16 +14,23 @@ mix_basic = dict(
 
 mix = mix_basic.copy()
 mix.update(dict(
-    ip_details=ips,
     description=fields.String(),
-    stats=analytical_data,
 ))
+
+
+annotated_units = api.model("AnnotatedUnits", dict(
+    id_annotated_unit=fields.Integer(example=834, description="ID of mix", required=True),
+    ip_mapping=fields.List(fields.Nested(ip_pair), required=True),
+    mac_mapping=fields.List(fields.Nested(mac_pair), required=True),
+    timestamp=fields.Float(example=1541346574.1234, required=True),
+))
+
 
 mix_create = api.model("MixCreate", dict(
     name=fields.String(description="Name of unit", example="My unit", required=True),
     labels=fields.List(label_field),
     description=fields.String(),
-    annotated_unit_ids=fields.List(id_annotated_unit),
+    annotated_units=fields.List(fields.Nested(annotated_units), required=True),
 ))
 
 mix_create_response = api.model("MixCreateResponse", dict(
@@ -46,5 +53,5 @@ mix_find_response = api.model("MixFindResponse",
 
 
 mix_generate_status_response = api.model("MixGenerateStatus", dict(
-    status=fields.Integer(min=0, max=100, example=10, description="Mix file generation progress in percent. (0-100%)")
+    progress=fields.Integer(min=0, max=100, example=10, description="Mix file generation progress in percent. (0-100%)")
 ))

@@ -33,17 +33,14 @@ class AnnotatedUnitService:
         :param labels: Annotated unit labels
         :return:
         """
-        random_file_name = "/tmp/TMP_TEST_FILE_NAME"
-        with open(random_file_name, "w"):
-            pass
+        new_ann_unit_file = File.create_new()
 
         configuration = self._trace_normalizer.prepare_configuration(ip_mapping, mac_mapping, timestamp)
-        self._trace_normalizer.normalize(unit_file_location, random_file_name, configuration)
+        self._trace_normalizer.normalize(unit_file_location, new_ann_unit_file.location, configuration)
 
-        new = File(random_file_name)
-        file_location = self._file_storage.save_file2(new)
+        file_location = self._file_storage.save_file2(new_ann_unit_file)
 
-        analyzed_data = self._trace_analyzer.analyze(new.location)
+        analyzed_data = self._trace_analyzer.analyze(new_ann_unit_file.location)
 
         annotated_unit = ModelAnnotatedUnit(
             name=name,
@@ -78,6 +75,17 @@ class AnnotatedUnitService:
         ann_unit = self.get_annotated_unit(id_annotated_unit)
 
         return self._file_storage.get_absolute_file_path(ann_unit.file_location)
+
+    def download_annotated_unit_bytes(self, id_annotated_unit):
+        """
+        Return captured packet in bytes
+
+        :param id_annotated_unit:
+        :return: bytes
+        """
+        file_location = self.download_annotated_unit(id_annotated_unit)
+        with open(file_location, "rb"):
+            return file_location.read()
 
     def get_annotated_units(self, limit=100, page=0, name=None, labels=None, description=None):
         """

@@ -15,6 +15,7 @@ class ModelMix(Base):
     stats = Column(String(4096))
 
     labels = relationship("ModelMixLabel")
+    origins = relationship("ModelMixOrigin")
 
     def dict(self):
         return dict(
@@ -23,6 +24,7 @@ class ModelMix(Base):
             description=self.description,
             creation_time=self.creation_time,
             labels=[label.label for label in self.labels],
+            ids_annotated_unit=[o.id_annotated_unit for o in self.origins],
         )
 
 
@@ -52,7 +54,8 @@ class ModelMixOrigin(Base):
         ForeignKey('annotated_unit.id_annotated_unit', ondelete="CASCADE", onupdate="RESTRICT"),
         primary_key=True
     )
-    ip_mac_mapping = Column(String(255))
+    ip_mapping = Column(String(4000))
+    mac_mapping = Column(String(4000))
     timestamp = Column(Integer())
 
 
@@ -67,6 +70,6 @@ class ModelMixFileGeneration(Base):
         index=True
     )
     creation_time = Column(DateTime, nullable=False)
-    file_location = Column(String(255), nullable=False)
+    file_location = Column(String(255), nullable=True)
     expired = Column(Boolean(), nullable=False)
     progress = Column(Integer(), nullable=False)

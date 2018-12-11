@@ -112,6 +112,45 @@ class TraceNormalizer:
         return configuration
 
 
+class TraceMixer:
+    """
+    One specific mixing operation
+
+    Example usage:
+        tm = TraceMixer()
+        tm.mix(ann_unit1)
+        tm.mix(ann_unit2)
+    """
+
+    def __init__(self, output_location):
+        self._output_location = output_location
+
+    def mix(self, annotated_unit_file):
+        """
+        Add annotated unit to mix
+        :param annotated_unit_file:
+        :return:
+        """
+        pass
+
+    def get_mixed_file_location(self):
+        return self._output_location
+
+
+class TraceMixing:
+    """
+    Provide ability to combine multiple annotated units into one mix
+    """
+    @staticmethod
+    def create_new_mixer(output_location):
+        """
+        Create one Trace mixer instance
+        :param output_location
+        :return: TraceMixer
+        """
+        return TraceMixer(output_location)
+
+
 if __name__ == "__main__":
     hydra_test_file = os.path.dirname(os.path.realpath(__file__)) + "/../tests/fixtures/hydra-1_tasks.pcap"
 

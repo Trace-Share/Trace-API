@@ -21,6 +21,18 @@ class File:
         shutil.move(self.location, new_location)
         self.location = new_location
 
+    @staticmethod
+    def create_new():
+        """
+        Create new empty file
+        :return: File object
+        """
+        random_file_path = "/tmp/trace_api_%s" % str(uuid.uuid4())
+        with open(random_file_path, "wb"):
+            pass
+
+        return File(location=random_file_path)
+
 
 class FileStorage:
 
