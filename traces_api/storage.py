@@ -1,10 +1,15 @@
 import uuid
 import shutil
+import os
 
 from datetime import datetime
 
 
 class File:
+    """
+    This class represents file on disc
+    Class allows make basic operations with file
+    """
 
     def __init__(self, location):
         """
@@ -37,14 +42,22 @@ class File:
 class FileStorage:
 
     def __init__(self, storage_folder):
+        """
+        :param storage_folder: Storage folder where files will be saved.
+                               Application should have correct permissions to write to this folder.
+        """
         self._storage_folder = storage_folder
 
     @staticmethod
     def _generate_file_name():
+        """
+        Generate random file name based on current time
+        :return: random file name
+        """
         t = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
         return "{}_{}".format(t, str(uuid.uuid4())[:5])
 
-    def save_file(self, file, expected_mime_types=None) -> str:
+    def save_file(self, file, expected_mime_types=None):
         """
         :param file: werkzeug.datastructures.FileStorage
         :param expected_mime_types:
@@ -59,6 +72,9 @@ class FileStorage:
         file.save(file_path)
 
         return file_name
+
+    def remove_file(self, relative_path):
+        os.remove(self.get_absolute_file_path(relative_path))
 
     def save_file2(self, file: File):
         file_name = self._generate_file_name()

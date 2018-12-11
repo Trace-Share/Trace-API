@@ -9,6 +9,10 @@ from traces_api.storage import FileStorage
 
 
 class UnitDoesntExistsException(Exception):
+    """
+    Unit doesnt exits
+    This exception is raised when annotated unit is not found in database
+    """
     pass
 
 
@@ -187,5 +191,8 @@ class UnitService(UnitServiceAbstract):
         )
 
         self._session.commit()
+
+        self._file_storage.remove_file(unit.uploaded_file_location)
+
         return annotated_unit
 

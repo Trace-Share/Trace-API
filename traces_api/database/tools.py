@@ -18,7 +18,7 @@ TABLES = [
 
 def recreate_database(engine):
     """
-    Drop all known databases and create them from scratch
+    Drop all known database tables and create them from scratch
     :param engine: sqlalchemy engine
     """
     Base.metadata.drop_all(engine, tables=TABLES)

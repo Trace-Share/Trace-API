@@ -11,10 +11,18 @@ from traces_api.storage import FileStorage, File
 
 
 class AnnotatedUnitDoesntExistsException(Exception):
+    """
+    Annotated unit doesnt exits
+    This exception is raised when annotated unit is not found in database
+    """
     pass
 
 
 class MixDoesntExistsException(Exception):
+    """
+    mix doesnt exits
+    This exception is raised when mix is not found in database
+    """
     pass
 
 
@@ -31,6 +39,11 @@ class MixService:
         self._trace_mixing = trace_mixing
 
     def _exits_ann_unit(self, id_annotated_unit):
+        """
+        This methods checks if annotated unit exists in database
+        :param id_annotated_unit:
+        :return: True if exists otherwise False
+        """
         return self._annotated_unit_service.get_annotated_unit(id_annotated_unit) is not None
 
     def _mix(self, mix_generation_id, annotated_units_data):
@@ -63,6 +76,15 @@ class MixService:
         self._session.commit()
 
     def create_mix(self, name, description, labels, annotated_units):
+        """
+        Create mix based on annotated_units
+
+        :param name: mix name
+        :param description: mix description
+        :param labels: labels that will be connected to mix
+        :param annotated_units: annotated units data used for mix generation
+        :return: Modelmix newly created mix
+        """
         if not (all([self._exits_ann_unit(ann_unit["id_annotated_unit"]) for ann_unit in annotated_units])):
             raise AnnotatedUnitDoesntExistsException()
 
@@ -86,6 +108,13 @@ class MixService:
         return mix
 
     def generate_mix(self, id_mix):
+        """
+        Generate mix file
+
+        :param id_mix: id of existing mix
+        :return: ModelMixFileGeneration
+        """
+
         mix = self.get_mix(id_mix)
         if not mix:
             raise MixDoesntExistsException(id_mix)
@@ -125,17 +154,32 @@ class MixService:
         return mix
 
     def get_mix_generation(self, id_mix):
+        """
+        Find mix file generation by mix_id
+        :param id_mix:
+        :return: ModelMixFileGeneration
+        """
         q = self._session.query(ModelMixFileGeneration).filter_by(expired=False).filter_by(id_mix=id_mix)
         q = q.order_by(desc(ModelMixFileGeneration.creation_time))
         mix_generation = q.first()
         return mix_generation
 
     def get_mix_generation_by_id_generation(self, id_mix_generation):
+        """
+        Find mix generation by id_mix_generation
+        :param id_mix_generation:
+        :return: ModelMixFileGeneration
+        """
         q = self._session.query(ModelMixFileGeneration).filter_by(id_mix_generation=id_mix_generation)
         mix_generation = q.first()
         return mix_generation
 
     def _update_mix_generation_progress(self, id_mix_generation, progress):
+        """
+        Update progress of mix file generation in database
+        :param id_mix_generation:
+        :param progress: progress in percent - (0 - 100)
+        """
         q = update(ModelMixFileGeneration).values(progress=progress)\
             .where(ModelMixFileGeneration.id_mix_generation == id_mix_generation)
         self._session.execute(q)
@@ -146,16 +190,21 @@ class MixService:
         Return absolute file location of mix
 
         :param id_mix:
-        :return: absolute path
+        :return: absolute path of mix file
         """
         mix_generation = self.get_mix_generation(id_mix)
         return self._file_storage.get_absolute_file_path(mix_generation.file_location)
 
     def get_mixes(self, limit=100, page=0, name=None, labels=None, description=None):
         """
-        Get all mixes
+        Find mixes
 
-        :return: list of annotated units
+        :param limit: number of mixes returned in one request, default 100
+        :param page: page id, starting from 0
+        :param name: search mix by name - exact match
+        :param labels: search mix by labels
+        :param description: search mix by description
+        :return: list of mixes that match given criteria
         """
         q = self._session.query(ModelMix)
 

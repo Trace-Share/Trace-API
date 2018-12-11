@@ -9,6 +9,10 @@ from traces_api.storage import FileStorage, File
 
 
 class AnnotatedUnitDoesntExistsException(Exception):
+    """
+    Annotated unit doesnt exits
+    This exception is raised when annotated unit is not found in database
+    """
     pass
 
 
@@ -84,9 +88,14 @@ class AnnotatedUnitService:
 
     def get_annotated_units(self, limit=100, page=0, name=None, labels=None, description=None):
         """
-        Get all annotated units
+        Find annotated units
 
-        :return: list of annotated units
+        :param limit: number of annotated units returned in one request, default 100
+        :param page: page id, starting from 0
+        :param name: search annotated units by name - exact match
+        :param labels: search annotated units by labels
+        :param description: search mix by description
+        :return: list of annotated units that match given criteria
         """
         q = self._session.query(ModelAnnotatedUnit)
 
