@@ -14,7 +14,7 @@ class AnnotatedUnitDoesntExistsException(Exception):
     pass
 
 
-class MixDoesntExists(Exception):
+class MixDoesntExistsException(Exception):
     pass
 
 
@@ -88,7 +88,7 @@ class MixService:
     def generate_mix(self, id_mix):
         mix = self.get_mix(id_mix)
         if not mix:
-            raise MixDoesntExists(id_mix)
+            raise MixDoesntExistsException(id_mix)
 
         annotated_units_data = []
         for origin in mix.origins:
@@ -120,6 +120,8 @@ class MixService:
         :return: mix
         """
         mix = self._session.query(ModelMix).filter(ModelMix.id_mix == id_mix).first()
+        if not mix:
+            raise MixDoesntExistsException()
         return mix
 
     def get_mix_generation(self, id_mix):

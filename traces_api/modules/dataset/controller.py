@@ -5,7 +5,7 @@ from flask_injector import inject
 from traces_api.api.restplus import api
 from .schemas import unit_step1_fields, unit_step1_response, unit_step2_fields
 from .schemas import unit_step3_fields, unit_step3_response
-from .service import UnitService
+from .service import UnitService, UnitDoesntExistsException
 from .service import Mapping, IPDetails
 
 ns = api.namespace("unit", description="Unit")
@@ -41,6 +41,8 @@ class UnitSaveStep2(Resource):
         self._service_unit = service_unit
 
     @api.expect(unit_step2_fields)
+    @api.doc(responses={200: "Success"})
+    @api.doc(responses={404: "Unit not found"})
     def post(self):
         self._service_unit.create_unit_step2(
             id_unit=request.json["id_unit"],
@@ -61,6 +63,7 @@ class UnitSaveStep3(Resource):
 
     @api.expect(unit_step3_fields)
     @api.marshal_with(unit_step3_response)
+    @api.doc(responses={404: "Unit not found"})
     def post(self):
         ip_mapping = Mapping()
         for ip in request.json["ip_mapping"]:
@@ -82,3 +85,10 @@ class UnitSaveStep3(Resource):
             timestamp=request.json["timestamp"]
         )
         return dict(id_annotated_unit=id_annotated_unit.id_annotated_unit)
+
+
+# errors
+
+@ns.errorhandler(UnitDoesntExistsException)
+def handle_unit_doesnt_exits(error):
+    return {'message': "Unit does not exists"}, 404, {}

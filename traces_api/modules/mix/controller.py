@@ -5,7 +5,7 @@ from flask_injector import inject
 from traces_api.api.restplus import api
 from .schemas import mix_detail_response, mix_find, mix_find_response, mix_create, mix_create_response
 from .schemas import mix_generate_status_response
-from .service import MixService
+from .service import MixService, MixDoesntExistsException, AnnotatedUnitDoesntExistsException
 
 ns = api.namespace("mix", description="Mix")
 
@@ -20,6 +20,7 @@ class MixCreate(Resource):
 
     @api.expect(mix_create)
     @api.marshal_with(mix_create_response)
+    @api.doc(responses={404: "Annotated unit not found"})
     def post(self):
         mix = self._service_mix.create_mix(**request.json)
         return dict(id_mix=mix.id_mix)
@@ -35,6 +36,7 @@ class MixDetail(Resource):
         self._service_mix = service_mix
 
     @api.marshal_with(mix_detail_response)
+    @api.doc(responses={404: "Mix not found"})
     def get(self, id_mix):
         ann_unit = self._service_mix.get_mix(id_mix)
 
@@ -51,6 +53,7 @@ class MixDownload(Resource):
 
     @api.response(200, "Mix returned")
     @ns.produces(["application/binary"])
+    @api.doc(responses={404: "Mix not found"})
     def get(self, id_mix):
         file_location = self._service_mix.download_mix(id_mix)
         return send_file(
@@ -85,6 +88,7 @@ class MixGenerate(Resource):
         self._service_mix = service_mix
 
     @api.response(200, "Mix generation started")
+    @api.doc(responses={404: "Mix not found"})
     def post(self, id_mix):
         self._service_mix.generate_mix(id_mix)
 
@@ -98,6 +102,19 @@ class MixGenerateStatus(Resource):
         self._service_mix = service_mix
 
     @api.marshal_with(mix_generate_status_response)
+    @api.doc(responses={404: "Mix not found"})
     def get(self, id_mix):
         mix_generation = self._service_mix.get_mix_generation(id_mix)
         return dict(progress=mix_generation.progress)
+
+
+# errors
+
+@ns.errorhandler(MixDoesntExistsException)
+def handle_mix_doesnt_exits(error):
+    return {'message': "Mix does not exists"}, 404, {}
+
+
+@ns.errorhandler(AnnotatedUnitDoesntExistsException)
+def handle_ann_unit_doesnt_exits(error):
+    return {'message': "Annotated unit does not exists"}, 404, {}

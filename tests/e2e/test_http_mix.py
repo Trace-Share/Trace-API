@@ -66,4 +66,35 @@ def test_generate_and_download(client):
     assert r4.status_code == 200
 
 
+def test_mix_create_invalid_input(client):
+    r = client.post("/mix/create")
+    assert r.status_code == 400
 
+
+def test_mix_create_invalid_ann_unit(client):
+    data = dict(
+        name="Mix #1",
+        description="Mix description #1",
+        labels=["L1", "label2"],
+        annotated_units=[
+            dict(
+                id_annotated_unit=345678,
+                ip_mapping=[],
+                mac_mapping=[],
+                timestamp=134
+            ),
+            dict(
+                id_annotated_unit=45678,
+                ip_mapping=[],
+                mac_mapping=[],
+                timestamp=123
+            ),
+        ]
+    )
+    r = client.post("/mix/create", json=data, content_type="application/json")
+    assert r.status_code == 404
+
+
+def test_mix_detail_invalid_mix_id(client):
+    r = client.get("/mix/%s/detail" % 4567, content_type="application/json")
+    assert r.status_code == 404

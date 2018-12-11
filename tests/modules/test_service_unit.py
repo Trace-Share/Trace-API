@@ -1,7 +1,7 @@
 import pytest
 from unittest import mock
 
-from traces_api.modules.dataset.service import UnitService, UnitDoesntExists
+from traces_api.modules.dataset.service import UnitService, UnitDoesntExistsException
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
 from traces_api.storage import FileStorage
 from traces_api.tools import TraceNormalizer, TraceAnalyzer
@@ -28,7 +28,7 @@ def test_service_unit(service_unit):
 
 
 def test_invalid_unit_step2(service_unit):
-    with pytest.raises(UnitDoesntExists):
+    with pytest.raises(UnitDoesntExistsException):
         service_unit.create_unit_step2(
             id_unit=123456789,
             name="Abc"

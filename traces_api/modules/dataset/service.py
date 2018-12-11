@@ -8,7 +8,7 @@ from traces_api.tools import TraceAnalyzer
 from traces_api.storage import FileStorage
 
 
-class UnitDoesntExists(Exception):
+class UnitDoesntExistsException(Exception):
     pass
 
 
@@ -159,7 +159,7 @@ class UnitService(UnitServiceAbstract):
     def create_unit_step2(self, id_unit, name, description=None, labels=None):
         unit = self._get_unit(id_unit)
         if not unit:
-            raise UnitDoesntExists()
+            raise UnitDoesntExistsException()
 
         annotation = dict(name=name, description=description, labels=labels)
         unit.annotation = json.dumps(annotation)
@@ -171,7 +171,7 @@ class UnitService(UnitServiceAbstract):
     def create_unit_step3(self, id_unit, ip_mapping, mac_mapping, ip_details, timestamp):
         unit = self._get_unit(id_unit)
         if not unit:
-            raise UnitDoesntExists()
+            raise UnitDoesntExistsException()
 
         unit_annotation = json.loads(unit.annotation)
 

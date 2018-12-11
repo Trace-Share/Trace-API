@@ -20,16 +20,14 @@ def test_get_ann_unit_invalid_id(client, id_ann_unit1):
     r = client.get(
         "/annotated_unit/%s/get" % 456325,
     )
-    assert r.status_code == 500
-    # todo return 404
+    assert r.status_code == 404
 
 
 def test_download_ann_unit_invalid_id(client, id_ann_unit1):
     r = client.get(
         "/annotated_unit/%s/download" % 456325,
     )
-    assert r.status_code == 500
-    # todo return 404
+    assert r.status_code == 404
 
 
 def test_find_ann_unit_empty(client):

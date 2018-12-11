@@ -8,6 +8,10 @@ from traces_api.tools import TraceAnalyzer, TraceNormalizer
 from traces_api.storage import FileStorage, File
 
 
+class AnnotatedUnitDoesntExistsException(Exception):
+    pass
+
+
 class AnnotatedUnitService:
     """
     This class allows to perform all business logic regarding to annotated units
@@ -73,19 +77,10 @@ class AnnotatedUnitService:
         :return: absolute path
         """
         ann_unit = self.get_annotated_unit(id_annotated_unit)
+        if not ann_unit:
+            raise AnnotatedUnitDoesntExistsException()
 
         return self._file_storage.get_absolute_file_path(ann_unit.file_location)
-
-    def download_annotated_unit_bytes(self, id_annotated_unit):
-        """
-        Return captured packet in bytes
-
-        :param id_annotated_unit:
-        :return: bytes
-        """
-        file_location = self.download_annotated_unit(id_annotated_unit)
-        with open(file_location, "rb"):
-            return file_location.read()
 
     def get_annotated_units(self, limit=100, page=0, name=None, labels=None, description=None):
         """

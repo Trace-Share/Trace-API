@@ -37,7 +37,7 @@ def test_step2_invalid_id_unit(client):
         "description": "string",
         "labels": ["IMPORTANT"]
     }, content_type="application/json")
-    assert r.status_code == 500  # TODO 404
+    assert r.status_code == 404
 
 
 def test_unit_all_steps(client, file_hydra_1_binary):
