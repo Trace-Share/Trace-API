@@ -65,13 +65,8 @@ class UnitSaveStep3(Resource):
     @api.marshal_with(unit_step3_response)
     @api.doc(responses={404: "Unit not found"})
     def post(self):
-        ip_mapping = Mapping()
-        for ip in request.json["ip_mapping"]:
-            ip_mapping.add_pair(ip["original"], ip["replacement"])
-
-        mac_mapping = Mapping()
-        for mac in request.json["mac_mapping"]:
-            mac_mapping.add_pair(mac["original"], mac["replacement"])
+        ip_mapping = Mapping.create_from_dict(request.json["ip_mapping"])
+        mac_mapping = Mapping.create_from_dict(request.json["mac_mapping"])
 
         id_annotated_unit = self._service_unit.create_unit_step3(
             id_unit=request.json["id_unit"],

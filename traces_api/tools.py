@@ -98,11 +98,11 @@ class TraceNormalizer:
         :return: configuration dict
         """
         configuration = {}
-        if ip_mapping:
+        if ip_mapping and ip_mapping.data:
             configuration["IP"] = [dict(original=original, new=replacement) for original, replacement in
                                    ip_mapping.data]
 
-        if mac_mapping:
+        if mac_mapping and mac_mapping.data:
             configuration["MAC"] = [dict(original=original, new=replacement) for original, replacement in
                                     mac_mapping.data]
 

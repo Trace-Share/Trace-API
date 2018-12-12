@@ -42,6 +42,18 @@ class Mapping:
         """
         return self._data
 
+    @staticmethod
+    def create_from_dict(data_dict):
+        """
+        Create new mapping object from dictionary
+        :param data_dict:
+        :return: Mapping
+        """
+        mapping = Mapping()
+        for d in data_dict:
+            mapping.add_pair(d["original"], d["replacement"])
+        return mapping
+
 
 class IPDetails:
     """

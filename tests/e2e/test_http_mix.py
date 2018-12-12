@@ -39,8 +39,14 @@ def test_generate_and_download(client):
         annotated_units=[
             dict(
                 id_annotated_unit=aunit1,
-                ip_mapping=[],
-                mac_mapping=[],
+                ip_mapping=[{
+                  "original": "1.2.3.4",
+                  "replacement": "172.16.0.0"
+                }],
+                mac_mapping=[{
+                  "original": "00:A0:C9:14:C8:29",
+                  "replacement": "00:A0:C9:14:C8:29"
+                }],
                 timestamp=134
             ),
             dict(

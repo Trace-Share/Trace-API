@@ -8,6 +8,7 @@ from traces_api.database.model.mix import ModelMix, ModelMixLabel, ModelMixOrigi
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
 from traces_api.tools import TraceNormalizer, TraceMixing
 from traces_api.storage import FileStorage, File
+from traces_api.modules.dataset.service import Mapping  # todo move me
 
 
 class AnnotatedUnitDoesntExistsException(Exception):
@@ -123,8 +124,8 @@ class MixService:
         for origin in mix.origins:
             annotated_units_data.append(dict(
                 id_annotated_unit=origin.id_annotated_unit,
-                ip_mapping=json.loads(origin.ip_mapping),
-                mac_mapping=json.loads(origin.mac_mapping),
+                ip_mapping=Mapping.create_from_dict(json.loads(origin.ip_mapping)),
+                mac_mapping=Mapping.create_from_dict(json.loads(origin.mac_mapping)),
                 timestamp=origin.timestamp,
             ))
 
