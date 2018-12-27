@@ -95,12 +95,25 @@ def test_find_by_labels(client):
     create_ann_unit(client, "First ann unit #1", labels=["L1", "L2"])
     create_ann_unit(client, "First ann unit #2", labels=["L2", "L3"])
 
-    r = client.post("/annotated_unit/find", json=dict(labels=["L2"]), content_type="application/json")
+    r = client.post("/annotated_unit/find", json=dict(labels=["L2"], operator="AND"), content_type="application/json")
     assert len(r.json["data"]) == 2
-    r = client.post("/annotated_unit/find", json=dict(labels=["L1"]), content_type="application/json")
+    r = client.post("/annotated_unit/find", json=dict(labels=["L1", "L2"], operator="AND"), content_type="application/json")
     assert len(r.json["data"]) == 1
 
-    r = client.post("/annotated_unit/find", json=dict(labels=["ABC"]), content_type="application/json")
+    r = client.post("/annotated_unit/find", json=dict(labels=["ABC"], operator="AND"), content_type="application/json")
+    assert len(r.json["data"]) == 0
+
+
+def test_find_operator_or(client):
+    create_ann_unit(client, "First ann unit #1", labels=["L1", "L2"])
+    create_ann_unit(client, "First ann unit #2", labels=["L2", "L3"])
+
+    r = client.post("/annotated_unit/find", json=dict(labels=["L2"], operator="OR"), content_type="application/json")
+    assert len(r.json["data"]) == 2
+    r = client.post("/annotated_unit/find", json=dict(labels=["L1", "L2"], operator="OR"), content_type="application/json")
+    assert len(r.json["data"]) == 2
+
+    r = client.post("/annotated_unit/find", json=dict(labels=["ABC"],  operator="OR"), content_type="application/json")
     assert len(r.json["data"]) == 0
 
 

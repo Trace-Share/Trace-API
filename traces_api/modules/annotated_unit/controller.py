@@ -4,7 +4,7 @@ from flask_injector import inject
 
 from traces_api.api.restplus import api
 from .schemas import ann_unit_details_response, ann_unit_find_response, ann_unit_find
-from .service import AnnotatedUnitService, AnnotatedUnitDoesntExistsException
+from .service import AnnotatedUnitService, AnnotatedUnitDoesntExistsException, OperatorEnum
 
 ns = api.namespace("annotated_unit", description="AnnotatedUnit")
 
@@ -63,7 +63,10 @@ class AnnUnitFind(Resource):
     @api.expect(ann_unit_find)
     @api.marshal_with(ann_unit_find_response)
     def post(self):
-        data = self._service_ann_unit.get_annotated_units(**request.json)
+        params = request.json.copy()
+        if "operator" in params:
+            params["operator"] = OperatorEnum(params["operator"])
+        data = self._service_ann_unit.get_annotated_units(**params)
         return dict(data=[d.dict() for d in data])
 
 

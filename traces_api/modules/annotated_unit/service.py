@@ -1,6 +1,7 @@
 import json
+from enum import Enum
 from datetime import datetime
-from sqlalchemy import desc
+from sqlalchemy import desc, or_, and_
 
 from traces_api.database.model.annotated_unit import ModelAnnotatedUnit, ModelAnnotatedUnitLabel
 
@@ -14,6 +15,14 @@ class AnnotatedUnitDoesntExistsException(Exception):
     This exception is raised when annotated unit is not found in database
     """
     pass
+
+
+class OperatorEnum(Enum):
+    """
+    SQL operators
+    """
+    AND = "AND"
+    OR = "OR"
 
 
 class AnnotatedUnitService:
@@ -86,7 +95,7 @@ class AnnotatedUnitService:
 
         return self._file_storage.get_absolute_file_path(ann_unit.file_location)
 
-    def get_annotated_units(self, limit=100, page=0, name=None, labels=None, description=None):
+    def get_annotated_units(self, limit=100, page=0, name=None, labels=None, description=None, operator=OperatorEnum.AND):
         """
         Find annotated units
 
@@ -95,20 +104,30 @@ class AnnotatedUnitService:
         :param name: search annotated units by name - exact match
         :param labels: search annotated units by labels
         :param description: search mix by description
+        :param operator: OperatorEnum
         :return: list of annotated units that match given criteria
         """
         q = self._session.query(ModelAnnotatedUnit)
 
+        filters = []
+
         if name:
-            q = q.filter(ModelAnnotatedUnit.name.like("%{}%".format(name)))
+            filters.append(ModelAnnotatedUnit.name.like("%{}%".format(name)))
 
         if description:
-            q = q.filter(ModelAnnotatedUnit.description.like("%{}%".format(description)))
+            filters.append(ModelAnnotatedUnit.description.like("%{}%".format(description)))
 
         if labels:
-            q = q.outerjoin(ModelAnnotatedUnitLabel)
             for label in labels:
-                q = q.filter(ModelAnnotatedUnitLabel.label == label)
+                sub_q = self._session.query(ModelAnnotatedUnit).filter(ModelAnnotatedUnitLabel.label == label).filter(
+                    ModelAnnotatedUnitLabel.id_annotated_unit == ModelAnnotatedUnit.id_annotated_unit
+                )
+                filters.append(sub_q.exists())
+
+        if operator is OperatorEnum.AND:
+            q = q.filter(and_(*filters))
+        else:
+            q = q.filter(or_(*filters))
 
         q = q.order_by(desc(ModelAnnotatedUnit.creation_time))
         q = q.offset(page*limit).limit(limit)
