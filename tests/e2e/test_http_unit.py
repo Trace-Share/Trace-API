@@ -7,9 +7,9 @@ def compare_list_dict(list_1, list_2):
     return sl1 == sl2
 
 
-def test_step1(client, file_hydra_1_binary):
+def test_upload(client, file_hydra_1_binary):
     r = client.post(
-        "/unit/step1",
+        "/unit/upload",
         buffered=True,
         content_type='multipart/form-data',
         data={"file": (BytesIO(file_hydra_1_binary), "hello.txt", "application/vnd.tcpdump.pcap")}
@@ -25,13 +25,13 @@ def test_step1(client, file_hydra_1_binary):
                               {'IP': '240.0.1.2', 'MAC': '08:00:27:90:8f:c4'}])
 
 
-def test_step2_invalid_input(client):
-    r = client.post("/unit/step2")
+def test_annotate_invalid_input(client):
+    r = client.post("/unit/annotate")
     assert r.status_code == 400
 
 
-def test_step2_invalid_id_unit(client):
-    r = client.post("/unit/step2", json={
+def test_annotate_invalid_id_unit(client):
+    r = client.post("/unit/annotate", json={
         "id_unit": 123456789,
         "name": "My unit",
         "description": "string",
@@ -42,14 +42,14 @@ def test_step2_invalid_id_unit(client):
 
 def test_unit_all_steps(client, file_hydra_1_binary):
     r1 = client.post(
-        "/unit/step1",
+        "/unit/upload",
         buffered=True,
         content_type='multipart/form-data',
         data={"file": (BytesIO(file_hydra_1_binary), "hello.txt", "application/vnd.tcpdump.pcap")}
     )
     assert r1.status_code == 200
 
-    r2 = client.post("/unit/step2", json={
+    r2 = client.post("/unit/annotate", json={
         "id_unit": r1.json["id_unit"],
         "name": "My unit",
         "description": "string",
@@ -57,7 +57,7 @@ def test_unit_all_steps(client, file_hydra_1_binary):
     }, content_type="application/json")
     assert r2.status_code == 200
 
-    r3 = client.post("/unit/step3", json={
+    r3 = client.post("/unit/normalize", json={
         "id_unit": r1.json["id_unit"],
         "ip_mapping": [
             {

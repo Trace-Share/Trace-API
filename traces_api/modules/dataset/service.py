@@ -92,7 +92,7 @@ class UnitServiceAbstract:
     This class allows to create unit and transform it into annotated unit.
     """
 
-    def create_unit_step1(self, file):
+    def unit_upload(self, file):
         """
         Create unit step 1
 
@@ -104,7 +104,7 @@ class UnitServiceAbstract:
         """
         raise NotImplementedError()
 
-    def create_unit_step2(self, id_unit, name, description=None, labels=None):
+    def unit_annotate(self, id_unit, name, description=None, labels=None):
         """
         Create unit step 2
 
@@ -120,7 +120,7 @@ class UnitServiceAbstract:
 
         raise NotImplementedError()
 
-    def create_unit_step3(self, id_unit, ip_mapping, mac_mapping, ips, timestamp):
+    def unit_normalize(self, id_unit, ip_mapping, mac_mapping, ips, timestamp):
         """
         Create unit step 3
 
@@ -159,7 +159,7 @@ class UnitService(UnitServiceAbstract):
         unit = self._session.query(ModelUnit).filter(ModelUnit.id_unit == id_unit).first()
         return unit
 
-    def create_unit_step1(self, file):
+    def unit_upload(self, file):
         file_path = self._file_storage.save_file(file, ["application/vnd.tcpdump.pcap"])
 
         unit = ModelUnit(
@@ -172,7 +172,7 @@ class UnitService(UnitServiceAbstract):
         self._session.commit()
         return unit, self._trace_analyzer.analyze("storage/units/"+unit.uploaded_file_location)
 
-    def create_unit_step2(self, id_unit, name, description=None, labels=None):
+    def unit_annotate(self, id_unit, name, description=None, labels=None):
         unit = self._get_unit(id_unit)
         if not unit:
             raise UnitDoesntExistsException()
@@ -184,7 +184,7 @@ class UnitService(UnitServiceAbstract):
         self._session.commit()
         return unit
 
-    def create_unit_step3(self, id_unit, ip_mapping, mac_mapping, ip_details, timestamp):
+    def unit_normalize(self, id_unit, ip_mapping, mac_mapping, ip_details, timestamp):
         unit = self._get_unit(id_unit)
         if not unit:
             raise UnitDoesntExistsException()

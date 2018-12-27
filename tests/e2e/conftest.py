@@ -25,14 +25,14 @@ def create_ann_unit(client, name, labels=None):
         labels = ["IMPORTANT", "SECOND_LABEL"]
 
     r1 = client.post(
-        "/unit/step1",
+        "/unit/upload",
         buffered=True,
         content_type='multipart/form-data',
         data={"file": (BytesIO(get_hydra_file()), "file.pcap", "application/vnd.tcpdump.pcap")}
     )
     assert r1.status_code == 200
 
-    r2 = client.post("/unit/step2", json={
+    r2 = client.post("/unit/annotate", json={
         "id_unit": r1.json["id_unit"],
         "name": name,
         "description": "Description %s" % name,
@@ -40,7 +40,7 @@ def create_ann_unit(client, name, labels=None):
     }, content_type="application/json")
     assert r2.status_code == 200
 
-    r3 = client.post("/unit/step3", json={
+    r3 = client.post("/unit/normalize", json={
         "id_unit": r1.json["id_unit"],
         "ip_mapping": [
             {

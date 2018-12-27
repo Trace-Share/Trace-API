@@ -11,7 +11,7 @@ from .service import Mapping, IPDetails
 ns = api.namespace("unit", description="Unit")
 
 
-@ns.route("/step1")
+@ns.route("/upload")
 class UnitSaveStep1(Resource):
 
     @inject
@@ -24,7 +24,7 @@ class UnitSaveStep1(Resource):
     def post(self):
         args = unit_step1_fields.parse_args()
 
-        unit, analytical_data = self._service_unit.create_unit_step1(args["file"])
+        unit, analytical_data = self._service_unit.unit_upload(args["file"])
 
         return dict(
             id_unit=unit.id_unit,
@@ -32,7 +32,7 @@ class UnitSaveStep1(Resource):
         )
 
 
-@ns.route("/step2")
+@ns.route("/annotate")
 class UnitSaveStep2(Resource):
 
     @inject
@@ -44,7 +44,7 @@ class UnitSaveStep2(Resource):
     @api.doc(responses={200: "Success"})
     @api.doc(responses={404: "Unit not found"})
     def post(self):
-        self._service_unit.create_unit_step2(
+        self._service_unit.unit_annotate(
             id_unit=request.json["id_unit"],
             name=request.json["name"],
             description=request.json["description"],
@@ -53,7 +53,7 @@ class UnitSaveStep2(Resource):
         return {}
 
 
-@ns.route("/step3")
+@ns.route("/normalize")
 class UnitSaveStep3(Resource):
 
     @inject
@@ -68,7 +68,7 @@ class UnitSaveStep3(Resource):
         ip_mapping = Mapping.create_from_dict(request.json["ip_mapping"])
         mac_mapping = Mapping.create_from_dict(request.json["mac_mapping"])
 
-        id_annotated_unit = self._service_unit.create_unit_step3(
+        id_annotated_unit = self._service_unit.unit_normalize(
             id_unit=request.json["id_unit"],
             ip_mapping=ip_mapping,
             mac_mapping=mac_mapping,
