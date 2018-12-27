@@ -82,6 +82,22 @@ class UnitSaveStep3(Resource):
         return dict(id_annotated_unit=id_annotated_unit.id_annotated_unit)
 
 
+@ns.route('/<id_unit>/delete')
+@api.doc(params={'id_unit': 'ID of unit'})
+class UnitDelete(Resource):
+
+    @inject
+    def __init__(self, service_unit: UnitService, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._service_unit = service_unit
+
+    @api.doc(responses={200: "Unit deleted"})
+    @api.doc(responses={404: "Unit not found"})
+    def delete(self, id_unit):
+        self._service_unit.unit_delete(id_unit)
+        return {}
+
+
 # errors
 
 @ns.errorhandler(UnitDoesntExistsException)

@@ -33,3 +33,22 @@ def test_invalid_unit_annotate(service_unit):
             id_unit=123456789,
             name="Abc"
         )
+
+
+def test_delete(service_unit):
+    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap")
+
+    unit1, _ = service_unit.unit_upload(file)
+
+    unit2 = service_unit._get_unit(unit1.id_unit)
+    assert unit2
+    assert unit1.id_unit == unit2.id_unit
+
+    service_unit.unit_delete(unit1.id_unit)
+
+    assert service_unit._get_unit(unit1.id_unit) is None
+
+
+def test_delete_invalid_id(service_unit):
+    with pytest.raises(UnitDoesntExistsException):
+        service_unit.unit_delete(123456)

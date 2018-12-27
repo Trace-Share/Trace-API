@@ -30,6 +30,20 @@ def test_download_ann_unit_invalid_id(client, id_ann_unit1):
     assert r.status_code == 404
 
 
+def test_delete_ann_unit(client, id_ann_unit1):
+    r = client.delete(
+        "/annotated_unit/%s/delete" % id_ann_unit1,
+    )
+    assert r.status_code == 200
+
+
+def test_delete_ann_unit_invalid_id(client, id_ann_unit1):
+    r = client.delete(
+        "/annotated_unit/%s/delete" % 456325,
+    )
+    assert r.status_code == 404
+
+
 def test_find_ann_unit_empty(client):
     r = client.post("/annotated_unit/find", json=dict(), content_type="application/json")
     assert r.status_code == 200

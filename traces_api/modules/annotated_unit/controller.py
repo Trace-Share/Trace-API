@@ -37,7 +37,7 @@ class AnnUnitDownload(Resource):
         super().__init__(*args, **kwargs)
         self._service_ann_unit = service_ann_unit
 
-    @api.response(200, "Dataset returned")
+    @api.response(200, "Annotated unit returned")
     @ns.produces(["application/binary"])
     @api.doc(responses={404: "Annotated unit not found"})
     def get(self, id_annotated_unit):
@@ -65,6 +65,23 @@ class AnnUnitFind(Resource):
     def post(self):
         data = self._service_ann_unit.get_annotated_units(**request.json)
         return dict(data=[d.dict() for d in data])
+
+
+@ns.route('/<id_annotated_unit>/delete')
+@api.doc(params={'id_annotated_unit': 'ID of annotated unit'})
+class AnnUnitDelete(Resource):
+
+    @inject
+    def __init__(self, service_ann_unit: AnnotatedUnitService, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._service_ann_unit = service_ann_unit
+
+    @api.response(200, "Annotated unit deleted")
+    @ns.produces(["application/binary"])
+    @api.doc(responses={404: "Annotated unit not found"})
+    def delete(self, id_annotated_unit):
+        self._service_ann_unit.delete_annotated_unit(id_annotated_unit)
+        return {}
 
 
 # errors

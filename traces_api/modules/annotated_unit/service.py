@@ -115,3 +115,17 @@ class AnnotatedUnitService:
 
         ann_units = q.all()
         return ann_units
+
+    def delete_annotated_unit(self, id_annotated_unit):
+        """
+        Delete annotated unit using id
+
+        :param id_annotated_unit: ID to be deleted
+        """
+
+        ann_unit = self.get_annotated_unit(id_annotated_unit)
+        if not ann_unit:
+            raise AnnotatedUnitDoesntExistsException()
+
+        self._session.delete(ann_unit)
+        self._session.commit()

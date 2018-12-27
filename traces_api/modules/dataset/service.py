@@ -140,6 +140,15 @@ class UnitServiceAbstract:
 
         raise NotImplementedError()
 
+    def unit_delete(self, id_unit):
+        """
+        Delete unit with given id
+
+        :param id_unit: ID of existing unit
+        """
+
+        raise NotImplementedError()
+
 
 class UnitService(UnitServiceAbstract):
 
@@ -208,3 +217,10 @@ class UnitService(UnitServiceAbstract):
 
         return annotated_unit
 
+    def unit_delete(self, id_unit):
+        unit = self._get_unit(id_unit)
+        if not unit:
+            raise UnitDoesntExistsException()
+
+        self._session.delete(unit)
+        self._session.commit()

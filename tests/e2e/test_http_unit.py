@@ -12,7 +12,7 @@ def test_upload(client, file_hydra_1_binary):
         "/unit/upload",
         buffered=True,
         content_type='multipart/form-data',
-        data={"file": (BytesIO(file_hydra_1_binary), "hello.txt", "application/vnd.tcpdump.pcap")}
+        data={"file": (BytesIO(file_hydra_1_binary), "hydra.pcap", "application/vnd.tcpdump.pcap")}
     )
     assert r.status_code == 200
     assert r.json["id_unit"] > 0
@@ -45,7 +45,7 @@ def test_unit_all_steps(client, file_hydra_1_binary):
         "/unit/upload",
         buffered=True,
         content_type='multipart/form-data',
-        data={"file": (BytesIO(file_hydra_1_binary), "hello.txt", "application/vnd.tcpdump.pcap")}
+        data={"file": (BytesIO(file_hydra_1_binary), "hydra.pcap", "application/vnd.tcpdump.pcap")}
     )
     assert r1.status_code == 200
 
@@ -86,3 +86,26 @@ def test_unit_all_steps(client, file_hydra_1_binary):
     }, content_type="application/json")
     assert r3.status_code == 200
     assert r3.json["id_annotated_unit"] > 0
+
+
+def test_delete(client, file_hydra_1_binary):
+    r = client.post(
+        "/unit/upload",
+        buffered=True,
+        content_type="multipart/form-data",
+        data={"file": (BytesIO(file_hydra_1_binary), "hydra.pcap", "application/vnd.tcpdump.pcap")}
+
+    )
+    assert r.status_code == 200
+
+    r = client.delete(
+        "/unit/{}/delete".format(r.json["id_unit"]),
+    )
+    assert r.status_code == 200
+
+
+def test_delete_invalid_id_unit(client):
+    r = client.delete(
+        "/unit/{}/delete".format(123)
+    )
+    assert r.status_code == 404
