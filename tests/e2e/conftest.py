@@ -71,3 +71,30 @@ def create_ann_unit(client, name, labels=None):
     assert r3.json["id_annotated_unit"] > 0
 
     return r3.json["id_annotated_unit"]
+
+
+def create_mix(client, name):
+    aunit1 = create_ann_unit(client, "First ann unit #1")
+    aunit2 = create_ann_unit(client, "Second ann unit #2")
+
+    data = dict(
+        name=name,
+        description="%s description" % name,
+        labels=["L1", "L2"],
+        annotated_units=[
+            dict(
+                id_annotated_unit=aunit1,
+                ip_mapping=[],
+                mac_mapping=[],
+                timestamp=134
+            ),
+            dict(
+                id_annotated_unit=aunit2,
+                ip_mapping=[],
+                mac_mapping=[],
+                timestamp=123
+            ),
+        ]
+    )
+    r = client.post("/mix/create", json=data, content_type="application/json")
+    return r.json["id_mix"]

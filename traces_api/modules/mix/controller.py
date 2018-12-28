@@ -1,11 +1,12 @@
 from flask import send_file, request
 from flask_restplus import Resource
 from flask_injector import inject
+from pathvalidate import sanitize_python_var_name
 
 from traces_api.api.restplus import api
 from .schemas import mix_detail_response, mix_find, mix_find_response, mix_create, mix_create_response
 from .schemas import mix_generate_status_response
-from .service import MixService, MixDoesntExistsException, AnnotatedUnitDoesntExistsException
+from .service import MixService, MixDoesntExistsException, AnnotatedUnitDoesntExistsException, OperatorEnum
 
 ns = api.namespace("mix", description="Mix")
 
@@ -55,11 +56,12 @@ class MixDownload(Resource):
     @ns.produces(["application/binary"])
     @api.doc(responses={404: "Mix not found"})
     def get(self, id_mix):
+        mix = self._service_mix.get_mix(id_mix)
         file_location = self._service_mix.download_mix(id_mix)
         return send_file(
             file_location,
             mimetype="application/vnd.tcpdump.pcap",
-            attachment_filename='file.pcap',
+            attachment_filename="%s.pcap" % sanitize_python_var_name(mix.name),
             as_attachment=True,
             cache_timeout=0
         )
@@ -75,7 +77,10 @@ class MixFind(Resource):
     @api.expect(mix_find)
     @api.marshal_with(mix_find_response)
     def post(self):
-        data = self._service_mix.get_mixes(**request.json)
+        params = request.json.copy()
+        if "operator" in params:
+            params["operator"] = OperatorEnum(params["operator"])
+        data = self._service_mix.get_mixes(**params)
         return dict(data=[d.dict() for d in data])
 
 
@@ -105,6 +110,8 @@ class MixGenerateStatus(Resource):
     @api.doc(responses={404: "Mix not found"})
     def get(self, id_mix):
         mix_generation = self._service_mix.get_mix_generation(id_mix)
+        if not mix_generation:
+            raise MixDoesntExistsException()
         return dict(progress=mix_generation.progress)
 
 

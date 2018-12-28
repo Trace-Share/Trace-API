@@ -6,3 +6,4 @@ pytest
 pytest-flask
 flask_injector
 flask_restful
+pathvalidate

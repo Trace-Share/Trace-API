@@ -1,4 +1,4 @@
-from .conftest import create_ann_unit
+from .conftest import create_ann_unit, create_mix
 
 
 def test_create(client):
@@ -72,12 +72,12 @@ def test_generate_and_download(client):
     assert r4.status_code == 200
 
 
-def test_mix_create_invalid_input(client):
+def test_create_invalid_input(client):
     r = client.post("/mix/create")
     assert r.status_code == 400
 
 
-def test_mix_create_invalid_ann_unit(client):
+def test_create_invalid_ann_unit(client):
     data = dict(
         name="Mix #1",
         description="Mix description #1",
@@ -101,6 +101,37 @@ def test_mix_create_invalid_ann_unit(client):
     assert r.status_code == 404
 
 
-def test_mix_detail_invalid_mix_id(client):
+def test_detail_invalid_id(client):
     r = client.get("/mix/%s/detail" % 4567, content_type="application/json")
     assert r.status_code == 404
+
+
+def test_download_invalid_id(client):
+    r = client.get("/mix/%s/download" % 4567, content_type="application/json")
+    assert r.status_code == 404
+
+
+def test_generate_invalid_id(client):
+    r = client.post("/mix/%s/generate" % 4567, content_type="application/json")
+    assert r.status_code == 404
+
+
+def test_generate_status_invalid_id(client):
+    r = client.get("/mix/%s/generate/status" % 4567, content_type="application/json")
+    assert r.status_code == 404
+
+
+def test_find(client):
+    create_mix(client, "First mix #1")
+    create_mix(client, "Second mix #2")
+    create_mix(client, "Third mix #3")
+
+    r = client.post("/mix/find", json=dict(name="mix #", operator="AND"), content_type="application/json")
+    assert len(r.json["data"]) == 3
+    r = client.post("/mix/find", json=dict(name="d mix #", operator="AND"), content_type="application/json")
+    assert len(r.json["data"]) == 2
+    r = client.post("/mix/find", json=dict(name="second mix #2", operator="AND"), content_type="application/json")
+    assert len(r.json["data"]) == 1
+
+    r = client.post("/mix/find", json=dict(name="Non existing mix", operator="AND"), content_type="application/json")
+    assert len(r.json["data"]) == 0

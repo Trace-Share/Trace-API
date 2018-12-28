@@ -1,6 +1,7 @@
 from flask import send_file, request
 from flask_restplus import Resource
 from flask_injector import inject
+from pathvalidate import sanitize_python_var_name
 
 from traces_api.api.restplus import api
 from .schemas import ann_unit_details_response, ann_unit_find_response, ann_unit_find
@@ -41,12 +42,13 @@ class AnnUnitDownload(Resource):
     @ns.produces(["application/binary"])
     @api.doc(responses={404: "Annotated unit not found"})
     def get(self, id_annotated_unit):
+        ann_unit = self._service_ann_unit.get_annotated_unit(id_annotated_unit)
         file_location = self._service_ann_unit.download_annotated_unit(id_annotated_unit)
 
         return send_file(
             file_location,
             mimetype="application/vnd.tcpdump.pcap",
-            attachment_filename='file.pcap',
+            attachment_filename="%s.pcap" % sanitize_python_var_name(ann_unit.name),
             as_attachment=True,
             cache_timeout=0
         )

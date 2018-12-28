@@ -1,14 +1,14 @@
 import json
-
+from enum import Enum
 from datetime import datetime
-from sqlalchemy import desc, update
+from sqlalchemy import desc, update, and_, or_
 
 from traces_api.database.model.mix import ModelMix, ModelMixLabel, ModelMixOrigin, ModelMixFileGeneration
 
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
 from traces_api.tools import TraceNormalizer, TraceMixing
 from traces_api.storage import FileStorage, File
-from traces_api.modules.dataset.service import Mapping  # todo move me
+from traces_api.modules.dataset.service import Mapping
 
 
 class AnnotatedUnitDoesntExistsException(Exception):
@@ -25,6 +25,14 @@ class MixDoesntExistsException(Exception):
     This exception is raised when mix is not found in database
     """
     pass
+
+
+class OperatorEnum(Enum):
+    """
+    SQL operators
+    """
+    AND = "AND"
+    OR = "OR"
 
 
 class MixService:
@@ -194,9 +202,11 @@ class MixService:
         :return: absolute path of mix file
         """
         mix_generation = self.get_mix_generation(id_mix)
+        if not mix_generation:
+            raise MixDoesntExistsException()
         return self._file_storage.get_absolute_file_path(mix_generation.file_location)
 
-    def get_mixes(self, limit=100, page=0, name=None, labels=None, description=None):
+    def get_mixes(self, limit=100, page=0, name=None, labels=None, description=None, operator=OperatorEnum.AND):
         """
         Find mixes
 
@@ -205,20 +215,30 @@ class MixService:
         :param name: search mix by name - exact match
         :param labels: search mix by labels
         :param description: search mix by description
+        :param operator: OperatorEnum
         :return: list of mixes that match given criteria
         """
         q = self._session.query(ModelMix)
 
+        filters = []
+
         if name:
-            q = q.filter(ModelMix.name.like("%{}%".format(name)))
+            filters.append(ModelMix.name.like("%{}%".format(name)))
 
         if description:
-            q = q.filter(ModelMix.description.like("%{}%".format(description)))
+            filters.append(ModelMix.description.like("%{}%".format(description)))
 
         if labels:
-            q = q.outerjoin(ModelMixLabel)
             for label in labels:
-                q = q.filter(ModelMixLabel.label == label)
+                sub_q = self._session.query(ModelMix).filter(ModelMixLabel.label == label).filter(
+                    ModelMixLabel.id_annotated_unit == ModelMix.id_annotated_unit
+                )
+                filters.append(sub_q.exists())
+
+        if operator is OperatorEnum.AND:
+            q = q.filter(and_(*filters))
+        else:
+            q = q.filter(or_(*filters))
 
         q = q.order_by(desc(ModelMix.creation_time))
         q = q.offset(page*limit).limit(limit)

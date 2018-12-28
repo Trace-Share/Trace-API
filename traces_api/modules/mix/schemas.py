@@ -4,6 +4,7 @@ from traces_api.api.restplus import api
 
 
 from traces_api.schemas import label_field, mac_pair, ip_pair
+from .service import OperatorEnum
 
 
 mix_basic = dict(
@@ -45,7 +46,11 @@ mix_find = api.model("MixFind", dict(
     page=fields.Integer(description="Number of page to return, counting from 0 (used in pagination)", example=0),
     labels=fields.List(label_field),
     name=fields.String(description="Filter rows by name - fulltext"),
-    description=fields.String(description="Filter rows by description - fulltext")
+    description=fields.String(description="Filter rows by description - fulltext"),
+    operator=fields.String(
+        enum=OperatorEnum._member_names_, default="AND",
+        description="Operator. AND - all filter parameters has to match. OR - one filter should match."
+    )
 ))
 
 mix_find_response = api.model("MixFindResponse",
