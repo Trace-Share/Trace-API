@@ -1,22 +1,12 @@
 import pytest
-from unittest import mock
+from io import BytesIO
 
-from traces_api.modules.dataset.service import UnitService, UnitDoesntExistsException
-from traces_api.modules.annotated_unit.service import AnnotatedUnitService
-from traces_api.storage import FileStorage
-from traces_api.tools import TraceNormalizer, TraceAnalyzer
+from traces_api.modules.dataset.service import UnitDoesntExistsException, Mapping, IPDetails
 
 import werkzeug.datastructures
 
 
-@pytest.fixture()
-def service_unit(sqlalchemy_session):
-    annotated_service = AnnotatedUnitService(sqlalchemy_session, FileStorage(storage_folder="storage/ann_units"), TraceAnalyzer(), TraceNormalizer())
-
-    return UnitService(sqlalchemy_session, annotated_service, FileStorage(storage_folder="storage/units"), mock.Mock())
-
-
-def test_service_unit(service_unit):
+def test_unit_upload(service_unit):
     file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap")
 
     unit1, _ = service_unit.unit_upload(file)
@@ -32,6 +22,17 @@ def test_invalid_unit_annotate(service_unit):
         service_unit.unit_annotate(
             id_unit=123456789,
             name="Abc"
+        )
+
+
+def test_invalid_unit_normalize(service_unit):
+    with pytest.raises(UnitDoesntExistsException):
+        service_unit.unit_normalize(
+            id_unit=123456789,
+            ip_mapping=Mapping(),
+            mac_mapping=Mapping(),
+            ip_details=IPDetails([], [], []),
+            timestamp=123456.12
         )
 
 
@@ -52,3 +53,44 @@ def test_delete(service_unit):
 def test_delete_invalid_id(service_unit):
     with pytest.raises(UnitDoesntExistsException):
         service_unit.unit_delete(123456)
+
+
+def test_unit_upload_annotate_normalize(service_unit, file_hydra_1_binary):
+    file = werkzeug.datastructures.FileStorage(stream=BytesIO(file_hydra_1_binary), content_type="application/vnd.tcpdump.pcap")
+
+    unit1, _ = service_unit.unit_upload(file)
+
+    unit2 = service_unit.unit_annotate(unit1.id_unit, "Unit #1", "Desc unit #1", ["L1", "L2"])
+    assert unit1.id_unit == unit2.id_unit
+
+    annotated_unit = service_unit.unit_normalize(
+        id_unit=unit1.id_unit,
+        ip_mapping=Mapping.create_from_dict([
+            {
+                "original": "1.2.3.4",
+                "replacement": "172.16.0.0"
+            }
+        ]),
+        mac_mapping=Mapping.create_from_dict([
+            {
+                "original": "00:A0:C9:14:C8:29",
+                "replacement": "00:A0:C9:14:C8:29"
+            }
+        ]),
+        ip_details=IPDetails(
+            target_nodes=[
+                "172.16.0.0"
+            ],
+            intermediate_nodes=[
+                "172.16.0.0"
+            ],
+            source_nodes=[
+                "172.16.0.0"
+            ]
+        ),
+        timestamp=1541346574.1234
+    )
+
+    assert annotated_unit.id_annotated_unit
+    assert annotated_unit.name == "Unit #1"
+    assert annotated_unit.description == "Desc unit #1"

@@ -120,7 +120,7 @@ class UnitServiceAbstract:
 
         raise NotImplementedError()
 
-    def unit_normalize(self, id_unit, ip_mapping, mac_mapping, ips, timestamp):
+    def unit_normalize(self, id_unit, ip_mapping, mac_mapping, ip_details, timestamp):
         """
         Create unit step 3
 
@@ -133,9 +133,9 @@ class UnitServiceAbstract:
         :param id_unit: ID of existing unit
         :param ip_mapping: list that contains dicts {"original": ORIGINAL_IP, "replacement": REPLACEMENT_IP}
         :param mac_mapping: list that contains dicts {"original": ORIGINAL_MAC, "replacement": REPLACEMENT_MAC}
-        :param ips:
+        :param ip_details:
         :param timestamp: base timestamp
-        :return:
+        :return: annotated_unit
         """
 
         raise NotImplementedError()

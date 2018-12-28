@@ -23,6 +23,13 @@ def test_get_ann_unit_invalid_id(client, id_ann_unit1):
     assert r.status_code == 404
 
 
+def test_get_ann_unit_invalid_method(client, id_ann_unit1):
+    r = client.post(
+        "/annotated_unit/%s/get" % 456325,
+    )
+    assert r.status_code == 405
+
+
 def test_download_ann_unit_invalid_id(client, id_ann_unit1):
     r = client.get(
         "/annotated_unit/%s/download" % 456325,
