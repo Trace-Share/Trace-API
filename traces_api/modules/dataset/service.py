@@ -169,7 +169,11 @@ class UnitService(UnitServiceAbstract):
         return unit
 
     def unit_upload(self, file):
-        file_path = self._file_storage.save_file(file, ["application/vnd.tcpdump.pcap"])
+        expected_mime_types = ["application/vnd.tcpdump.pcap"]
+        if file.mimetype not in expected_mime_types:
+            raise Exception("Invalid MIME type {}, expected: {}".format(file.mimetype, expected_mime_types))
+
+        file_path = self._file_storage.save_file(file.stream)
 
         unit = ModelUnit(
             creation_time=datetime.now(),
@@ -207,7 +211,7 @@ class UnitService(UnitServiceAbstract):
             mac_mapping=mac_mapping,
             timestamp=timestamp,
             ip_details=ip_details,
-            unit_file_location=self._file_storage.get_absolute_file_path(unit.uploaded_file_location),
+            unit_file=self._file_storage.get_file(unit.uploaded_file_location),
             labels=unit_annotation["labels"]
         )
 

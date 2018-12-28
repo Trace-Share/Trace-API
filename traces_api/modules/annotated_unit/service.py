@@ -36,7 +36,7 @@ class AnnotatedUnitService:
         self._trace_analyzer = trace_analyzer
         self._trace_normalizer = trace_normalizer
 
-    def create_annotated_unit(self, name, description, ip_mapping, mac_mapping, timestamp, ip_details, unit_file_location, labels):
+    def create_annotated_unit(self, name, description, ip_mapping, mac_mapping, timestamp, ip_details, unit_file, labels):
         """
         New annotated unit will be crated, normalized and saved into database
 
@@ -46,18 +46,19 @@ class AnnotatedUnitService:
         :param mac_mapping:
         :param timestamp:
         :param ip_details:
-        :param unit_file_location:
+        :param unit_file:
         :param labels: Annotated unit labels
-        :return:
+        :return: new annotated unit
         """
         new_ann_unit_file = File.create_new()
 
         configuration = self._trace_normalizer.prepare_configuration(ip_mapping, mac_mapping, timestamp)
-        self._trace_normalizer.normalize(unit_file_location, new_ann_unit_file.location, configuration)
-
-        file_location = self._file_storage.save_file2(new_ann_unit_file)
+        self._trace_normalizer.normalize(unit_file.location, new_ann_unit_file.location, configuration)
 
         analyzed_data = self._trace_analyzer.analyze(new_ann_unit_file.location)
+
+        with open(new_ann_unit_file.location, "rb") as f:
+            ann_unit_file_name = self._file_storage.save_file(f)
 
         annotated_unit = ModelAnnotatedUnit(
             name=name,
@@ -65,7 +66,7 @@ class AnnotatedUnitService:
             creation_time=datetime.now(),
             stats=json.dumps(analyzed_data),
             ip_details=json.dumps(ip_details.dict()),
-            file_location=file_location,
+            file_location=ann_unit_file_name,
             labels=[ModelAnnotatedUnitLabel(label=l) for l in labels]
         )
 
@@ -87,13 +88,13 @@ class AnnotatedUnitService:
         Return absolute file location of annotated unit
 
         :param id_annotated_unit:
-        :return: absolute path
+        :return: File
         """
         ann_unit = self.get_annotated_unit(id_annotated_unit)
         if not ann_unit:
             raise AnnotatedUnitDoesntExistsException()
 
-        return self._file_storage.get_absolute_file_path(ann_unit.file_location)
+        return self._file_storage.get_file(ann_unit.file_location)
 
     def get_annotated_units(self, limit=100, page=0, name=None, labels=None, description=None, operator=OperatorEnum.AND):
         """

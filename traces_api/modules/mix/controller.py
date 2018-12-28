@@ -57,11 +57,16 @@ class MixDownload(Resource):
     @api.doc(responses={404: "Mix not found"})
     def get(self, id_mix):
         mix = self._service_mix.get_mix(id_mix)
-        file_location = self._service_mix.download_mix(id_mix)
+        file = self._service_mix.download_mix(id_mix)
+
+        file_name = "%s.pcap" % sanitize_python_var_name(mix.name)
+        if file.is_compressed():
+            file_name += ".gz"
+
         return send_file(
-            file_location,
+            file.location,
             mimetype="application/vnd.tcpdump.pcap",
-            attachment_filename="%s.pcap" % sanitize_python_var_name(mix.name),
+            attachment_filename=file_name,
             as_attachment=True,
             cache_timeout=0
         )

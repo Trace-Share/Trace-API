@@ -43,12 +43,16 @@ class AnnUnitDownload(Resource):
     @api.doc(responses={404: "Annotated unit not found"})
     def get(self, id_annotated_unit):
         ann_unit = self._service_ann_unit.get_annotated_unit(id_annotated_unit)
-        file_location = self._service_ann_unit.download_annotated_unit(id_annotated_unit)
+        file = self._service_ann_unit.download_annotated_unit(id_annotated_unit)
+
+        file_name = "%s.pcap" % sanitize_python_var_name(ann_unit.name)
+        if file.is_compressed():
+            file_name += ".gz"
 
         return send_file(
-            file_location,
+            file.location,
             mimetype="application/vnd.tcpdump.pcap",
-            attachment_filename="%s.pcap" % sanitize_python_var_name(ann_unit.name),
+            attachment_filename=file_name,
             as_attachment=True,
             cache_timeout=0
         )

@@ -12,6 +12,7 @@ from traces_api.modules.annotated_unit.controller import ns as annotated_unit_na
 from traces_api.modules.mix.controller import ns as mix_namespace
 
 from traces_api.tools import TraceAnalyzer, TraceNormalizer, TraceMixing
+from traces_api.compression import Compression
 
 
 def create_engine(url):
@@ -56,14 +57,14 @@ class FlaskApp:
         from traces_api.modules.mix.service import MixService
         from traces_api.storage import FileStorage
 
-        annotated_unit_service = AnnotatedUnitService(self._session, FileStorage(storage_folder="storage/ann_units"), TraceAnalyzer(), TraceNormalizer())
+        annotated_unit_service = AnnotatedUnitService(self._session, FileStorage(storage_folder="storage/ann_units", compression=Compression()), TraceAnalyzer(), TraceNormalizer())
 
         unit_service = UnitService(
-            self._session, annotated_unit_service, FileStorage(storage_folder="storage/units"), TraceAnalyzer()
+            self._session, annotated_unit_service, FileStorage(storage_folder="storage/units", compression=Compression()), TraceAnalyzer()
         )
 
         mix_service = MixService(
-            self._session, annotated_unit_service, FileStorage(storage_folder="storage/mixes"), TraceNormalizer(), TraceMixing()
+            self._session, annotated_unit_service, FileStorage(storage_folder="storage/mixes", compression=Compression()), TraceNormalizer(), TraceMixing()
         )
 
         binder.bind(UnitService, to=unit_service)

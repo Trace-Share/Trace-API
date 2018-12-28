@@ -10,16 +10,17 @@ from traces_api.modules.dataset.service import UnitService
 
 from traces_api.storage import FileStorage
 from traces_api.tools import TraceNormalizer, TraceAnalyzer
+from traces_api.compression import Compression
 
 
 @pytest.fixture()
 def service_annotated_unit(sqlalchemy_session):
-    return AnnotatedUnitService(sqlalchemy_session, FileStorage(storage_folder="storage/ann_units"), TraceAnalyzer(), TraceNormalizer())
+    return AnnotatedUnitService(sqlalchemy_session, FileStorage(storage_folder="storage/ann_units", compression=Compression()), TraceAnalyzer(), TraceNormalizer())
 
 
 @pytest.fixture()
 def service_unit(sqlalchemy_session, service_annotated_unit):
-    return UnitService(sqlalchemy_session, service_annotated_unit, FileStorage(storage_folder="storage/units"), mock.Mock())
+    return UnitService(sqlalchemy_session, service_annotated_unit, FileStorage(storage_folder="storage/units", compression=Compression()), mock.Mock())
 
 
 @pytest.fixture()

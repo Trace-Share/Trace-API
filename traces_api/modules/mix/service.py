@@ -66,16 +66,17 @@ class MixService:
             id_annotated_unit = ann_unit["id_annotated_unit"]
 
             new_ann_unit_file = File.create_new()
-            ann_unit_location = self._annotated_unit_service.download_annotated_unit(id_annotated_unit)
+            ann_unit_file = self._annotated_unit_service.download_annotated_unit(id_annotated_unit)
             configuration = self._trace_normalizer.prepare_configuration(ann_unit["ip_mapping"], ann_unit["mac_mapping"], ann_unit["timestamp"])
-            self._trace_normalizer.normalize(ann_unit_location, new_ann_unit_file.location, configuration)
+            self._trace_normalizer.normalize(ann_unit_file.location, new_ann_unit_file.location, configuration)
 
             mixing.mix(new_ann_unit_file.location)
 
         self._update_mix_generation_progress(mix_generation_id, 99)
 
         mix_file = File(mixing.get_mixed_file_location())
-        file_name = self._file_storage.save_file2(mix_file)
+        with open(mix_file.location, "rb") as f:
+            file_name = self._file_storage.save_file(f)
 
         mix_generation = self.get_mix_generation_by_id_generation(mix_generation_id)
         mix_generation.progress = 100
@@ -199,12 +200,12 @@ class MixService:
         Return absolute file location of mix
 
         :param id_mix:
-        :return: absolute path of mix file
+        :return: mix File
         """
         mix_generation = self.get_mix_generation(id_mix)
         if not mix_generation:
             raise MixDoesntExistsException()
-        return self._file_storage.get_absolute_file_path(mix_generation.file_location)
+        return self._file_storage.get_file(mix_generation.file_location)
 
     def get_mixes(self, limit=100, page=0, name=None, labels=None, description=None, operator=OperatorEnum.AND):
         """
@@ -231,7 +232,7 @@ class MixService:
         if labels:
             for label in labels:
                 sub_q = self._session.query(ModelMix).filter(ModelMixLabel.label == label).filter(
-                    ModelMixLabel.id_annotated_unit == ModelMix.id_annotated_unit
+                    ModelMixLabel.id_mix == ModelMix.id_mix
                 )
                 filters.append(sub_q.exists())
 

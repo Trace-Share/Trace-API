@@ -1,8 +1,10 @@
 import uuid
 import shutil
 import os
+import os.path
 
 from datetime import datetime
+import werkzeug.datastructures
 
 
 class File:
@@ -26,10 +28,19 @@ class File:
         shutil.move(self.location, new_location)
         self.location = new_location
 
+    def is_compressed(self):
+        """
+        Is file compressed
+
+        :return: True if compressed otherwise False
+        """
+        return self.location.endswith(".gz")
+
     @staticmethod
     def create_new():
         """
         Create new empty file
+
         :return: File object
         """
         random_file_path = "/tmp/trace_api_%s" % str(uuid.uuid4())
@@ -41,48 +52,57 @@ class File:
 
 class FileStorage:
 
-    def __init__(self, storage_folder):
+    def __init__(self, storage_folder, compression):
         """
         :param storage_folder: Storage folder where files will be saved.
                                Application should have correct permissions to write to this folder.
+        :param compression: Used for compressing files
         """
         self._storage_folder = storage_folder
+        self._compression = compression
 
     @staticmethod
     def _generate_file_name():
         """
         Generate random file name based on current time
+
         :return: random file name
         """
         t = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
         return "{}_{}".format(t, str(uuid.uuid4())[:5])
 
-    def save_file(self, file, expected_mime_types=None):
+    def save_file(self, file_stream):
         """
-        :param file: werkzeug.datastructures.FileStorage
-        :param expected_mime_types:
+        :param file_stream:
         :return: Relative file location
         """
-        if expected_mime_types and file.mimetype not in expected_mime_types:
-            raise Exception("Invalid MIME type {}, expected: {}".format(file.mimetype, expected_mime_types))
 
-        file_name = self._generate_file_name()
+        file_name = "{}.gz".format(self._generate_file_name())
         file_path = "{}/{}".format(self._storage_folder, file_name)
 
-        file.save(file_path)
+        self._compression.compress(file_stream, file_path)
 
         return file_name
 
     def remove_file(self, relative_path):
-        os.remove(self.get_absolute_file_path(relative_path))
+        """
+        Permanently remove file
 
-    def save_file2(self, file: File):
-        file_name = self._generate_file_name()
-        file_path = "{}/{}".format(self._storage_folder, file_name)
+        :param relative_path:
+        :return:
+        """
+        file_path = self._get_absolute_file_path(relative_path)
+        os.remove(file_path)
 
-        file.move_file(file_path)
+    def get_file(self, relative_path):
+        """
+        Get File using relative path
 
-        return file_name
+        :param relative_path:
+        :return: File
+        """
+        abs_path = self._get_absolute_file_path(relative_path)
+        return File(abs_path)
 
-    def get_absolute_file_path(self, relative_path):
+    def _get_absolute_file_path(self, relative_path):
         return "{}/{}".format(self._storage_folder, relative_path)
