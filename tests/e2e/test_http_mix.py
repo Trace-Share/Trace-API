@@ -130,8 +130,35 @@ def test_find(client):
     assert len(r.json["data"]) == 3
     r = client.post("/mix/find", json=dict(name="d mix #", operator="AND"), content_type="application/json")
     assert len(r.json["data"]) == 2
-    r = client.post("/mix/find", json=dict(name="second mix #2", operator="AND"), content_type="application/json")
+    r = client.post("/mix/find", json=dict(name="Second mix #2", operator="AND"), content_type="application/json")
     assert len(r.json["data"]) == 1
 
     r = client.post("/mix/find", json=dict(name="Non existing mix", operator="AND"), content_type="application/json")
     assert len(r.json["data"]) == 0
+
+
+def test_remove_annotated_unit_in_mix(client):
+        aunit1 = create_ann_unit(client, "First ann unit #1")
+        aunit2 = create_ann_unit(client, "Second ann unit #2")
+
+        data = dict(
+            name="Mix #1",
+            description="Mix description #1",
+            labels=["L1", "label2"],
+            annotated_units=[
+                dict(
+                    id_annotated_unit=aunit1,
+                    ip_mapping=[],
+                    mac_mapping=[],
+                    timestamp=134
+                )
+            ]
+        )
+        r = client.post("/mix/create", json=data, content_type="application/json")
+        assert r.json["id_mix"]
+
+        r = client.delete("/annotated_unit/%s/delete" % aunit2)
+        assert r.status_code == 200
+
+        r = client.delete("/annotated_unit/%s/delete" % aunit1)
+        assert r.status_code == 409

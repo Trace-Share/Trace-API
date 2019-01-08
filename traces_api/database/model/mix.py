@@ -51,7 +51,7 @@ class ModelMixOrigin(Base):
     )
     id_annotated_unit = Column(
         Integer(),
-        ForeignKey('annotated_unit.id_annotated_unit', ondelete="CASCADE", onupdate="RESTRICT"),
+        ForeignKey('annotated_unit.id_annotated_unit', ondelete="RESTRICT", onupdate="RESTRICT"),
         primary_key=True
     )
     ip_mapping = Column(String(4000))

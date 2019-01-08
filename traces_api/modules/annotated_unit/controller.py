@@ -5,7 +5,7 @@ from pathvalidate import sanitize_python_var_name
 
 from traces_api.api.restplus import api
 from .schemas import ann_unit_details_response, ann_unit_find_response, ann_unit_find
-from .service import AnnotatedUnitService, AnnotatedUnitDoesntExistsException, OperatorEnum
+from .service import AnnotatedUnitService, AnnotatedUnitDoesntExistsException, OperatorEnum, UnableToRemoveAnnotatedUnitException
 
 ns = api.namespace("annotated_unit", description="AnnotatedUnit")
 
@@ -88,6 +88,7 @@ class AnnUnitDelete(Resource):
     @api.response(200, "Annotated unit deleted")
     @ns.produces(["application/binary"])
     @api.doc(responses={404: "Annotated unit not found"})
+    @api.doc(responses={409: "Unable to remove annotated unit. There exists mix that contains this annotated unit"})
     def delete(self, id_annotated_unit):
         self._service_ann_unit.delete_annotated_unit(id_annotated_unit)
         return {}
@@ -98,3 +99,8 @@ class AnnUnitDelete(Resource):
 @ns.errorhandler(AnnotatedUnitDoesntExistsException)
 def handle_ann_unit_doesnt_exits(error):
     return {'message': "Annotated unit does not exists"}, 404, {}
+
+
+@ns.errorhandler(UnableToRemoveAnnotatedUnitException)
+def handle_ann_unit_unable_to_delete(error):
+    return {'message': "Unable to remove annotated unit. There exists mix that contains this annotated unit"}, 409, {}

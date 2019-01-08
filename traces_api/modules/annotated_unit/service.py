@@ -1,4 +1,5 @@
 import json
+import sqlalchemy.exc
 from enum import Enum
 from datetime import datetime
 from sqlalchemy import desc, or_, and_
@@ -11,8 +12,16 @@ from traces_api.storage import FileStorage, File
 
 class AnnotatedUnitDoesntExistsException(Exception):
     """
-    Annotated unit doesnt exits
+    Annotated unit does not exits
     This exception is raised when annotated unit is not found in database
+    """
+    pass
+
+
+class UnableToRemoveAnnotatedUnitException(Exception):
+    """
+    Unable to remove annotated unit.
+    Possible reason: There exists mix that contains this annotated unit
     """
     pass
 
@@ -147,5 +156,8 @@ class AnnotatedUnitService:
         if not ann_unit:
             raise AnnotatedUnitDoesntExistsException()
 
-        self._session.delete(ann_unit)
-        self._session.commit()
+        try:
+            self._session.delete(ann_unit)
+            self._session.commit()
+        except sqlalchemy.exc.IntegrityError as ex:
+            raise UnableToRemoveAnnotatedUnitException() from ex

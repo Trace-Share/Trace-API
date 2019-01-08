@@ -1,5 +1,7 @@
+import sqlite3
 import sqlalchemy
 import sqlalchemy.orm
+import sqlalchemy.event
 
 from flask import Flask, Blueprint
 from flask_injector import FlaskInjector
@@ -15,8 +17,15 @@ from traces_api.tools import TraceAnalyzer, TraceNormalizer, TraceMixing
 from traces_api.compression import Compression
 
 
+def _fk_pragma_on_connect(dbapi_con, con_record):
+    # Enable Foreign key support on SQLite db
+    if isinstance(dbapi_con, sqlite3.Connection):
+        dbapi_con.execute('pragma foreign_keys=ON')
+
+
 def create_engine(url):
     engine = sqlalchemy.create_engine(url)
+    sqlalchemy.event.listen(engine, 'connect', _fk_pragma_on_connect)
     return engine
 
 

@@ -64,7 +64,7 @@ def test_find_by_name(service_annotated_unit, service_unit):
     assert len(r) == 3
     r = service_annotated_unit.get_annotated_units(name="d ann unit #")
     assert len(r) == 2
-    r = service_annotated_unit.get_annotated_units(name="second ann unit #2")
+    r = service_annotated_unit.get_annotated_units(name="Second ann unit #2")
     assert len(r) == 1
 
     r = service_annotated_unit.get_annotated_units(name="Non existing unit")
@@ -76,11 +76,11 @@ def test_find_by_description(service_annotated_unit, service_unit):
     create_ann_unit(service_unit, "Second ann unit #2")
     create_ann_unit(service_unit, "Third ann unit #3")
 
-    r = service_annotated_unit.get_annotated_units(description="description")
+    r = service_annotated_unit.get_annotated_units(description="Description")
     assert len(r) == 3
     r = service_annotated_unit.get_annotated_units(description="d ann unit #")
     assert len(r) == 2
-    r = service_annotated_unit.get_annotated_units(description="Description second ann unit #2")
+    r = service_annotated_unit.get_annotated_units(description="Description Second ann unit #2")
     assert len(r) == 1
 
     r = service_annotated_unit.get_annotated_units(description="Non existing unit")

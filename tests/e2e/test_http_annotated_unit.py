@@ -3,7 +3,7 @@ from .conftest import create_ann_unit
 
 def test_get_ann_unit(client, id_ann_unit1):
     r = client.get(
-        "/annotated_unit/%s/get" % id_ann_unit1,
+        "/annotated_unit/%s/get" % id_ann_unit1
     )
     assert r.status_code == 200
 
@@ -18,7 +18,7 @@ def test_get_ann_unit(client, id_ann_unit1):
 
 def test_get_ann_unit_invalid_id(client, id_ann_unit1):
     r = client.get(
-        "/annotated_unit/%s/get" % 456325,
+        "/annotated_unit/%s/get" % 456325
     )
     assert r.status_code == 404
 
@@ -32,21 +32,21 @@ def test_get_ann_unit_invalid_method(client, id_ann_unit1):
 
 def test_download_ann_unit_invalid_id(client, id_ann_unit1):
     r = client.get(
-        "/annotated_unit/%s/download" % 456325,
+        "/annotated_unit/%s/download" % 456325
     )
     assert r.status_code == 404
 
 
 def test_delete_ann_unit(client, id_ann_unit1):
     r = client.delete(
-        "/annotated_unit/%s/delete" % id_ann_unit1,
+        "/annotated_unit/%s/delete" % id_ann_unit1
     )
     assert r.status_code == 200
 
 
 def test_delete_ann_unit_invalid_id(client, id_ann_unit1):
     r = client.delete(
-        "/annotated_unit/%s/delete" % 456325,
+        "/annotated_unit/%s/delete" % 456325
     )
     assert r.status_code == 404
 
@@ -75,7 +75,7 @@ def test_find_by_name(client):
     assert len(r.json["data"]) == 3
     r = client.post("/annotated_unit/find", json=dict(name="d ann unit #"), content_type="application/json")
     assert len(r.json["data"]) == 2
-    r = client.post("/annotated_unit/find", json=dict(name="second ann unit #2"), content_type="application/json")
+    r = client.post("/annotated_unit/find", json=dict(name="Second ann unit #2"), content_type="application/json")
     assert len(r.json["data"]) == 1
 
     r = client.post("/annotated_unit/find", json=dict(name="Non existing unit"), content_type="application/json")
@@ -87,11 +87,11 @@ def test_find_by_description(client):
     create_ann_unit(client, "Second ann unit #2")
     create_ann_unit(client, "Third ann unit #3")
 
-    r = client.post("/annotated_unit/find", json=dict(description="description"), content_type="application/json")
+    r = client.post("/annotated_unit/find", json=dict(description="Description"), content_type="application/json")
     assert len(r.json["data"]) == 3
     r = client.post("/annotated_unit/find", json=dict(description="d ann unit #"), content_type="application/json")
     assert len(r.json["data"]) == 2
-    r = client.post("/annotated_unit/find", json=dict(description="Description second ann unit #2"), content_type="application/json")
+    r = client.post("/annotated_unit/find", json=dict(description="Description Second ann unit #2"), content_type="application/json")
     assert len(r.json["data"]) == 1
 
     r = client.post("/annotated_unit/find", json=dict(description="Non existing unit"), content_type="application/json")
