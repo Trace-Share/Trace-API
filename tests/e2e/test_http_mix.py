@@ -137,6 +137,24 @@ def test_find(client):
     assert len(r.json["data"]) == 0
 
 
+def test_delete_mix(client):
+    id_mix = create_mix(client, "First mix #1")
+
+    r = client.delete(
+        "/mix/%s/delete" % id_mix
+    )
+    assert r.status_code == 200
+
+
+def test_delete_mix_invalid_id(client):
+    create_mix(client, "First mix #1")
+
+    r = client.delete(
+        "/mix/%s/delete" % 456325
+    )
+    assert r.status_code == 404
+
+
 def test_remove_annotated_unit_in_mix(client):
         aunit1 = create_ann_unit(client, "First ann unit #1")
         aunit2 = create_ann_unit(client, "Second ann unit #2")
@@ -156,9 +174,16 @@ def test_remove_annotated_unit_in_mix(client):
         )
         r = client.post("/mix/create", json=data, content_type="application/json")
         assert r.json["id_mix"]
+        mix1 = r.json["id_mix"]
 
         r = client.delete("/annotated_unit/%s/delete" % aunit2)
         assert r.status_code == 200
 
         r = client.delete("/annotated_unit/%s/delete" % aunit1)
         assert r.status_code == 409
+
+        r = client.delete("/mix/%s/delete" % mix1)
+        assert r.status_code == 200
+
+        r = client.delete("/annotated_unit/%s/delete" % aunit1)
+        assert r.status_code == 200

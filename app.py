@@ -49,8 +49,13 @@ class FlaskApp:
     def __init__(self, session):
         self._session = session
 
-    @staticmethod
-    def init_app(flask_app):
+    def init_app(self, flask_app):
+        @flask_app.teardown_request
+        def teardown_request(exception):
+            # Always rollback and cleanup transaction
+            # All data should be already saved
+            self._session.rollback()
+
         blueprint = Blueprint('api', __name__)
         api.init_app(blueprint)
 

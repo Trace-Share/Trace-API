@@ -120,6 +120,21 @@ class MixGenerateStatus(Resource):
         return dict(progress=mix_generation.progress)
 
 
+@ns.route('/<id_mix>/delete')
+@api.doc(params={'id_mix': 'ID of mix'})
+class MixDelete(Resource):
+    @inject
+    def __init__(self, service_mix: MixService, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._service_mix = service_mix
+
+    @api.response(200, "Mix deleted")
+    @api.doc(responses={404: "Mix not found"})
+    def delete(self, id_mix):
+        self._service_mix.delete_mix(id_mix)
+        return {}
+
+
 # errors
 
 @ns.errorhandler(MixDoesntExistsException)

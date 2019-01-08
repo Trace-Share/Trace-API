@@ -86,7 +86,6 @@ class AnnUnitDelete(Resource):
         self._service_ann_unit = service_ann_unit
 
     @api.response(200, "Annotated unit deleted")
-    @ns.produces(["application/binary"])
     @api.doc(responses={404: "Annotated unit not found"})
     @api.doc(responses={409: "Unable to remove annotated unit. There exists mix that contains this annotated unit"})
     def delete(self, id_annotated_unit):

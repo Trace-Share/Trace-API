@@ -246,3 +246,17 @@ class MixService:
 
         ann_units = q.all()
         return ann_units
+
+    def delete_mix(self, id_mix):
+        """
+        Delete mix using id
+
+        :param id_mix: ID to be deleted
+        """
+
+        mix = self.get_mix(id_mix)
+        if not mix:
+            raise MixDoesntExistsException()
+
+        self._session.delete(mix)
+        self._session.commit()
