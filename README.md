@@ -1,11 +1,11 @@
 # Traces-API
 
-Full API to support handling of packet traces
+Full API to support handling of packet traces.
 
 
 ## Requirements
 * Python3
-* Python3 packages in requirements.txt
+* Python3 packages in `requirements.txt`
 * tshark
 * tcprewrite
 * bittwiste
@@ -28,3 +28,11 @@ py.test -v
 ```
 python3 app.py
 ```
+
+### Basic HTTP status codes returned by application
+
+##### 400 - Bad request
+Client sent invalid data. See response body for details.
+
+##### 500 - Internal Server Error
+Unhandled error occurred. See logs for details.
