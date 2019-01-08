@@ -15,6 +15,10 @@ class TraceNormalizerError(Exception):
     pass
 
 
+class TraceMixerError(Exception):
+    pass
+
+
 class TraceAnalyzer:
     """
     Analyze captured traffic dump
@@ -117,12 +121,15 @@ class TraceMixer:
     One specific mixing operation
 
     Example usage:
-        tm = TraceMixer()
+        tm = TraceMixer(output_location)
         tm.mix(ann_unit1)
         tm.mix(ann_unit2)
     """
 
+    BASE_PCAP_FILE = EXT_FOLDER + "/trace-mixer/base.pcap"
+
     def __init__(self, output_location):
+        self._previous_pcap = self.BASE_PCAP_FILE
         self._output_location = output_location
 
     def mix(self, annotated_unit_file):
@@ -131,10 +138,45 @@ class TraceMixer:
         :param annotated_unit_file:
         :return:
         """
-        pass
+        with tempfile.NamedTemporaryFile(mode="w") as f:
+            f.write(json.dumps(self.prepare_configuration(annotated_unit_file)))
+            f.flush()
+            f.file.close()
+
+            configuration_file = f.name
+
+            self._mix(configuration_file)
+
+            self._previous_pcap = self._output_location
+
+    def _mix(self, configuration_file):
+        with tempfile.NamedTemporaryFile(mode="wb") as f_tmp:
+            with open(self._previous_pcap, "rb") as f_previouse:
+                f_tmp.write(f_previouse.read())
+            f_tmp.flush()
+            f_tmp.file.close()
+            tmp_file = f_tmp.name
+
+            cmd = subprocess.Popen(
+                'python3 {}/trace-mixer/trace-mixer.py -b "{}" -o "{}" -c "{}"'
+                    .format(EXT_FOLDER, tmp_file, self._output_location, configuration_file),
+                shell=True, stdout=subprocess.PIPE)
+
+            stdout, stderr = cmd.communicate()
+
+            if cmd.returncode != 0:
+                raise TraceMixerError("error_code: %s" % cmd.returncode)
 
     def get_mixed_file_location(self):
         return self._output_location
+
+    @staticmethod
+    def prepare_configuration(annotated_unit_file):
+        configuration = {
+            "mix_file": annotated_unit_file
+        }
+
+        return configuration
 
 
 class TraceMixing:
