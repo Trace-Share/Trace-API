@@ -8,6 +8,7 @@ from flask_injector import FlaskInjector
 
 from traces_api.api.restplus import api
 from traces_api.database.tools import recreate_database
+from traces_api.config import Config
 
 from traces_api.modules.dataset.controller import ns as dataset_namespace
 from traces_api.modules.annotated_unit.controller import ns as annotated_unit_namespace
@@ -95,8 +96,9 @@ class FlaskApp:
 
 
 def run():
-    session = setup_databasea("postgresql://root:example@localhost/traces")
-    # session = setup_databasea("sqlite://")
+    config = Config("config.ini")
+
+    session = setup_databasea(config.get("database", "connection_string"))
 
     app = FlaskApp(session).create_app()
     app.run(debug=True)
