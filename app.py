@@ -24,38 +24,38 @@ def _fk_pragma_on_connect(dbapi_con, con_record):
         dbapi_con.execute('pragma foreign_keys=ON')
 
 
-def create_engine(url):
-    engine = sqlalchemy.create_engine(url)
+def create_engine(url, **params):
+    engine = sqlalchemy.create_engine(url, **params)
     sqlalchemy.event.listen(engine, 'connect', _fk_pragma_on_connect)
     return engine
 
 
 def setup_database(engine):
-    session = sqlalchemy.orm.sessionmaker(bind=engine)()
-
+    session = sqlalchemy.orm.sessionmaker(bind=engine)
+    session = sqlalchemy.orm.scoped_session(session)
     return session
 
 
-def setup_databasea(url):
+def prepare_database(url):
     engine = create_engine(url)
-    session = setup_database(engine)
+    session_maker = setup_database(engine)
 
     recreate_database(engine)
 
-    return session
+    return session_maker
 
 
 class FlaskApp:
 
     def __init__(self, session):
-        self._session = session
+        self._session_maker = session
 
     def init_app(self, flask_app):
         @flask_app.teardown_request
         def teardown_request(exception):
             # Always rollback and cleanup transaction
             # All data should be already saved
-            self._session.rollback()
+            self._session_maker().rollback()
 
         blueprint = Blueprint('api', __name__)
         api.init_app(blueprint)
@@ -72,14 +72,14 @@ class FlaskApp:
         from traces_api.modules.mix.service import MixService
         from traces_api.storage import FileStorage
 
-        annotated_unit_service = AnnotatedUnitService(self._session, FileStorage(storage_folder="storage/ann_units", compression=Compression()), TraceAnalyzer(), TraceNormalizer())
+        annotated_unit_service = AnnotatedUnitService(self._session_maker, FileStorage(storage_folder="storage/ann_units", compression=Compression()), TraceAnalyzer(), TraceNormalizer())
 
         unit_service = UnitService(
-            self._session, annotated_unit_service, FileStorage(storage_folder="storage/units", compression=Compression()), TraceAnalyzer()
+            self._session_maker, annotated_unit_service, FileStorage(storage_folder="storage/units", compression=Compression()), TraceAnalyzer()
         )
 
         mix_service = MixService(
-            self._session, annotated_unit_service, FileStorage(storage_folder="storage/mixes", compression=Compression()), TraceNormalizer(), TraceMixing()
+            self._session_maker, annotated_unit_service, FileStorage(storage_folder="storage/mixes", compression=Compression()), TraceNormalizer(), TraceMixing()
         )
 
         binder.bind(UnitService, to=unit_service)
@@ -98,7 +98,7 @@ class FlaskApp:
 def run():
     config = Config("config.ini")
 
-    session = setup_databasea(config.get("database", "connection_string"))
+    session = prepare_database(config.get("database", "connection_string"))
 
     app = FlaskApp(session).create_app()
     app.run(debug=True)

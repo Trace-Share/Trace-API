@@ -39,11 +39,15 @@ class AnnotatedUnitService:
     This class allows to perform all business logic regarding to annotated units
     """
 
-    def __init__(self, session, file_storage: FileStorage, trace_analyzer: TraceAnalyzer, trace_normalizer: TraceNormalizer):
-        self._session = session
+    def __init__(self, session_maker, file_storage: FileStorage, trace_analyzer: TraceAnalyzer, trace_normalizer: TraceNormalizer):
+        self._session_maker = session_maker
         self._file_storage = file_storage
         self._trace_analyzer = trace_analyzer
         self._trace_normalizer = trace_normalizer
+
+    @property
+    def _session(self):
+        return self._session_maker()
 
     def create_annotated_unit(self, name, description, ip_mapping, mac_mapping, timestamp, ip_details, unit_file, labels):
         """

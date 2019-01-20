@@ -152,11 +152,15 @@ class UnitServiceAbstract:
 
 class UnitService(UnitServiceAbstract):
 
-    def __init__(self, session, annotated_unit_service: AnnotatedUnitService, file_storage: FileStorage, trace_analyzer: TraceAnalyzer):
-        self._session = session
+    def __init__(self, session_maker, annotated_unit_service: AnnotatedUnitService, file_storage: FileStorage, trace_analyzer: TraceAnalyzer):
+        self._session_maker = session_maker
         self._annotated_unit_service = annotated_unit_service
         self._trace_analyzer = trace_analyzer
         self._file_storage = file_storage
+
+    @property
+    def _session(self):
+        return self._session_maker()
 
     def _get_unit(self, id_unit) -> ModelUnit:
         """

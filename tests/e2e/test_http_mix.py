@@ -1,3 +1,4 @@
+import time
 from .conftest import create_ann_unit, create_mix
 
 
@@ -64,9 +65,18 @@ def test_generate_and_download(client):
     r2 = client.post("/mix/%s/generate" % id_mix, json={}, content_type="application/json")
     assert r2.status_code == 200
 
-    r3 = client.get("/mix/%s/generate/status" % id_mix, content_type="application/json")
-    assert r3.status_code == 200
-    assert r3.json["progress"] >= 0
+    for i in range(0, 5):
+        r3 = client.get("/mix/%s/generate/status" % id_mix, content_type="application/json")
+        assert r3.status_code == 200
+        assert r3.json["progress"] >= 0
+
+        if r3.json["progress"] == 100:
+            break
+
+        if i == 4:
+            raise TimeoutError()
+
+        time.sleep(0.5)
 
     r4 = client.get("/mix/%s/download" % id_mix, content_type="application/json")
     assert r4.status_code == 200

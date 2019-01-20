@@ -1,6 +1,7 @@
 import json
 from enum import Enum
 from datetime import datetime
+from threading import Thread
 from sqlalchemy import desc, update, and_, or_
 
 from traces_api.database.model.mix import ModelMix, ModelMixLabel, ModelMixOrigin, ModelMixFileGeneration
@@ -40,12 +41,16 @@ class MixService:
     This class allows to perform all business logic regarding to mixes
     """
 
-    def __init__(self, session, annotated_unit_service: AnnotatedUnitService, file_storage: FileStorage, trace_normalizer: TraceNormalizer, trace_mixing: TraceMixing):
-        self._session = session
+    def __init__(self, session_maker, annotated_unit_service: AnnotatedUnitService, file_storage: FileStorage, trace_normalizer: TraceNormalizer, trace_mixing: TraceMixing):
+        self._session_maker = session_maker
         self._annotated_unit_service = annotated_unit_service
         self._file_storage = file_storage
         self._trace_normalizer = trace_normalizer
         self._trace_mixing = trace_mixing
+
+    @property
+    def _session(self):
+        return self._session_maker()
 
     def _exits_ann_unit(self, id_annotated_unit):
         """
@@ -147,7 +152,8 @@ class MixService:
         self._session.add(mix_generation)
         self._session.commit()
 
-        self._mix(mix_generation.id_mix_generation, annotated_units_data)
+        thread = Thread(target=self._mix, args=(mix_generation.id_mix_generation, annotated_units_data))
+        thread.start()
 
         return mix_generation
 
