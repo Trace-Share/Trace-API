@@ -136,3 +136,12 @@ def test_find_pagination(client):
     r = client.post("/annotated_unit/find", json=dict(limit=2, page=1), content_type="application/json")
     assert len(r.json["data"]) == 1
     assert [d["name"] for d in r.json["data"]] == ["#1"]
+
+
+def test_escape(client):
+    create_ann_unit(client, "string a'bc")
+
+    r = client.post("/annotated_unit/find", json=dict(name="string a'bc"), content_type="application/json")
+    assert len(r.json["data"]) == 1
+    assert r.json["data"][0]["name"] == "string a'bc"
+    
