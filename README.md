@@ -6,18 +6,11 @@ Full API to support handling of packet traces.
 ## Requirements
 * Python3
 * Python3 packages in `requirements.txt`
-* tshark
-* tcprewrite
-* bittwiste
+* Docker
 
 ### How to install requirements
-#### Centos
-* `pip3 install -r requirements.txt`
-* `yum install wireshark-cli tcpreplay`
-* Install rpm from: https://opensuse.pkgs.org/42.2/opensuse-network-utilities/bittwist-2.0-6.2.x86_64.rpm.html
-#### Ubuntu  
-* `pip3 install -r requirements.txt`
-* `apt install tshark tcpreplay bittwist`
+* Install python requirements `pip3 install -r requirements.txt`
+* Build docker image `bash build_docker_image.sh`
 
 ### Run tests
 ```

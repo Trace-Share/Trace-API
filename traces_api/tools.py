@@ -41,12 +41,15 @@ class TraceAnalyzer:
         :param filepath: path to file to be analyzed
         :return: dict that contains analyzed information
         """
-        cmd = subprocess.Popen('python3 {}/trace-analyzer/trace-analyzer.py -f "{}" -tcp -q'.format(EXT_FOLDER, filepath), shell=True, stdout=subprocess.PIPE)
+        docker_params = "docker run --rm  -v \"{}\":/dumps/file.pcap trace-tools".format(filepath)
+        cmd = '{} python3 trace-analyzer/trace-analyzer.py -f "{}" -tcp -q'.format(docker_params, "/dumps/file.pcap")
 
-        stdout, stderr = cmd.communicate()
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 
-        if cmd.returncode != 0:
-            raise TraceAnalyzerError("error_code: %s" % cmd.returncode)
+        stdout, stderr = p.communicate()
+
+        if p.returncode != 0:
+            raise TraceAnalyzerError("error_code: %s" % p.returncode)
 
         parts = re.split(b"\n", stdout)
         try:
@@ -81,15 +84,19 @@ class TraceNormalizer:
 
             configuration_file = f.name
 
-            cmd = subprocess.Popen(
-                'python3 {}/trace-normalizer/trace-normalizer.py -i "{}" -o "{}" -c "{}"'
-                    .format(EXT_FOLDER, target_file_location, output_file_location, configuration_file),
-            shell=True, stdout=subprocess.PIPE)
+            docker_params = 'docker run --rm -v "{}":/data/target.pcap -v "{}":/data/output.pcap ' \
+                            '-v "{}":/data/config.conf trace-tools'.format(
+                                target_file_location, output_file_location, configuration_file
+                            )
+            cmd = '{} python3 trace-normalizer/trace-normalizer.py -i "{}" -o "{}" -c "{}"'\
+                .format(docker_params, "/data/target.pcap", "/data/output.pcap", "/data/config.conf")
 
-            stdout, stderr = cmd.communicate()
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 
-            if cmd.returncode != 0:
-                raise TraceNormalizerError("error_code: %s" % cmd.returncode)
+            stdout, stderr = p.communicate()
+
+            if p.returncode != 0:
+                raise TraceNormalizerError("error_code: %s" % p.returncode)
 
     @staticmethod
     def prepare_configuration(ip_mapping, mac_mapping, timestamp):
@@ -138,18 +145,12 @@ class TraceMixer:
         :param annotated_unit_file:
         :return:
         """
-        with tempfile.NamedTemporaryFile(mode="w") as f:
-            f.write(json.dumps(self.prepare_configuration(annotated_unit_file)))
-            f.flush()
-            f.file.close()
 
-            configuration_file = f.name
+        self._mix(annotated_unit_file)
 
-            self._mix(configuration_file)
+        self._previous_pcap = self._output_location
 
-            self._previous_pcap = self._output_location
-
-    def _mix(self, configuration_file):
+    def _mix(self, annotated_unit_file):
         with tempfile.NamedTemporaryFile(mode="wb") as f_tmp:
             with open(self._previous_pcap, "rb") as f_previouse:
                 f_tmp.write(f_previouse.read())
@@ -157,26 +158,22 @@ class TraceMixer:
             f_tmp.file.close()
             tmp_file = f_tmp.name
 
-            cmd = subprocess.Popen(
-                'python3 {}/trace-mixer/trace-mixer.py -b "{}" -o "{}" -c "{}"'
-                    .format(EXT_FOLDER, tmp_file, self._output_location, configuration_file),
-                shell=True, stdout=subprocess.PIPE)
+            docker_params = 'docker run --rm -v "{}":/data/target.pcap -v "{}":/data/output.pcap ' \
+                            '-v "{}":/data/mix_file.pcap trace-tools'.format(
+                                tmp_file, self._output_location, annotated_unit_file
+                            )
 
-            stdout, stderr = cmd.communicate()
+            cmd = '{} python3 trace-mixer/trace-mixer.py -b "{}" -o "{}" -m "{}"'\
+                      .format(docker_params, "/data/target.pcap", "/data/output.pcap", "/data/mix_file.pcap")
 
-            if cmd.returncode != 0:
-                raise TraceMixerError("error_code: %s" % cmd.returncode)
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            stdout, stderr = p.communicate()
+
+            if p.returncode != 0:
+                raise TraceMixerError("error_code: %s" % p.returncode)
 
     def get_mixed_file_location(self):
         return self._output_location
-
-    @staticmethod
-    def prepare_configuration(annotated_unit_file):
-        configuration = {
-            "mix_file": annotated_unit_file
-        }
-
-        return configuration
 
 
 class TraceMixing:

@@ -1,3 +1,4 @@
+import os.path
 import sqlite3
 import sqlalchemy
 import sqlalchemy.orm
@@ -16,6 +17,9 @@ from traces_api.modules.mix.controller import ns as mix_namespace
 
 from traces_api.tools import TraceAnalyzer, TraceNormalizer, TraceMixing
 from traces_api.compression import Compression
+
+
+APP_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 def _fk_pragma_on_connect(dbapi_con, con_record):
@@ -72,14 +76,14 @@ class FlaskApp:
         from traces_api.modules.mix.service import MixService
         from traces_api.storage import FileStorage
 
-        annotated_unit_service = AnnotatedUnitService(self._session_maker, FileStorage(storage_folder="storage/ann_units", compression=Compression()), TraceAnalyzer(), TraceNormalizer())
+        annotated_unit_service = AnnotatedUnitService(self._session_maker, FileStorage(storage_folder="{}/storage/ann_units".format(APP_DIR), compression=Compression()), TraceAnalyzer(), TraceNormalizer())
 
         unit_service = UnitService(
-            self._session_maker, annotated_unit_service, FileStorage(storage_folder="storage/units", compression=Compression()), TraceAnalyzer()
+            self._session_maker, annotated_unit_service, FileStorage(storage_folder="{}/storage/units".format(APP_DIR), compression=Compression()), TraceAnalyzer()
         )
 
         mix_service = MixService(
-            self._session_maker, annotated_unit_service, FileStorage(storage_folder="storage/mixes", compression=Compression()), TraceNormalizer(), TraceMixing()
+            self._session_maker, annotated_unit_service, FileStorage(storage_folder="{}/storage/mixes".format(APP_DIR), compression=Compression()), TraceNormalizer(), TraceMixing()
         )
 
         binder.bind(UnitService, to=unit_service)

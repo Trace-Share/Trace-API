@@ -1,4 +1,5 @@
 import pytest
+import os.path
 import werkzeug.datastructures
 from io import BytesIO
 from unittest import mock
@@ -13,14 +14,17 @@ from traces_api.tools import TraceNormalizer, TraceAnalyzer
 from traces_api.compression import Compression
 
 
+APP_DIR = os.path.dirname(os.path.realpath(__file__)) + "/../.."
+
+
 @pytest.fixture()
 def service_annotated_unit(sqlalchemy_session):
-    return AnnotatedUnitService(sqlalchemy_session, FileStorage(storage_folder="storage/ann_units", compression=Compression()), TraceAnalyzer(), TraceNormalizer())
+    return AnnotatedUnitService(sqlalchemy_session, FileStorage(storage_folder="{}/storage/ann_units".format(APP_DIR), compression=Compression()), TraceAnalyzer(), TraceNormalizer())
 
 
 @pytest.fixture()
 def service_unit(sqlalchemy_session, service_annotated_unit):
-    return UnitService(sqlalchemy_session, service_annotated_unit, FileStorage(storage_folder="storage/units", compression=Compression()), mock.Mock())
+    return UnitService(sqlalchemy_session, service_annotated_unit, FileStorage(storage_folder="{}/storage/units".format(APP_DIR), compression=Compression()), mock.Mock())
 
 
 @pytest.fixture()

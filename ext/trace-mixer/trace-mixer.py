@@ -20,17 +20,11 @@ def mix(base_file, mixed_file, output_file):
         raise Exception("Error occurred: %s" % stderr)
 
 
-def run_mixer(base_file, output_file, config_file):
-    config = parse_configuration(config_file)
-
-    mix(base_file, config["mix_file"], output_file)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", help="Configuration file.", type=str, required=True)
+    parser.add_argument("-m", "--mix_file", help="File to be mixed.", type=str, required=True)
     parser.add_argument("-b", "--base_file", help="Base pcap file", type=str, required=True)
     parser.add_argument("-o", "--output", help="Output file", type=str, required=True)
     args = parser.parse_args()
 
-    run_mixer(args.base_file, args.output, args.config)
+    mix(args.base_file, args.mix_file, args.output)

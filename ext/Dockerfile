@@ -1,0 +1,14 @@
+FROM python:3.6
+
+RUN apt update
+RUN DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpreplay bittwist
+
+RUN useradd -ms /bin/bash trace
+RUN mkdir -p /home/trace/
+
+COPY trace-analyzer /home/trace/trace-analyzer
+COPY trace-mixer /home/trace/trace-mixer
+COPY trace-normalizer /home/trace/trace-normalizer
+
+USER trace
+WORKDIR /home/trace

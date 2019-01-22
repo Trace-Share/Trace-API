@@ -65,7 +65,7 @@ def test_generate_and_download(client):
     r2 = client.post("/mix/%s/generate" % id_mix, json={}, content_type="application/json")
     assert r2.status_code == 200
 
-    for i in range(0, 5):
+    for i in range(0, 20):
         r3 = client.get("/mix/%s/generate/status" % id_mix, content_type="application/json")
         assert r3.status_code == 200
         assert r3.json["progress"] >= 0
@@ -73,10 +73,10 @@ def test_generate_and_download(client):
         if r3.json["progress"] == 100:
             break
 
-        if i == 4:
+        if i == 19:
             raise TimeoutError()
 
-        time.sleep(0.5)
+        time.sleep(1)
 
     r4 = client.get("/mix/%s/download" % id_mix, content_type="application/json")
     assert r4.status_code == 200

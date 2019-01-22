@@ -84,8 +84,8 @@ class MixService:
             file_name = self._file_storage.save_file(f)
 
         mix_generation = self.get_mix_generation_by_id_generation(mix_generation_id)
-        mix_generation.progress = 100
         mix_generation.file_location = file_name
+        mix_generation.progress = 100
 
         self._session.add(mix_generation)
         self._session.commit()

@@ -187,7 +187,7 @@ class UnitService(UnitServiceAbstract):
 
         self._session.add(unit)
         self._session.commit()
-        return unit, self._trace_analyzer.analyze("storage/units/"+unit.uploaded_file_location)
+        return unit, self._trace_analyzer.analyze(self._file_storage.get_file(file_path).location)
 
     def unit_annotate(self, id_unit, name, description=None, labels=None):
         unit = self._get_unit(id_unit)
