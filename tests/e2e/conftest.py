@@ -1,7 +1,7 @@
 import pytest
 from io import BytesIO
 
-from app import FlaskApp
+from app import FlaskApp;
 
 
 @pytest.fixture
@@ -17,6 +17,11 @@ def id_ann_unit1(client):
 
 def get_hydra_file():
     with open("tests/fixtures/hydra-1_tasks.pcap", "rb") as f:
+        return f.read()
+
+
+def get_medusa_file():
+    with open("tests/fixtures/medusa-1_tasks.pcap", "rb") as f:
         return f.read()
 
 
