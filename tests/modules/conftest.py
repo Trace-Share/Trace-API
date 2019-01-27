@@ -10,7 +10,7 @@ from traces_api.modules.annotated_unit.service import AnnotatedUnitService
 from traces_api.modules.dataset.service import UnitService
 
 from traces_api.storage import FileStorage
-from traces_api.tools import TraceNormalizer, TraceAnalyzer
+from traces_api.trace_tools import TraceNormalizer, TraceAnalyzer
 from traces_api.compression import Compression
 
 

@@ -4,7 +4,7 @@ import tempfile
 
 from .conftest import get_medusa_file, get_hydra_file
 from ..test_tools import compare_list_dict
-from traces_api.tools import TraceAnalyzer
+from traces_api.trace_tools import TraceAnalyzer
 
 
 def create_medusa(client):

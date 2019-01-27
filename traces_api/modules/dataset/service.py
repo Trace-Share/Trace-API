@@ -4,7 +4,7 @@ from datetime import datetime
 
 from traces_api.database.model.unit import ModelUnit
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
-from traces_api.tools import TraceAnalyzer
+from traces_api.trace_tools import TraceAnalyzer
 from traces_api.storage import FileStorage
 
 

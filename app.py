@@ -15,7 +15,7 @@ from traces_api.modules.dataset.controller import ns as dataset_namespace
 from traces_api.modules.annotated_unit.controller import ns as annotated_unit_namespace
 from traces_api.modules.mix.controller import ns as mix_namespace
 
-from traces_api.tools import TraceAnalyzer, TraceNormalizer, TraceMixing
+from traces_api.trace_tools import TraceAnalyzer, TraceNormalizer, TraceMixing
 from traces_api.compression import Compression
 
 

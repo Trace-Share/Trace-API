@@ -7,7 +7,7 @@ from sqlalchemy import desc, update, and_, or_
 from traces_api.database.model.mix import ModelMix, ModelMixLabel, ModelMixOrigin, ModelMixFileGeneration
 
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
-from traces_api.tools import TraceNormalizer, TraceMixing
+from traces_api.trace_tools import TraceNormalizer, TraceMixing
 from traces_api.storage import FileStorage, File
 from traces_api.modules.dataset.service import Mapping
 

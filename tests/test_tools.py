@@ -2,8 +2,8 @@ import pytest
 import os.path
 import tempfile
 
-from traces_api.tools import TraceNormalizer, TraceNormalizerError
-from traces_api.tools import TraceAnalyzer, TraceAnalyzerError
+from traces_api.trace_tools import TraceNormalizer, TraceNormalizerError
+from traces_api.trace_tools import TraceAnalyzer, TraceAnalyzerError
 
 
 @pytest.fixture()

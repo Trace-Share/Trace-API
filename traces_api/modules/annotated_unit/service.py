@@ -6,7 +6,7 @@ from sqlalchemy import desc, or_, and_
 
 from traces_api.database.model.annotated_unit import ModelAnnotatedUnit, ModelAnnotatedUnitLabel
 
-from traces_api.tools import TraceAnalyzer, TraceNormalizer
+from traces_api.trace_tools import TraceAnalyzer, TraceNormalizer
 from traces_api.storage import FileStorage, File
 
 
