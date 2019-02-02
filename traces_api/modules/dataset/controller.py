@@ -3,6 +3,7 @@ from flask_restplus import Resource
 from flask_injector import inject
 
 from traces_api.api.restplus import api
+from traces_api.tools import escape
 from .schemas import unit_step1_fields, unit_step1_response, unit_step2_fields
 from .schemas import unit_step3_fields, unit_step3_response
 from .service import UnitService, UnitDoesntExistsException
@@ -26,10 +27,10 @@ class UnitSaveStep1(Resource):
 
         unit, analytical_data = self._service_unit.unit_upload(args["file"])
 
-        return dict(
+        return escape(dict(
             id_unit=unit.id_unit,
             analytical_data=analytical_data
-        )
+        ))
 
 
 @ns.route("/annotate")
@@ -44,11 +45,12 @@ class UnitSaveStep2(Resource):
     @api.doc(responses={200: "Success"})
     @api.doc(responses={404: "Unit not found"})
     def post(self):
+        data = escape(request.json)
         self._service_unit.unit_annotate(
-            id_unit=request.json["id_unit"],
-            name=request.json["name"],
-            description=request.json["description"],
-            labels=request.json["labels"],
+            id_unit=data["id_unit"],
+            name=data["name"],
+            description=data["description"],
+            labels=data["labels"],
         )
         return {}
 
@@ -65,19 +67,21 @@ class UnitSaveStep3(Resource):
     @api.marshal_with(unit_step3_response)
     @api.doc(responses={404: "Unit not found"})
     def post(self):
-        ip_mapping = Mapping.create_from_dict(request.json["ip_mapping"])
-        mac_mapping = Mapping.create_from_dict(request.json["mac_mapping"])
+        data = escape(request.json)
+
+        ip_mapping = Mapping.create_from_dict(data["ip_mapping"])
+        mac_mapping = Mapping.create_from_dict(data["mac_mapping"])
 
         id_annotated_unit = self._service_unit.unit_normalize(
-            id_unit=request.json["id_unit"],
+            id_unit=data["id_unit"],
             ip_mapping=ip_mapping,
             mac_mapping=mac_mapping,
             ip_details=IPDetails(
-                request.json["ips"]["target_nodes"],
-                request.json["ips"]["intermediate_nodes"],
-                request.json["ips"]["source_nodes"]
+                data["ips"]["target_nodes"],
+                data["ips"]["intermediate_nodes"],
+                data["ips"]["source_nodes"]
             ),
-            timestamp=request.json["timestamp"]
+            timestamp=data["timestamp"]
         )
         return dict(id_annotated_unit=id_annotated_unit.id_annotated_unit)
 

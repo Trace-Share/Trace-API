@@ -4,6 +4,7 @@ from flask_injector import inject
 from pathvalidate import sanitize_python_var_name
 
 from traces_api.api.restplus import api
+from traces_api.tools import escape
 from .schemas import mix_detail_response, mix_find, mix_find_response, mix_create, mix_create_response
 from .schemas import mix_generate_status_response
 from .service import MixService, MixDoesntExistsException, AnnotatedUnitDoesntExistsException, OperatorEnum
@@ -23,7 +24,7 @@ class MixCreate(Resource):
     @api.marshal_with(mix_create_response)
     @api.doc(responses={404: "Annotated unit not found"})
     def post(self):
-        mix = self._service_mix.create_mix(**request.json)
+        mix = self._service_mix.create_mix(**escape(request.json))
         return dict(id_mix=mix.id_mix)
 
 
@@ -41,7 +42,7 @@ class MixDetail(Resource):
     def get(self, id_mix):
         ann_unit = self._service_mix.get_mix(id_mix)
 
-        return ann_unit.dict()
+        return escape(ann_unit.dict())
 
 
 @ns.route('/<id_mix>/download')
@@ -82,11 +83,11 @@ class MixFind(Resource):
     @api.expect(mix_find)
     @api.marshal_with(mix_find_response)
     def post(self):
-        params = request.json.copy()
+        params = escape(request.json.copy())
         if "operator" in params:
             params["operator"] = OperatorEnum(params["operator"])
         data = self._service_mix.get_mixes(**params)
-        return dict(data=[d.dict() for d in data])
+        return escape(dict(data=[d.dict() for d in data]))
 
 
 @ns.route('/<id_mix>/generate')

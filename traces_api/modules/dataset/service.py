@@ -6,6 +6,7 @@ from traces_api.database.model.unit import ModelUnit
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
 from traces_api.trace_tools import TraceAnalyzer
 from traces_api.storage import FileStorage
+from traces_api.tools import escape
 
 
 class UnitDoesntExistsException(Exception):
@@ -187,7 +188,7 @@ class UnitService(UnitServiceAbstract):
 
         self._session.add(unit)
         self._session.commit()
-        return unit, self._trace_analyzer.analyze(self._file_storage.get_file(file_path).location)
+        return unit, escape(self._trace_analyzer.analyze(self._file_storage.get_file(file_path).location))
 
     def unit_annotate(self, id_unit, name, description=None, labels=None):
         unit = self._get_unit(id_unit)

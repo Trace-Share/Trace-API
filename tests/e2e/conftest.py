@@ -1,12 +1,18 @@
 import pytest
 from io import BytesIO
 
-from app import FlaskApp;
+from app import FlaskApp
+from traces_api.config import Config
+
+
+@pytest.fixture()
+def config():
+    return Config("config.ini")
 
 
 @pytest.fixture
-def app(sqlalchemy_session):
-    app = FlaskApp(sqlalchemy_session).create_app()
+def app(sqlalchemy_session, config):
+    app = FlaskApp(sqlalchemy_session, config).create_app()
     return app
 
 

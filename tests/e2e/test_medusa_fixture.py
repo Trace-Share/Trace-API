@@ -3,7 +3,7 @@ import time
 import tempfile
 
 from .conftest import get_medusa_file, get_hydra_file
-from ..test_tools import compare_list_dict
+from ..test_trace_tools import compare_list_dict
 from traces_api.trace_tools import TraceAnalyzer
 
 

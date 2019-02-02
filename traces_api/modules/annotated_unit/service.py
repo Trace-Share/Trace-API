@@ -8,6 +8,7 @@ from traces_api.database.model.annotated_unit import ModelAnnotatedUnit, ModelAn
 
 from traces_api.trace_tools import TraceAnalyzer, TraceNormalizer
 from traces_api.storage import FileStorage, File
+from traces_api.tools import escape
 
 
 class AnnotatedUnitDoesntExistsException(Exception):
@@ -68,7 +69,7 @@ class AnnotatedUnitService:
         configuration = self._trace_normalizer.prepare_configuration(ip_mapping, mac_mapping, timestamp)
         self._trace_normalizer.normalize(unit_file.location, new_ann_unit_file.location, configuration)
 
-        analyzed_data = self._trace_analyzer.analyze(new_ann_unit_file.location)
+        analyzed_data = escape(self._trace_analyzer.analyze(new_ann_unit_file.location))
 
         with open(new_ann_unit_file.location, "rb") as f:
             ann_unit_file_name = self._file_storage.save_file(f)

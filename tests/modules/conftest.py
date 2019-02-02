@@ -24,7 +24,9 @@ def service_annotated_unit(sqlalchemy_session):
 
 @pytest.fixture()
 def service_unit(sqlalchemy_session, service_annotated_unit):
-    return UnitService(sqlalchemy_session, service_annotated_unit, FileStorage(storage_folder="{}/storage/units".format(APP_DIR), compression=Compression()), mock.Mock())
+    analyzer = mock.Mock()
+    analyzer.analyze.return_value = {}
+    return UnitService(sqlalchemy_session, service_annotated_unit, FileStorage(storage_folder="{}/storage/units".format(APP_DIR), compression=Compression()), TraceAnalyzer())
 
 
 @pytest.fixture()

@@ -3,6 +3,7 @@ from flask_restplus import Resource
 from flask_injector import inject
 from pathvalidate import sanitize_python_var_name
 
+from traces_api.tools import escape
 from traces_api.api.restplus import api
 from .schemas import ann_unit_details_response, ann_unit_find_response, ann_unit_find
 from .service import AnnotatedUnitService, AnnotatedUnitDoesntExistsException, OperatorEnum, UnableToRemoveAnnotatedUnitException
@@ -26,7 +27,7 @@ class AnnUnitGet(Resource):
         if not ann_unit:
             raise AnnotatedUnitDoesntExistsException()
 
-        return ann_unit.dict()
+        return escape(ann_unit.dict())
 
 
 @ns.route('/<id_annotated_unit>/download')
@@ -69,11 +70,11 @@ class AnnUnitFind(Resource):
     @api.expect(ann_unit_find)
     @api.marshal_with(ann_unit_find_response)
     def post(self):
-        params = request.json.copy()
+        params = escape(request.json.copy())
         if "operator" in params:
             params["operator"] = OperatorEnum(params["operator"])
         data = self._service_ann_unit.get_annotated_units(**params)
-        return dict(data=[d.dict() for d in data])
+        return escape(dict(data=[d.dict() for d in data]))
 
 
 @ns.route('/<id_annotated_unit>/delete')
