@@ -9,7 +9,7 @@ from traces_api.database.model.mix import ModelMix, ModelMixLabel, ModelMixOrigi
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
 from traces_api.trace_tools import TraceNormalizer, TraceMixing
 from traces_api.storage import FileStorage, File
-from traces_api.modules.dataset.service import Mapping
+from traces_api.modules.unit.service import Mapping
 
 
 class AnnotatedUnitDoesntExistsException(Exception):

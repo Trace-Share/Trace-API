@@ -4,10 +4,10 @@ import werkzeug.datastructures
 from io import BytesIO
 from unittest import mock
 
-from traces_api.modules.dataset.service import Mapping, IPDetails
+from traces_api.modules.unit.service import Mapping, IPDetails
 
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
-from traces_api.modules.dataset.service import UnitService
+from traces_api.modules.unit.service import UnitService
 
 from traces_api.storage import FileStorage
 from traces_api.trace_tools import TraceNormalizer, TraceAnalyzer

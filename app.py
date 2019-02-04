@@ -11,7 +11,7 @@ from traces_api.api.restplus import api
 from traces_api.database.tools import recreate_database
 from traces_api.config import Config
 
-from traces_api.modules.dataset.controller import ns as dataset_namespace
+from traces_api.modules.unit.controller import ns as dataset_namespace
 from traces_api.modules.annotated_unit.controller import ns as annotated_unit_namespace
 from traces_api.modules.mix.controller import ns as mix_namespace
 
@@ -120,7 +120,7 @@ class FlaskApp:
         :param binder:
         """
 
-        from traces_api.modules.dataset.service import UnitService
+        from traces_api.modules.unit.service import UnitService
         from traces_api.modules.annotated_unit.service import AnnotatedUnitService
         from traces_api.modules.mix.service import MixService
         from traces_api.storage import FileStorage

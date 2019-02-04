@@ -1,7 +1,7 @@
 import pytest
 from io import BytesIO
 
-from traces_api.modules.dataset.service import UnitDoesntExistsException, Mapping, IPDetails
+from traces_api.modules.unit.service import UnitDoesntExistsException, Mapping, IPDetails
 
 import werkzeug.datastructures
 
