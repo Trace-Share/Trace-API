@@ -4,7 +4,6 @@ import os
 import os.path
 
 from datetime import datetime
-import werkzeug.datastructures
 
 
 class File:
@@ -105,4 +104,9 @@ class FileStorage:
         return File(abs_path)
 
     def _get_absolute_file_path(self, relative_path):
+        """
+        Return absolute path of saved file
+        :param relative_path: relative path
+        :return: absolute path on disk
+        """
         return "{}/{}".format(self._storage_folder, relative_path)

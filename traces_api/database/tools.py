@@ -5,6 +5,9 @@ from .model.annotated_unit import ModelAnnotatedUnit, ModelAnnotatedUnitLabel
 from .model.mix import ModelMix, ModelMixFileGeneration, ModelMixLabel, ModelMixOrigin
 
 
+"""
+List of all tables used in application
+"""
 TABLES = [
     ModelUnit.__table__,
     ModelAnnotatedUnit.__table__,

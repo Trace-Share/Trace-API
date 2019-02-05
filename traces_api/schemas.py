@@ -16,7 +16,7 @@ ips = fields.Nested(api.model("IPs", dict(
     target_nodes=fields.List(ip_replacement, required=True),
     intermediate_nodes=fields.List(ip_replacement, required=True),
     source_nodes=fields.List(ip_replacement, required=True),
-)), description="Classification of ip addresses, every IP address should belong to one of this categories TODO DOESNT WORK", required=True)
+)), description="Classification of ip addresses, every IP address should belong to one of this categories", required=True)
 
 
 mac = fields.String(example="00:A0:C9:14:C8:29", description="MAC addess", required=True)
@@ -68,8 +68,5 @@ analytical_data = fields.Nested(api.model("AnalyticalData", dict(
         "Strict time order": fields.String(),
         "Capture application": fields.String(),
         "Number of interfaces in file": fields.String(),
-    }))),
-
-
-
+    })))
 )))

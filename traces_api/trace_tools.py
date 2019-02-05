@@ -8,14 +8,23 @@ EXT_FOLDER = os.path.dirname(os.path.realpath(__file__)) + "/../ext"
 
 
 class TraceAnalyzerError(Exception):
+    """
+    Unknown error in trace analyzer occurs
+    """
     pass
 
 
 class TraceNormalizerError(Exception):
+    """
+    Unknown error in trace normalizer occurs
+    """
     pass
 
 
 class TraceMixerError(Exception):
+    """
+    Unknown error in trace mixer occurs
+    """
     pass
 
 
@@ -32,11 +41,11 @@ class TraceAnalyzer:
         """
         Analyze captured traffic dump
 
-        Tool is able to extract this information from captured traffuc dump:
+        Tool is able to extract this information from captured traffic dump:
         - tcp conversations
         - ip paris
         - mac pairs
-        - other capture informations
+        - other capture information
 
         :param filepath: path to file to be analyzed
         :return: dict that contains analyzed information
