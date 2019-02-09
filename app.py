@@ -152,15 +152,26 @@ class FlaskApp:
         return app
 
 
-def run():
+def get_config():
+    return Config("config.ini")
+
+
+def get_flask_application():
     """
     Rum application
     """
-    config = Config("config.ini")
+    config = get_config()
 
     session = prepare_database(config.get("database", "connection_string"))
 
     app = FlaskApp(session, config).create_app()
+    return app
+
+
+def run():
+    config = get_config()
+    
+    app = get_flask_application()
     app.run(debug=True, port=int(config.get("app", "port")))
 
 

@@ -1,7 +1,7 @@
 from flask import send_file, request
 from flask_restplus import Resource
 from flask_injector import inject
-from pathvalidate import sanitize_python_var_name
+from pathvalidate import sanitize_filename
 
 from traces_api.api.restplus import api
 from traces_api.tools import escape
@@ -60,7 +60,7 @@ class MixDownload(Resource):
         mix = self._service_mix.get_mix(id_mix)
         file = self._service_mix.download_mix(id_mix)
 
-        file_name = "%s.pcap" % sanitize_python_var_name(mix.name)
+        file_name = "%s.pcap" % sanitize_filename(mix.name)
         if file.is_compressed():
             file_name += ".gz"
 

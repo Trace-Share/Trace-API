@@ -1,7 +1,7 @@
 from flask import send_file, request
 from flask_restplus import Resource
 from flask_injector import inject
-from pathvalidate import sanitize_python_var_name
+from pathvalidate import sanitize_filename
 
 from traces_api.tools import escape
 from traces_api.api.restplus import api
@@ -46,7 +46,7 @@ class AnnUnitDownload(Resource):
         ann_unit = self._service_ann_unit.get_annotated_unit(id_annotated_unit)
         file = self._service_ann_unit.download_annotated_unit(id_annotated_unit)
 
-        file_name = "%s.pcap" % sanitize_python_var_name(ann_unit.name)
+        file_name = "%s.pcap" % sanitize_filename(ann_unit.name)
         if file.is_compressed():
             file_name += ".gz"
 
