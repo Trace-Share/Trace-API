@@ -3,13 +3,18 @@ import pytest
 from app import create_engine, setup_database
 
 from traces_api.database.tools import recreate_database
+from traces_api.config import Config
 from sqlalchemy.pool import StaticPool
 
 
 @pytest.fixture()
-def database_url():
-    # return "postgresql://root:example@localhost/traces"
-    return "sqlite://"
+def config():
+    return Config("config_tests.ini")
+
+
+@pytest.fixture()
+def database_url(config):
+    return config.get("database", "connection_string")
 
 
 @pytest.fixture(scope="function")

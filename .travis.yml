@@ -2,8 +2,18 @@ language: python
 
 python: 3.6
 
+services:
+  - docker
+  - postgresql
+
+before_script:
+  - psql -c 'create database traces;' -U postgres
+  - rm -f config_tests.ini && mv config_tests.ini.travis config_tests.ini
+
 install:
   - pip install -r requirements.txt
+  - pip install pytest==3.6
+  - bash build_docker_image.sh
 
 script:
-  - py.test -v
+  - py.test -v .

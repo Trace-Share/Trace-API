@@ -5,11 +5,6 @@ from app import FlaskApp
 from traces_api.config import Config
 
 
-@pytest.fixture()
-def config():
-    return Config("config.ini")
-
-
 @pytest.fixture
 def app(sqlalchemy_session, config):
     app = FlaskApp(sqlalchemy_session, config).create_app()
