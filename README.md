@@ -1,6 +1,8 @@
 # Traces-API
 
-Full API to support handling of packet traces.
+![CI status](https://travis-ci.org/Trace-Share/Trace-API.svg?branch=master)
+
+Full API to support handling of packet traces. 
 
 
 ## Requirements
