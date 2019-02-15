@@ -8,7 +8,7 @@ from flask import Flask, Blueprint
 from flask_injector import FlaskInjector
 
 from traces_api.api.restplus import api
-from traces_api.database.tools import recreate_database
+from traces_api.database.tools import create_database
 from traces_api.config import Config
 
 from traces_api.modules.unit.controller import ns as dataset_namespace
@@ -61,7 +61,7 @@ def prepare_database(url):
     engine = create_engine(url)
     session_maker = setup_database(engine)
 
-    recreate_database(engine)
+    create_database(engine)
 
     return session_maker
 

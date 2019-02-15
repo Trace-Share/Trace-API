@@ -19,6 +19,15 @@ TABLES = [
 ]
 
 
+def create_database(engine):
+    """
+    Create database schema if not exists
+    :param engine: sqlalchemy engine
+    :return:
+    """
+    Base.metadata.create_all(engine, tables=TABLES)
+
+
 def recreate_database(engine):
     """
     Drop all known database tables and create them from scratch
