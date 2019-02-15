@@ -81,7 +81,7 @@ class MixService:
 
         mix_file = File(mixing.get_mixed_file_location())
         with open(mix_file.location, "rb") as f:
-            file_name = self._file_storage.save_file(f)
+            file_name = self._file_storage.save_file(f, format="pcap")
 
         mix_generation = self.get_mix_generation_by_id_generation(mix_generation_id)
         mix_generation.file_location = file_name

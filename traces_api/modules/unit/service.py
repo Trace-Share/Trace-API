@@ -178,7 +178,7 @@ class UnitService(UnitServiceAbstract):
         if file.mimetype not in expected_mime_types:
             raise Exception("Invalid MIME type {}, expected: {}".format(file.mimetype, expected_mime_types))
 
-        file_path = self._file_storage.save_file(file.stream)
+        file_path = self._file_storage.save_file(file.stream, format="pcap")
 
         unit = ModelUnit(
             creation_time=datetime.now(),

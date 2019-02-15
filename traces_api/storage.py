@@ -4,6 +4,7 @@ import os
 import os.path
 
 from datetime import datetime
+from pathvalidate import sanitize_filename
 
 
 class File:
@@ -70,13 +71,14 @@ class FileStorage:
         t = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
         return "{}_{}".format(t, str(uuid.uuid4())[:5])
 
-    def save_file(self, file_stream):
+    def save_file(self, file_stream, format):
         """
         :param file_stream:
+        :param format: file format (e.g. pcap, ...)
         :return: Relative file location
         """
 
-        file_name = "{}.gz".format(self._generate_file_name())
+        file_name = "{}.{}.gz".format(self._generate_file_name(), sanitize_filename(format))
         file_path = "{}/{}".format(self._storage_folder, file_name)
 
         self._compression.compress(file_stream, file_path)
