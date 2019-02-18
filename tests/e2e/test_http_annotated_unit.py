@@ -143,5 +143,4 @@ def test_escape(client):
 
     r = client.post("/annotated_unit/find", json=dict(name="string a'bc"), content_type="application/json")
     assert len(r.json["data"]) == 1
-    assert r.json["data"][0]["name"] == "string a'bc"
-    
+    assert r.json["data"][0]["name"] == "string a&amp;#39;bc"

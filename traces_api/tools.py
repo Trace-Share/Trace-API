@@ -1,4 +1,5 @@
 import datetime
+import flask
 
 
 def escape(input):
@@ -36,4 +37,4 @@ def escape_str(input):
     :return: escaped value
     """
 
-    return input.replace("<", "").replace(">", "")
+    return str(flask.escape(input))
