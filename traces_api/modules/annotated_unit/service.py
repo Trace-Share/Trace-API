@@ -81,7 +81,7 @@ class AnnotatedUnitService:
             stats=json.dumps(analyzed_data),
             ip_details=json.dumps(ip_details.dict()),
             file_location=ann_unit_file_name,
-            labels=[ModelAnnotatedUnitLabel(label=l) for l in labels]
+            labels=[ModelAnnotatedUnitLabel(label=l.lower()) for l in labels]
         )
 
         self._session.add(annotated_unit)
@@ -127,14 +127,14 @@ class AnnotatedUnitService:
         filters = []
 
         if name:
-            filters.append(ModelAnnotatedUnit.name.like("%{}%".format(name)))
+            filters.append(ModelAnnotatedUnit.name.ilike("%{}%".format(name)))
 
         if description:
-            filters.append(ModelAnnotatedUnit.description.like("%{}%".format(description)))
+            filters.append(ModelAnnotatedUnit.description.ilike("%{}%".format(description)))
 
         if labels:
             for label in labels:
-                sub_q = self._session.query(ModelAnnotatedUnit).filter(ModelAnnotatedUnitLabel.label == label).filter(
+                sub_q = self._session.query(ModelAnnotatedUnit).filter(ModelAnnotatedUnitLabel.label == label.lower()).filter(
                     ModelAnnotatedUnitLabel.id_annotated_unit == ModelAnnotatedUnit.id_annotated_unit
                 )
                 filters.append(sub_q.exists())

@@ -12,7 +12,7 @@ def test_get_ann_unit(client, id_ann_unit1):
     assert r.json["id_annotated_unit"] == id_ann_unit1
     assert r.json["name"] == "My annotated unit"
     assert r.json["description"] == "Description My annotated unit"
-    assert set(r.json["labels"]) == {"IMPORTANT", "SECOND_LABEL"}
+    assert set(r.json["labels"]) == {"important", "second_label"}
     assert r.json["ip_details"] == {'intermediate_nodes': ['172.16.0.0'], 'source_nodes': ['172.16.0.0'], 'target_nodes': ['172.16.0.0']}
 
 
@@ -63,7 +63,7 @@ def test_find_ann_unit(client, id_ann_unit1):
     assert r.status_code == 200
 
     assert len(r.json["data"]) == 1
-    assert r.json["data"][0] == {'id_annotated_unit': 1, 'labels': ['IMPORTANT', 'SECOND_LABEL'], 'name': 'My annotated unit'}
+    assert r.json["data"][0] == {'id_annotated_unit': 1, 'labels': ['important', 'second_label'], 'name': 'My annotated unit'}
 
 
 def test_find_by_name(client):
@@ -122,6 +122,22 @@ def test_find_operator_or(client):
 
     r = client.post("/annotated_unit/find", json=dict(labels=["ABC"],  operator="OR"), content_type="application/json")
     assert len(r.json["data"]) == 0
+
+
+def test_find_ignore_case(client):
+    create_ann_unit(client, "First ann unit #1", labels=["L1", "L2"])
+    create_ann_unit(client, "First ann unit #2", labels=["L2", "L3"])
+
+    r = client.post("/annotated_unit/find", json=dict(labels=["l2"], operator="AND"), content_type="application/json")
+    assert len(r.json["data"]) == 2
+    r = client.post("/annotated_unit/find", json=dict(labels=["l1", "L3"], operator="OR"), content_type="application/json")
+    assert len(r.json["data"]) == 2
+
+    r = client.post("/annotated_unit/find", json=dict(name="AnN uNiT #1"), content_type="application/json")
+    assert len(r.json["data"]) == 1
+
+    r = client.post("/annotated_unit/find", json=dict(description="DeScRipTion"), content_type="application/json")
+    assert len(r.json["data"]) == 2
 
 
 def test_find_pagination(client):

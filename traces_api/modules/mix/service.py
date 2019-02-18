@@ -107,7 +107,7 @@ class MixService:
             name=name,
             description=description,
             creation_time=datetime.now(),
-            labels=[ModelMixLabel(label=l) for l in labels],
+            labels=[ModelMixLabel(label=l.lower()) for l in labels],
             origins=[
                 ModelMixOrigin(
                     id_annotated_unit=ann_unit["id_annotated_unit"],
@@ -230,14 +230,14 @@ class MixService:
         filters = []
 
         if name:
-            filters.append(ModelMix.name.like("%{}%".format(name)))
+            filters.append(ModelMix.name.ilike("%{}%".format(name)))
 
         if description:
-            filters.append(ModelMix.description.like("%{}%".format(description)))
+            filters.append(ModelMix.description.ilike("%{}%".format(description)))
 
         if labels:
             for label in labels:
-                sub_q = self._session.query(ModelMix).filter(ModelMixLabel.label == label).filter(
+                sub_q = self._session.query(ModelMix).filter(ModelMixLabel.label == label.lower()).filter(
                     ModelMixLabel.id_mix == ModelMix.id_mix
                 )
                 filters.append(sub_q.exists())

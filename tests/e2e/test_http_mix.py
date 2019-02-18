@@ -142,6 +142,8 @@ def test_find(client):
     assert len(r.json["data"]) == 2
     r = client.post("/mix/find", json=dict(name="Second mix #2", operator="AND"), content_type="application/json")
     assert len(r.json["data"]) == 1
+    r = client.post("/mix/find", json=dict(name="seconD MiX #2", operator="AND"), content_type="application/json")
+    assert len(r.json["data"]) == 1
 
     r = client.post("/mix/find", json=dict(name="Non existing mix", operator="AND"), content_type="application/json")
     assert len(r.json["data"]) == 0
