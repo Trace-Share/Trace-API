@@ -57,14 +57,16 @@ class File:
 
 class FileStorage:
 
-    def __init__(self, storage_folder, compression):
+    def __init__(self, storage_folder, compression, subdirectories=True):
         """
         :param storage_folder: Storage folder where files will be saved.
                                Application should have correct permissions to write to this folder.
         :param compression: Used for compressing files
+        :param subdirectories: True if enable subdirectories in storage
         """
         self._storage_folder = storage_folder
         self._compression = compression
+        self._subdirectories = subdirectories
 
     @staticmethod
     def _generate_file_name():
@@ -82,8 +84,16 @@ class FileStorage:
         :param format: file format (e.g. pcap, ...)
         :return: Relative file location
         """
+        if self._subdirectories:
+            current_date = datetime.now().strftime("%Y-%m-%d")
 
-        file_name = "{}.{}.gz".format(self._generate_file_name(), sanitize_filename(format))
+            if not os.path.isdir("{}/{}".format(self._storage_folder, current_date)):
+                os.mkdir("{}/{}".format(self._storage_folder, current_date))
+
+            file_name = "{}/{}.{}.gz".format(current_date, self._generate_file_name(), sanitize_filename(format))
+        else:
+            file_name = "{}.{}.gz".format(self._generate_file_name(), sanitize_filename(format))
+
         file_path = "{}/{}".format(self._storage_folder, file_name)
 
         self._compression.compress(file_stream, file_path)

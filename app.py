@@ -128,7 +128,7 @@ class FlaskApp:
         annotated_unit_storage = FileStorage(self._abs_storage_path(self._config.get("storage", "ann_units_dir")), compression=Compression())
         annotated_unit_service = AnnotatedUnitService(self._session_maker, annotated_unit_storage, TraceAnalyzer(), TraceNormalizer())
 
-        unit_storage = FileStorage(self._abs_storage_path(self._config.get("storage", "units_dir")), compression=Compression())
+        unit_storage = FileStorage(self._abs_storage_path(self._config.get("storage", "units_dir")), compression=Compression(), subdirectories=False)
         unit_service = UnitService(self._session_maker, annotated_unit_service, unit_storage, TraceAnalyzer())
 
         mix_storage = FileStorage(self._abs_storage_path(self._config.get("storage", "mixes_dir")), compression=Compression())
