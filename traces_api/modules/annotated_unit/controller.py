@@ -46,7 +46,7 @@ class AnnUnitDownload(Resource):
         ann_unit = self._service_ann_unit.get_annotated_unit(id_annotated_unit)
         file = self._service_ann_unit.download_annotated_unit(id_annotated_unit)
 
-        file_name = "%s.pcap" % sanitize_filename(ann_unit.name)
+        file_name = "%s.%s" % (sanitize_filename(ann_unit.name), sanitize_filename(file.format))
         if file.is_compressed():
             file_name += ".gz"
 

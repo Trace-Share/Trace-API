@@ -72,7 +72,7 @@ class AnnotatedUnitService:
         analyzed_data = escape(self._trace_analyzer.analyze(new_ann_unit_file.location))
 
         with open(new_ann_unit_file.location, "rb") as f:
-            ann_unit_file_name = self._file_storage.save_file(f, format="pcap")
+            ann_unit_file_name = self._file_storage.save_file(f, format=unit_file.format)
 
         annotated_unit = ModelAnnotatedUnit(
             name=name,

@@ -19,6 +19,11 @@ class File:
         """
         self.location = location
 
+        if self.location.endswith(".gz"):
+            self.format = self.location.split(".")[-2]
+        else:
+            self.format = self.location.split(".")[-1]
+
     def move_file(self, new_location):
         """
         Move file to specific location

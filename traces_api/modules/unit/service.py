@@ -174,11 +174,16 @@ class UnitService(UnitServiceAbstract):
         return unit
 
     def unit_upload(self, file):
-        expected_mime_types = ["application/vnd.tcpdump.pcap"]
+        expected_mime_types = ["application/vnd.tcpdump.pcap", "application/octet-stream"]
         if file.mimetype not in expected_mime_types:
             raise Exception("Invalid MIME type {}, expected: {}".format(file.mimetype, expected_mime_types))
 
-        file_path = self._file_storage.save_file(file.stream, format="pcap")
+        if file.mimetype == "application/vnd.tcpdump.pcap":
+            format = "pcap"
+        else:
+            format = "pcapng"
+
+        file_path = self._file_storage.save_file(file.stream, format)
 
         unit = ModelUnit(
             creation_time=datetime.now(),

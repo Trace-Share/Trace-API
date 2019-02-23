@@ -60,7 +60,7 @@ class MixDownload(Resource):
         mix = self._service_mix.get_mix(id_mix)
         file = self._service_mix.download_mix(id_mix)
 
-        file_name = "%s.pcap" % sanitize_filename(mix.name)
+        file_name = "%s.%s" % (sanitize_filename(mix.name), sanitize_filename(file.format))
         if file.is_compressed():
             file_name += ".gz"
 
