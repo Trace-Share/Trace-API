@@ -1,6 +1,7 @@
 import json
 
 from datetime import datetime
+from sqlalchemy import desc
 
 from traces_api.database.model.unit import ModelUnit
 from traces_api.modules.annotated_unit.service import AnnotatedUnitService
@@ -13,6 +14,13 @@ class UnitDoesntExistsException(Exception):
     """
     Unit doesnt exits
     This exception is raised when annotated unit is not found in database
+    """
+    pass
+
+
+class InvalidUnitStageException(Exception):
+    """
+    Unit is not not stage it should be use another method
     """
     pass
 
@@ -188,7 +196,8 @@ class UnitService(UnitServiceAbstract):
         unit = ModelUnit(
             creation_time=datetime.now(),
             last_update_time=datetime.now(),
-            uploaded_file_location=file_path
+            uploaded_file_location=file_path,
+            stage="upload"
         )
 
         self._session.add(unit)
@@ -200,8 +209,12 @@ class UnitService(UnitServiceAbstract):
         if not unit:
             raise UnitDoesntExistsException()
 
+        if unit.stage != "upload":
+            raise InvalidUnitStageException()
+
         annotation = dict(name=name, description=description, labels=labels)
         unit.annotation = json.dumps(annotation)
+        unit.stage = "annotate"
 
         self._session.add(unit)
         self._session.commit()
@@ -211,6 +224,9 @@ class UnitService(UnitServiceAbstract):
         unit = self._get_unit(id_unit)
         if not unit:
             raise UnitDoesntExistsException()
+
+        if unit.stage != "annotate":
+            raise InvalidUnitStageException()
 
         unit_annotation = json.loads(unit.annotation)
 
@@ -225,9 +241,11 @@ class UnitService(UnitServiceAbstract):
             labels=unit_annotation["labels"]
         )
 
+        unit_file_location = unit.uploaded_file_location
+        self._session.delete(unit)
         self._session.commit()
 
-        self._file_storage.remove_file(unit.uploaded_file_location)
+        self._file_storage.remove_file(unit_file_location)
 
         return annotated_unit
 
@@ -238,3 +256,19 @@ class UnitService(UnitServiceAbstract):
 
         self._session.delete(unit)
         self._session.commit()
+
+    def get_units(self, limit=100, page=0):
+        """
+        Find units
+
+        :param limit: number of mixes returned in one request, default 100
+        :param page: page id, starting from 0
+        :return: list of units
+        """
+        q = self._session.query(ModelUnit)
+
+        q = q.order_by(desc(ModelUnit.creation_time))
+        q = q.offset(page*limit).limit(limit)
+
+        units = q.all()
+        return units

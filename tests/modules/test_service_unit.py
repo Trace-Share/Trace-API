@@ -94,3 +94,30 @@ def test_unit_upload_annotate_normalize(service_unit, file_hydra_1_binary):
     assert annotated_unit.id_annotated_unit
     assert annotated_unit.name == "Unit #1"
     assert annotated_unit.description == "Desc unit #1"
+
+
+def test_find(service_unit):
+    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap")
+
+    unit, _ = service_unit.unit_upload(file)
+
+    units = service_unit.get_units()
+    assert len(units) == 1
+    assert units[0].stage == "upload"
+
+    _ = service_unit.unit_annotate(unit.id_unit, "Unit #1", "Desc unit #1", ["L1", "L2"])
+
+    units = service_unit.get_units()
+    assert len(units) == 1
+    assert units[0].stage == "annotate"
+
+    service_unit.unit_normalize(
+        id_unit=unit.id_unit,
+        ip_mapping=Mapping(),
+        mac_mapping=Mapping(),
+        ip_details=IPDetails([], [], []),
+        timestamp=123456.12
+    )
+
+    units = service_unit.get_units()
+    assert len(units) == 0

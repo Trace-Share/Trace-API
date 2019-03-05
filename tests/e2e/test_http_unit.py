@@ -109,3 +109,19 @@ def test_delete_invalid_id_unit(client):
         "/unit/{}/delete".format(123)
     )
     assert r.status_code == 404
+
+
+def test_find(client, file_hydra_1_binary):
+    r = client.post(
+        "/unit/upload",
+        buffered=True,
+        content_type="multipart/form-data",
+        data={"file": (BytesIO(file_hydra_1_binary), "hydra.pcap", "application/vnd.tcpdump.pcap")}
+
+    )
+    assert r.status_code == 200
+
+    r = client.post("/unit/find", json=dict(limit=1000, page=0), content_type="application/json")
+    assert r.status_code == 200
+    assert len(r.json["data"]) == 1
+    assert r.json["data"][0]["stage"] == "upload"

@@ -250,8 +250,8 @@ class MixService:
         q = q.order_by(desc(ModelMix.creation_time))
         q = q.offset(page*limit).limit(limit)
 
-        ann_units = q.all()
-        return ann_units
+        mixes = q.all()
+        return mixes
 
     def delete_mix(self, id_mix):
         """

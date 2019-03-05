@@ -48,3 +48,20 @@ unit_step3_fields = api.model("UnitStep3", dict(
 unit_step3_response = api.model("UnitStep3Response", dict(
     id_annotated_unit=fields.Integer(example=156, description="ID of newly created annotated unit based on unit", required=True)
 ))
+
+
+# Unit find
+
+unit_find = api.model("UnitFind", dict(
+    limit=fields.Integer(description="Limit number of rows", example=25, default=100),
+    page=fields.Integer(description="Number of page to return, counting from 0 (used in pagination)", example=0),
+))
+
+unit = dict(
+    id_unit=fields.Integer(example=23, description="ID of unit", required=True),
+    creation_time=fields.String(example="2019-02-25 20:00:00", description="Creation time", required=True),
+    stage=fields.String(example="upload", description="Last unit stage", required=True),
+)
+
+unit_find_response = api.model("UnitFindResponse",
+                              dict(data=fields.List(fields.Nested(api.model("UnitBasic", unit)))))

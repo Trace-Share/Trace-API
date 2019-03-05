@@ -12,3 +12,12 @@ class ModelUnit(Base):
     annotation = Column(String(255))
     ip_mac_mapping = Column(String(255))
     uploaded_file_location = Column(String(255), nullable=False)
+    stage = Column(String(), nullable=False)
+
+    def dict(self):
+        return dict(
+            id_unit=self.id_unit,
+            creation_time=self.creation_time,
+            last_update_time=self.last_update_time,
+            stage=self.stage
+        )

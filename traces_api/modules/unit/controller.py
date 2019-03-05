@@ -6,7 +6,8 @@ from traces_api.api.restplus import api
 from traces_api.tools import escape
 from .schemas import unit_step1_fields, unit_step1_response, unit_step2_fields
 from .schemas import unit_step3_fields, unit_step3_response
-from .service import UnitService, UnitDoesntExistsException
+from .schemas import unit_find, unit_find_response
+from .service import UnitService, UnitDoesntExistsException, InvalidUnitStageException
 from .service import Mapping, IPDetails
 
 ns = api.namespace("unit", description="Unit")
@@ -102,8 +103,29 @@ class UnitDelete(Resource):
         return {}
 
 
+@ns.route('/find')
+class UnitFind(Resource):
+
+    @inject
+    def __init__(self, service_unit: UnitService, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._service_unit = service_unit
+
+    @api.expect(unit_find)
+    @api.marshal_with(unit_find_response)
+    def post(self):
+        params = escape(request.json.copy())
+        data = self._service_unit.get_units(**params)
+        return escape(dict(data=[d.dict() for d in data]))
+
+
 # errors
 
 @ns.errorhandler(UnitDoesntExistsException)
 def handle_unit_doesnt_exits(error):
     return {'message': "Unit does not exists"}, 404, {}
+
+
+@ns.errorhandler(InvalidUnitStageException)
+def handle_unit_invalid_stage(error):
+    return {'message': "Unit is not not stage it should be use another method"}, 400, {}
