@@ -43,8 +43,11 @@ def create_ann_unit(service_unit, name, labels=None):
     if not labels:
         labels = ["IMPORTANT", "SECOND_LABEL"]
 
-    file = werkzeug.datastructures.FileStorage(stream=BytesIO(get_hydra_file()),
-                                               content_type="application/vnd.tcpdump.pcap")
+    file = werkzeug.datastructures.FileStorage(
+        stream=BytesIO(get_hydra_file()),
+        content_type="application/vnd.tcpdump.pcap",
+        filename="file.pcap"
+    )
 
     unit1, _ = service_unit.unit_upload(file)
 

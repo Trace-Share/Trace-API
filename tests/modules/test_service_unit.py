@@ -7,7 +7,7 @@ import werkzeug.datastructures
 
 
 def test_unit_upload(service_unit):
-    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap")
+    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap", filename="file.pcap")
 
     unit1, _ = service_unit.unit_upload(file)
     unit2 = service_unit._get_unit(unit1.id_unit)
@@ -37,7 +37,7 @@ def test_invalid_unit_normalize(service_unit):
 
 
 def test_delete(service_unit):
-    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap")
+    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap", filename="1.pcap")
 
     unit1, _ = service_unit.unit_upload(file)
 
@@ -56,7 +56,7 @@ def test_delete_invalid_id(service_unit):
 
 
 def test_unit_upload_annotate_normalize(service_unit, file_hydra_1_binary):
-    file = werkzeug.datastructures.FileStorage(stream=BytesIO(file_hydra_1_binary), content_type="application/vnd.tcpdump.pcap")
+    file = werkzeug.datastructures.FileStorage(stream=BytesIO(file_hydra_1_binary), content_type="application/vnd.tcpdump.pcap", filename="file.pcap")
 
     unit1, _ = service_unit.unit_upload(file)
 
@@ -97,7 +97,7 @@ def test_unit_upload_annotate_normalize(service_unit, file_hydra_1_binary):
 
 
 def test_find(service_unit):
-    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap")
+    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap", filename="dump.pcap")
 
     unit, _ = service_unit.unit_upload(file)
 
