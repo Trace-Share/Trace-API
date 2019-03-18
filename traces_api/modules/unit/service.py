@@ -250,8 +250,11 @@ class UnitService(UnitServiceAbstract):
         if not unit:
             raise UnitDoesntExistsException()
 
+        unit_file_location = unit.uploaded_file_location
         self._session.delete(unit)
         self._session.commit()
+
+        self._file_storage.remove_file(unit_file_location)
 
     def get_units(self, limit=100, page=0):
         """
