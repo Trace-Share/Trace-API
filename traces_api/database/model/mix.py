@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, BigInteger
 from sqlalchemy.orm import relationship
 
 from traces_api.database import Base
@@ -8,7 +8,7 @@ class ModelMix(Base):
 
     __tablename__ = "mix"
 
-    id_mix = Column(Integer(), primary_key=True, autoincrement=True)
+    id_mix = Column(BigInteger(), primary_key=True, autoincrement=True)
     name = Column(String(64), nullable=False)
     description = Column(String(4096), nullable=False)
     creation_time = Column(DateTime, nullable=False)
@@ -33,7 +33,7 @@ class ModelMixLabel(Base):
     __tablename__ = "mix_label"
 
     id_mix = Column(
-        Integer(),
+        BigInteger(),
         ForeignKey('mix.id_mix', ondelete="CASCADE", onupdate="RESTRICT"),
         primary_key=True
     )
@@ -45,12 +45,12 @@ class ModelMixOrigin(Base):
     __tablename__ = "mix_origin"
 
     id_mix = Column(
-        Integer(),
+        BigInteger(),
         ForeignKey('mix.id_mix', ondelete="CASCADE", onupdate="RESTRICT"),
         primary_key=True
     )
     id_annotated_unit = Column(
-        Integer(),
+        BigInteger(),
         ForeignKey('annotated_unit.id_annotated_unit', ondelete="RESTRICT", onupdate="RESTRICT"),
         primary_key=True
     )
@@ -63,9 +63,9 @@ class ModelMixFileGeneration(Base):
 
     __tablename__ = "mix_file_generation"
 
-    id_mix_generation = Column(Integer(), primary_key=True, autoincrement=True)
+    id_mix_generation = Column(BigInteger(), primary_key=True, autoincrement=True)
     id_mix = Column(
-        Integer(),
+        BigInteger(),
         ForeignKey('mix.id_mix', ondelete="CASCADE", onupdate="RESTRICT"),
         index=True
     )

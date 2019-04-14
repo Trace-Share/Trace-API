@@ -1,5 +1,5 @@
 import json
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, BigInteger, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
 from traces_api.database import Base
@@ -9,7 +9,7 @@ class ModelAnnotatedUnit(Base):
 
     __tablename__ = "annotated_unit"
 
-    id_annotated_unit = Column(Integer(), primary_key=True, autoincrement=True)
+    id_annotated_unit = Column(BigInteger(), primary_key=True, autoincrement=True)
     name = Column(String(64), nullable=False)
     description = Column(String(4096), nullable=False)
     creation_time = Column(DateTime, nullable=False)
@@ -37,7 +37,7 @@ class ModelAnnotatedUnitLabel(Base):
     __tablename__ = "annotated_unit_label"
 
     id_annotated_unit = Column(
-        Integer(),
+        BigInteger(),
         ForeignKey('annotated_unit.id_annotated_unit', ondelete="CASCADE", onupdate="RESTRICT"),
         primary_key=True
     )
