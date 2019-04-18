@@ -1,7 +1,8 @@
+import os
 import json
 from enum import Enum
 from datetime import datetime
-from threading import Thread
+import multiprocessing
 from sqlalchemy import desc, update, and_, or_
 
 from traces_api.database.model.mix import ModelMix, ModelMixLabel, ModelMixOrigin, ModelMixFileGeneration
@@ -60,13 +61,25 @@ class MixService:
         """
         return self._annotated_unit_service.get_annotated_unit(id_annotated_unit) is not None
 
-    def _mix(self, mix_generation_id, annotated_units_data):
+    def generate_mix(self, mix_generation_id, annotated_units_data):
+        """
+        Generate mix
+
+        :param mix_generation_id:
+        :param annotated_units_data:
+        """
+        new_pid = os.fork()
+        if new_pid != 0:
+            exit(1)
+
         if not (all([self._exits_ann_unit(ann_unit["id_annotated_unit"]) for ann_unit in annotated_units_data])):
             raise AnnotatedUnitDoesntExistsException()
 
         self._update_mix_generation_progress(mix_generation_id, 1)
         mixing = self._trace_mixing.create_new_mixer(File.create_new().location)
 
+        num_processed = 0
+        num_ann_units = len(annotated_units_data)
         for ann_unit in annotated_units_data:
             id_annotated_unit = ann_unit["id_annotated_unit"]
 
@@ -77,7 +90,8 @@ class MixService:
 
             mixing.mix(new_ann_unit_file.location)
 
-        self._update_mix_generation_progress(mix_generation_id, 99)
+            num_processed = num_processed + 1
+            self._update_mix_generation_progress(mix_generation_id, int(99*(num_processed/num_ann_units)))
 
         mix_file = File(mixing.get_mixed_file_location())
         with open(mix_file.location, "rb") as f:
@@ -122,9 +136,9 @@ class MixService:
         self._session.commit()
         return mix
 
-    def generate_mix(self, id_mix):
+    def start_mix_generation(self, id_mix):
         """
-        Generate mix file
+        Start async mix file generation
 
         :param id_mix: id of existing mix
         :return: ModelMixFileGeneration
@@ -143,6 +157,9 @@ class MixService:
                 timestamp=origin.timestamp,
             ))
 
+        if not (all([self._exits_ann_unit(ann_unit["id_annotated_unit"]) for ann_unit in annotated_units_data])):
+            raise AnnotatedUnitDoesntExistsException()
+
         mix_generation = ModelMixFileGeneration(
             id_mix=mix.id_mix,
             creation_time=datetime.now(),
@@ -152,8 +169,10 @@ class MixService:
         self._session.add(mix_generation)
         self._session.commit()
 
-        thread = Thread(target=self._mix, args=(mix_generation.id_mix_generation, annotated_units_data))
-        thread.start()
+        p = multiprocessing.Process(target=self.generate_mix, args=(mix_generation.id_mix_generation, annotated_units_data))
+        p.daemon = True
+        p.start()
+        p.join()
 
         return mix_generation
 

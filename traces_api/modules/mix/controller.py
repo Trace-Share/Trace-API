@@ -101,7 +101,8 @@ class MixGenerate(Resource):
     @api.response(200, "Mix generation started")
     @api.doc(responses={404: "Mix not found"})
     def post(self, id_mix):
-        self._service_mix.generate_mix(id_mix)
+        self._service_mix.start_mix_generation(id_mix)
+        return {}
 
 
 @ns.route('/<id_mix>/generate/status')
