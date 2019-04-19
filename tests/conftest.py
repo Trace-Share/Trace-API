@@ -17,17 +17,23 @@ def database_url(config):
     return config.get("database", "connection_string")
 
 
-@pytest.fixture(scope="function")
-def sqlalchemy_session(database_url):
+@pytest.fixture()
+def sqlalchemy_engine(database_url):
     params = {}
     if database_url.startswith("sqlite"):
         params["connect_args"] = {'check_same_thread': False}
         params["poolclass"] = StaticPool
 
     engine = create_engine(database_url, **params)
-    session = setup_database(engine)
 
-    recreate_database(engine)
+    return engine
+
+
+@pytest.fixture(scope="function")
+def sqlalchemy_session(sqlalchemy_engine):
+    session = setup_database(sqlalchemy_engine)
+
+    recreate_database(sqlalchemy_engine)
 
     try:
         yield session

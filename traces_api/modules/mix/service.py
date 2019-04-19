@@ -42,8 +42,9 @@ class MixService:
     This class allows to perform all business logic regarding to mixes
     """
 
-    def __init__(self, session_maker, annotated_unit_service: AnnotatedUnitService, file_storage: FileStorage, trace_normalizer: TraceNormalizer, trace_mixing: TraceMixing):
+    def __init__(self, session_maker, engine, annotated_unit_service: AnnotatedUnitService, file_storage: FileStorage, trace_normalizer: TraceNormalizer, trace_mixing: TraceMixing):
         self._session_maker = session_maker
+        self._engine = engine
         self._annotated_unit_service = annotated_unit_service
         self._file_storage = file_storage
         self._trace_normalizer = trace_normalizer
@@ -68,7 +69,6 @@ class MixService:
         :param mix_generation_id:
         :param annotated_units_data:
         """
-        self._session_maker.remove()
 
         new_pid = os.fork()
         if new_pid != 0:
@@ -143,7 +143,7 @@ class MixService:
         Start async mix file generation
 
         :param id_mix: id of existing mix
-        :return: ModelMixFileGeneration
+        :return: id_mix_generation
         """
 
         mix = self.get_mix(id_mix)
@@ -170,13 +170,17 @@ class MixService:
         )
         self._session.add(mix_generation)
         self._session.commit()
+        id_mix_generation = mix_generation.id_mix_generation
 
-        p = multiprocessing.Process(target=self.generate_mix, args=(mix_generation.id_mix_generation, annotated_units_data))
+        self._session_maker.remove()
+        self._engine.dispose()
+
+        p = multiprocessing.Process(target=self.generate_mix, args=(id_mix_generation, annotated_units_data))
         p.daemon = True
         p.start()
         p.join()
 
-        return mix_generation
+        return id_mix_generation
 
     def get_mix(self, id_mix):
         """

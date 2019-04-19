@@ -63,7 +63,7 @@ def prepare_database(url):
 
     create_database(engine)
 
-    return session_maker
+    return engine, session_maker
 
 
 class FlaskApp:
@@ -71,12 +71,13 @@ class FlaskApp:
     Configure Flask Application
     """
 
-    def __init__(self, session_maker, config):
+    def __init__(self, session_maker, engine, config):
         """
-        :param session_maker: Sqlalchemy session maker
+        :param session_maker: SqlAlchemy session maker
         :param config: config
         """
         self._session_maker = session_maker
+        self._engine = engine
         self._config = config
 
     def init_app(self, flask_app):
@@ -132,7 +133,7 @@ class FlaskApp:
         unit_service = UnitService(self._session_maker, annotated_unit_service, unit_storage, TraceAnalyzer())
 
         mix_storage = FileStorage(self._abs_storage_path(self._config.get("storage", "mixes_dir")), compression=Compression())
-        mix_service = MixService(self._session_maker, annotated_unit_service, mix_storage, TraceNormalizer(), TraceMixing())
+        mix_service = MixService(self._session_maker, self._engine, annotated_unit_service, mix_storage, TraceNormalizer(), TraceMixing())
 
         binder.bind(UnitService, to=unit_service)
         binder.bind(AnnotatedUnitService, to=annotated_unit_service)
@@ -162,9 +163,9 @@ def get_flask_application():
     """
     config = get_config()
 
-    session = prepare_database(config.get("database", "connection_string"))
+    engine, session = prepare_database(config.get("database", "connection_string"))
 
-    app = FlaskApp(session, config).create_app()
+    app = FlaskApp(session, engine, config).create_app()
     return app
 
 

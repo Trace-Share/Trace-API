@@ -6,8 +6,8 @@ from traces_api.config import Config
 
 
 @pytest.fixture
-def app(sqlalchemy_session, config):
-    app = FlaskApp(sqlalchemy_session, config).create_app()
+def app(sqlalchemy_session, sqlalchemy_engine, config):
+    app = FlaskApp(sqlalchemy_session, sqlalchemy_engine, config).create_app()
     return app
 
 
