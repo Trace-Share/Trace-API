@@ -68,6 +68,8 @@ class MixService:
         :param mix_generation_id:
         :param annotated_units_data:
         """
+        self._session_maker.remove()
+
         new_pid = os.fork()
         if new_pid != 0:
             exit(1)
