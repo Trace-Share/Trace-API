@@ -165,6 +165,8 @@ def get_flask_application():
 
     engine, session = prepare_database(config.get("database", "connection_string"))
 
+    engine.dispose()
+
     app = FlaskApp(session, engine, config).create_app()
     return app
 
