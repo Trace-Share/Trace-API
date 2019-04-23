@@ -11,6 +11,7 @@ ann_unit_basic = dict(
     id_annotated_unit=id_annotated_unit,
     name=fields.String(description="Name of annotated unit", example="My annotated unit", required=True),
     labels=fields.List(label_field),
+    creation_time=fields.Integer(example=1554076800, description="Creation time of annotated unit in unixtime", required=True)
 )
 
 ann_unit = ann_unit_basic.copy()

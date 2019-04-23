@@ -22,7 +22,7 @@ class ModelMix(Base):
             id_mix=self.id_mix,
             name=self.name,
             description=self.description,
-            creation_time=self.creation_time,
+            creation_time=self.creation_time.timestamp(),
             labels=[label.label for label in self.labels],
             ids_annotated_unit=[o.id_annotated_unit for o in self.origins],
         )

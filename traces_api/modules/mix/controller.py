@@ -119,7 +119,7 @@ class MixGenerate(Resource):
     @api.doc(responses={404: "Mix not found"})
     def post(self, id_mix):
         self._service_mix.start_mix_generation(id_mix)
-        return {}
+        return dict()
 
 
 @ns.route('/<id_mix>/generate/status')
@@ -151,7 +151,7 @@ class MixDelete(Resource):
     @api.doc(responses={404: "Mix not found"})
     def delete(self, id_mix):
         self._service_mix.delete_mix(id_mix)
-        return {}
+        return dict()
 
 
 # errors

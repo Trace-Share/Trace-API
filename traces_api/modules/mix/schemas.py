@@ -11,6 +11,7 @@ mix_basic = dict(
     id_mix=fields.Integer(example=834, description="ID of mix", required=True),
     name=fields.String(description="Name of mix", example="My mix", required=True),
     labels=fields.List(label_field),
+    creation_time=fields.Integer(example=1554076800, description="Creation time of mix in unixtime", required=True)
 )
 
 mix = mix_basic.copy()

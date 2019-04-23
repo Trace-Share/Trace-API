@@ -24,7 +24,7 @@ class ModelAnnotatedUnit(Base):
             id_annotated_unit=self.id_annotated_unit,
             name=self.name,
             description=self.description,
-            creation_time=self.creation_time,
+            creation_time=self.creation_time.timestamp(),
             stats=json.loads(self.stats) if self.stats else None,
             ip_details=json.loads(self.ip_details) if self.ip_details else None,
             file_location=self.file_location,

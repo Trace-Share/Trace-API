@@ -53,7 +53,7 @@ class UnitSaveStep2(Resource):
             description=data["description"],
             labels=data["labels"],
         )
-        return {}
+        return dict()
 
 
 @ns.route("/normalize")
@@ -100,7 +100,7 @@ class UnitDelete(Resource):
     @api.doc(responses={404: "Unit not found"})
     def delete(self, id_unit):
         self._service_unit.unit_delete(id_unit)
-        return {}
+        return dict()
 
 
 @ns.route('/find')

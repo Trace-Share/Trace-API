@@ -54,6 +54,7 @@ def test_update(client):
     assert r.json["name"] == "Mix #1"
     assert r.json["description"] == "Mix description #1"
     assert set(r.json["labels"]) == {"l1", "label2"}
+    assert r.json["creation_time"]
 
     # update mix
     data = dict(

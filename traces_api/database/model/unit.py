@@ -17,7 +17,7 @@ class ModelUnit(Base):
     def dict(self):
         return dict(
             id_unit=self.id_unit,
-            creation_time=self.creation_time,
-            last_update_time=self.last_update_time,
+            creation_time=self.creation_time.timestamp(),
+            last_update_time=self.last_update_time.timestamp(),
             stage=self.stage
         )

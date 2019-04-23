@@ -7,13 +7,14 @@ def test_get_ann_unit(client, id_ann_unit1):
     )
     assert r.status_code == 200
 
-    assert set(r.json.keys()) == {"name", "description", "ip_details", "labels", "id_annotated_unit", "stats"}
+    assert set(r.json.keys()) == {"name", "description", "ip_details", "labels", "id_annotated_unit", "stats", "creation_time"}
 
     assert r.json["id_annotated_unit"] == id_ann_unit1
     assert r.json["name"] == "My annotated unit"
     assert r.json["description"] == "Description My annotated unit"
     assert set(r.json["labels"]) == {"important", "second_label"}
     assert r.json["ip_details"] == {'intermediate_nodes': ['172.16.0.0'], 'source_nodes': ['172.16.0.0'], 'target_nodes': ['172.16.0.0']}
+    assert r.json["creation_time"]
 
 
 def test_get_ann_unit_invalid_id(client, id_ann_unit1):
@@ -63,6 +64,7 @@ def test_find_ann_unit(client, id_ann_unit1):
     assert r.status_code == 200
 
     assert len(r.json["data"]) == 1
+    del r.json["data"][0]["creation_time"]
     assert r.json["data"][0] == {'id_annotated_unit': 1, 'labels': ['important', 'second_label'], 'name': 'My annotated unit'}
 
 

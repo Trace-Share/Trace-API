@@ -107,7 +107,7 @@ class AnnUnitDelete(Resource):
     @api.doc(responses={409: "Unable to remove annotated unit. There exists mix that contains this annotated unit"})
     def delete(self, id_annotated_unit):
         self._service_ann_unit.delete_annotated_unit(id_annotated_unit)
-        return {}
+        return dict()
 
 
 # errors
