@@ -5,7 +5,7 @@ from pathvalidate import sanitize_filename
 
 from traces_api.api.restplus import api
 from traces_api.tools import escape
-from .schemas import mix_detail_response, mix_find, mix_find_response, mix_create, mix_create_response
+from .schemas import mix_detail_response, mix_find, mix_find_response, mix_create, mix_create_response, mix_update
 from .schemas import mix_generate_status_response
 from .service import MixService, MixDoesntExistsException, AnnotatedUnitDoesntExistsException, OperatorEnum
 
@@ -22,10 +22,27 @@ class MixCreate(Resource):
 
     @api.expect(mix_create)
     @api.marshal_with(mix_create_response)
-    @api.doc(responses={404: "Annotated unit not found"})
+    @api.doc(responses={404: "Mix not found"})
     def post(self):
         mix = self._service_mix.create_mix(**escape(request.json))
         return dict(id_mix=mix.id_mix)
+
+
+@ns.route('/<id_mix>/update')
+@api.doc(params={'id_mix': 'ID of mix'})
+class MixUpdate(Resource):
+
+    @inject
+    def __init__(self, service_mix: MixService, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._service_mix = service_mix
+
+    @api.expect(mix_update)
+    @api.response(200, "Mix updated")
+    @api.doc(responses={404: "Mix not found"})
+    def post(self, id_mix):
+        self._service_mix.update_mix(id_mix, **escape(request.json))
+        return dict()
 
 
 @ns.route('/<id_mix>/detail')

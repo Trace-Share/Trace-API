@@ -26,7 +26,10 @@ def get_medusa_file():
         return f.read()
 
 
-def create_ann_unit(client, name, labels=None):
+def create_ann_unit(client, name, description=None, labels=None):
+    if not description:
+        description = "Description %s" % name
+
     if not labels:
         labels = ["IMPORTANT", "SECOND_LABEL"]
 
@@ -41,7 +44,7 @@ def create_ann_unit(client, name, labels=None):
     r2 = client.post("/unit/annotate", json={
         "id_unit": r1.json["id_unit"],
         "name": name,
-        "description": "Description %s" % name,
+        "description": description,
         "labels": labels,
     }, content_type="application/json")
     assert r2.status_code == 200

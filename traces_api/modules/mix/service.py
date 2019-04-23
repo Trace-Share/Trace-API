@@ -138,6 +138,35 @@ class MixService:
         self._session.commit()
         return mix
 
+    def update_mix(self, id_mix, name=None, description=None, labels=None):
+        """
+        Update mix
+
+        :param id_mix: id of existing mix
+        :param name: mix name
+        :param description: mix description
+        :param labels: labels that will be connected to mix
+        :return: Modelmix updated mix
+        """
+
+        mix = self.get_mix(id_mix)
+        if not mix:
+            raise MixDoesntExistsException(id_mix)
+
+        if name:
+            mix.name = name
+
+        if description:
+            mix.description = description
+
+        if labels:
+            mix.labels = [ModelMixLabel(label=l.lower()) for l in labels]
+
+        self._session.add(mix)
+        self._session.commit()
+
+        return mix
+
     def start_mix_generation(self, id_mix):
         """
         Start async mix file generation

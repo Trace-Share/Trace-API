@@ -29,6 +29,57 @@ def test_create(client):
     assert r.json["id_mix"]
 
 
+def test_update(client):
+    aunit1 = create_ann_unit(client, "First ann unit #1")
+
+    data = dict(
+        name="Mix #1",
+        description="Mix description #1",
+        labels=["l1", "label2"],
+        annotated_units=[
+            dict(
+                id_annotated_unit=aunit1,
+                ip_mapping=[],
+                mac_mapping=[],
+                timestamp=134
+            ),
+        ]
+    )
+    r = client.post("/mix/create", json=data, content_type="application/json")
+    assert r.json["id_mix"]
+
+    id_mix = r.json["id_mix"]
+
+    r = client.get("/mix/%s/detail" % id_mix, content_type="application/json")
+    assert r.json["name"] == "Mix #1"
+    assert r.json["description"] == "Mix description #1"
+    assert set(r.json["labels"]) == {"l1", "label2"}
+
+    # update mix
+    data = dict(
+        name="Updated mix name",
+        description="Updated description",
+        labels=["new_label"]
+    )
+    r2 = client.post("/mix/%s/update" % id_mix, json=data, content_type="application/json")
+    assert r2.status_code == 200
+
+    r = client.get("/mix/%s/detail" % id_mix, content_type="application/json")
+    assert r.json["name"] == "Updated mix name"
+    assert r.json["description"] == "Updated description"
+    assert set(r.json["labels"]) == {"new_label"}
+
+
+def test_update_invalid_id(client):
+    data = dict(
+        name="Updated mix name",
+        description="Updated description",
+        labels=["new_label"]
+    )
+    r = client.post("/mix/%s/update" % 4567, json=data, content_type="application/json")
+    assert r.status_code == 404
+
+
 def test_generate_and_download(client):
     aunit1 = create_ann_unit(client, "First ann unit #1")
     aunit2 = create_ann_unit(client, "Second ann unit #2")

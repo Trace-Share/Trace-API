@@ -20,6 +20,12 @@ ann_unit.update(dict(
     stats=analytical_data,
 ))
 
+ann_unit_update = api.model("AnnUnitUpdate", dict(
+    name=fields.String(description="Name of annotated unit", example="My unit"),
+    labels=fields.List(label_field),
+    description=fields.String(),
+))
+
 
 ann_unit_details_response = api.model("AnnotatedUnitDetailsResponse", ann_unit)
 

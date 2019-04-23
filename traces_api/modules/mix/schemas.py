@@ -28,10 +28,16 @@ annotated_units = api.model("AnnotatedUnits", dict(
 
 
 mix_create = api.model("MixCreate", dict(
-    name=fields.String(description="Name of unit", example="My unit", required=True),
+    name=fields.String(description="Name of mix", example="My mix", required=True),
     labels=fields.List(label_field),
     description=fields.String(),
     annotated_units=fields.List(fields.Nested(annotated_units), required=True),
+))
+
+mix_update = api.model("MixUpdate", dict(
+    name=fields.String(description="Name of mix", example="My mix"),
+    labels=fields.List(label_field),
+    description=fields.String(),
 ))
 
 mix_create_response = api.model("MixCreateResponse", dict(

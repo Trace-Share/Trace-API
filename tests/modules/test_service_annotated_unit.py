@@ -125,3 +125,16 @@ def test_find_pagination(service_annotated_unit, service_unit):
     r = service_annotated_unit.get_annotated_units(limit=2, page=1)
     assert len(r) == 1
     assert [d.name for d in r] == ["#1"]
+
+
+def test_update(service_annotated_unit, ann_unit1):
+    assert ann_unit1.name == "My annotated unit"
+    assert ann_unit1.description == "Description My annotated unit"
+    assert {l.label for l in ann_unit1.labels} == {"important", "second_label"}
+
+    service_annotated_unit.update_annotated_unit(ann_unit1.id_annotated_unit, "New name", "New desc", ["abc"])
+
+    ann_unit2 = service_annotated_unit.get_annotated_unit(ann_unit1.id_annotated_unit)
+    assert ann_unit2.name == "New name"
+    assert ann_unit2.description == "New desc"
+    assert {l.label for l in ann_unit2.labels} == {"abc"}

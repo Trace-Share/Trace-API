@@ -5,7 +5,7 @@ from pathvalidate import sanitize_filename
 
 from traces_api.tools import escape
 from traces_api.api.restplus import api
-from .schemas import ann_unit_details_response, ann_unit_find_response, ann_unit_find
+from .schemas import ann_unit_details_response, ann_unit_find_response, ann_unit_find, ann_unit_update
 from .service import AnnotatedUnitService, AnnotatedUnitDoesntExistsException, OperatorEnum, UnableToRemoveAnnotatedUnitException
 
 ns = api.namespace("annotated_unit", description="AnnotatedUnit")
@@ -57,6 +57,22 @@ class AnnUnitDownload(Resource):
             as_attachment=True,
             cache_timeout=0
         )
+
+
+@ns.route('/<id_annotated_unit>/update')
+class AnnUnitUpdate(Resource):
+
+    @inject
+    def __init__(self, service_ann_unit: AnnotatedUnitService, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._service_ann_unit = service_ann_unit
+
+    @api.expect(ann_unit_update)
+    @api.response(200, "Annotated unit updated")
+    @api.doc(responses={404: "Annotated unit not found"})
+    def post(self, id_annotated_unit):
+        self._service_ann_unit.update_annotated_unit(id_annotated_unit, **escape(request.json))
+        return dict()
 
 
 @ns.route('/find')

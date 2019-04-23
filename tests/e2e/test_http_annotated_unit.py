@@ -154,6 +154,39 @@ def test_find_pagination(client):
     assert [d["name"] for d in r.json["data"]] == ["#1"]
 
 
+def test_update(client):
+    id_ann_unit = create_ann_unit(client, "First ann unit #1", "First desc", ["l1", "l3"])
+
+    r = client.get("/annotated_unit/%s/get" % id_ann_unit, content_type="application/json")
+    assert r.json["name"] == "First ann unit #1"
+    assert r.json["description"] == "First desc"
+    assert set(r.json["labels"]) == {"l1", "l3"}
+
+    # update annotated unit
+    data = dict(
+        name="Updated unit name",
+        description="Updated description ##",
+        labels=["new_label"]
+    )
+    r2 = client.post("/annotated_unit/%s/update" % id_ann_unit, json=data, content_type="application/json")
+    assert r2.status_code == 200
+
+    r = client.get("/annotated_unit/%s/get" % id_ann_unit, json=data, content_type="application/json")
+    assert r.json["name"] == "Updated unit name"
+    assert r.json["description"] == "Updated description ##"
+    assert set(r.json["labels"]) == {"new_label"}
+
+
+def test_update_invalid_id(client):
+    data = dict(
+        name="Updated name",
+        description="Updated description",
+        labels=["new_label"]
+    )
+    r = client.post("/annotated_unit/%s/update" % 4567, json=data, content_type="application/json")
+    assert r.status_code == 404
+
+
 def test_escape(client):
     create_ann_unit(client, "string a'bc")
 

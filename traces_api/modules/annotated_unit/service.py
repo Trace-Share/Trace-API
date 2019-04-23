@@ -87,6 +87,33 @@ class AnnotatedUnitService:
         self._session.add(annotated_unit)
         return annotated_unit
 
+    def update_annotated_unit(self, id_annotated_unit, name=None, description=None, labels=None):
+        """
+        Update annotated unit
+
+        :param id_annotated_unit:
+        :param name: Name of annotated unit
+        :param description: Description of annotated unit
+        :param labels: Annotated unit labels
+        :return: updated annotated unit
+        """
+        ann_unit = self.get_annotated_unit(id_annotated_unit)
+        if not ann_unit:
+            raise AnnotatedUnitDoesntExistsException()
+
+        if name:
+            ann_unit.name = name
+
+        if description:
+            ann_unit.description = description
+
+        if labels:
+            ann_unit.labels = [ModelAnnotatedUnitLabel(label=l.lower()) for l in labels]
+
+        self._session.add(ann_unit)
+        self._session.commit()
+        return ann_unit
+
     def get_annotated_unit(self, id_annotated_unit):
         """
         Get annotated unit by uid_id from database

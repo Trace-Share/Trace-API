@@ -14,7 +14,7 @@ class ModelMix(Base):
     creation_time = Column(DateTime, nullable=False)
     stats = Column(String(4096))
 
-    labels = relationship("ModelMixLabel", cascade="all,delete")
+    labels = relationship("ModelMixLabel", cascade="all,delete,delete-orphan")
     origins = relationship("ModelMixOrigin", cascade="all,delete")
 
     def dict(self):

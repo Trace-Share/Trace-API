@@ -17,7 +17,7 @@ class ModelAnnotatedUnit(Base):
     ip_details = Column(Text(), nullable=False)
     file_location = Column(String(255), nullable=False)
 
-    labels = relationship("ModelAnnotatedUnitLabel", cascade="all,delete")
+    labels = relationship("ModelAnnotatedUnitLabel", cascade="all,delete,delete-orphan")
 
     def dict(self):
         return dict(
