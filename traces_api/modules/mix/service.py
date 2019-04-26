@@ -320,3 +320,13 @@ class MixService:
 
         self._session.delete(mix)
         self._session.commit()
+
+    def find_mixes_by_annotated_unit(self, id_annotated_unit):
+        """
+        Find all mixes containing specific annotated unit
+
+        :param id_annotated_unit:
+        :return: set of mixes
+        """
+        q = self._session.query(ModelMixOrigin).filter(ModelMixOrigin.id_annotated_unit == id_annotated_unit)
+        return {m.id_mix for m in q.all()}

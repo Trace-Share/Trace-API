@@ -24,7 +24,11 @@ class UnableToRemoveAnnotatedUnitException(Exception):
     Unable to remove annotated unit.
     Possible reason: There exists mix that contains this annotated unit
     """
-    pass
+    def __init__(self, id_mixes=None):
+        """
+        :param id_mixes: list of mixes protecting annotated unit to be deleted
+        """
+        self.id_mixes = id_mixes
 
 
 class OperatorEnum(Enum):
@@ -192,4 +196,5 @@ class AnnotatedUnitService:
             self._session.delete(ann_unit)
             self._session.commit()
         except sqlalchemy.exc.IntegrityError as ex:
+            self._session.rollback()
             raise UnableToRemoveAnnotatedUnitException() from ex

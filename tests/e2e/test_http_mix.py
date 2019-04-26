@@ -245,6 +245,9 @@ def test_remove_annotated_unit_in_mix(client):
 
         r = client.delete("/annotated_unit/%s/delete" % aunit1)
         assert r.status_code == 409
+        assert r.json["message"] == "Unable to remove annotated unit. " \
+                                    "There exists mix that contains this annotated unit. " \
+                                    "First you need to remove mix/es: %s" % mix1
 
         r = client.delete("/mix/%s/delete" % mix1)
         assert r.status_code == 200

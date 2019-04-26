@@ -7,6 +7,7 @@ from traces_api.tools import escape
 from traces_api.api.restplus import api
 from .schemas import ann_unit_details_response, ann_unit_find_response, ann_unit_find, ann_unit_update
 from .service import AnnotatedUnitService, AnnotatedUnitDoesntExistsException, OperatorEnum, UnableToRemoveAnnotatedUnitException
+from traces_api.modules.mix.service import MixService
 
 ns = api.namespace("annotated_unit", description="AnnotatedUnit")
 
@@ -98,15 +99,21 @@ class AnnUnitFind(Resource):
 class AnnUnitDelete(Resource):
 
     @inject
-    def __init__(self, service_ann_unit: AnnotatedUnitService, *args, **kwargs):
+    def __init__(self, service_ann_unit: AnnotatedUnitService, service_mix: MixService, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._service_ann_unit = service_ann_unit
+        self._service_mix = service_mix
 
     @api.response(200, "Annotated unit deleted")
     @api.doc(responses={404: "Annotated unit not found"})
     @api.doc(responses={409: "Unable to remove annotated unit. There exists mix that contains this annotated unit"})
     def delete(self, id_annotated_unit):
-        self._service_ann_unit.delete_annotated_unit(id_annotated_unit)
+        try:
+            self._service_ann_unit.delete_annotated_unit(id_annotated_unit)
+        except UnableToRemoveAnnotatedUnitException as ex:
+            mixes = self._service_mix.find_mixes_by_annotated_unit(id_annotated_unit)
+            raise UnableToRemoveAnnotatedUnitException(mixes)
+
         return dict()
 
 
@@ -119,4 +126,10 @@ def handle_ann_unit_doesnt_exits(error):
 
 @ns.errorhandler(UnableToRemoveAnnotatedUnitException)
 def handle_ann_unit_unable_to_delete(error):
-    return {'message': "Unable to remove annotated unit. There exists mix that contains this annotated unit"}, 409, {}
+    error_msg = "Unable to remove annotated unit. There exists mix that contains this annotated unit"
+
+    if error.id_mixes:
+        mixes = [str(id_mix) for id_mix in error.id_mixes]
+        return {'message': "{}. First you need to remove mix/es: {}".format(error_msg, ", ".join(mixes))}, 409, {}
+
+    return {'message': error_msg}, 409, {}
