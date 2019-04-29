@@ -74,6 +74,7 @@ class FlaskApp:
     def __init__(self, session_maker, engine, config):
         """
         :param session_maker: SqlAlchemy session maker
+        :param engine: SqlAlchemy engine
         :param config: config
         """
         self._session_maker = session_maker
@@ -154,6 +155,10 @@ class FlaskApp:
 
 
 def get_config():
+    """
+    Get config
+    :return: Config
+    """
     return Config("config.ini")
 
 

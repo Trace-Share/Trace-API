@@ -1,4 +1,7 @@
 
+# This script is used to build docker images
+
+
 if [ -z "$DOCKER_UID" ]; then
     DOCKER_UID=$(id -u)
 fi

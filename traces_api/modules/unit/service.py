@@ -158,10 +158,26 @@ class UnitServiceAbstract:
 
         raise NotImplementedError()
 
+    def get_units(self, limit=100, page=0):
+        """
+        Find units
+
+        :param limit: number of mixes returned in one request, default 100
+        :param page: page id, starting from 0
+        :return: list of units
+        """
+        raise NotImplementedError()
+
 
 class UnitService(UnitServiceAbstract):
 
     def __init__(self, session_maker, annotated_unit_service: AnnotatedUnitService, file_storage: FileStorage, trace_analyzer: TraceAnalyzer):
+        """
+        :param session_maker: SqlAlchemy session maker
+        :param annotated_unit_service: AnnotatedUnitService
+        :param file_storage: file storage for storing datasets
+        :param trace_analyzer: trace analyzer is used to extract analytical data from dataset
+        """
         self._session_maker = session_maker
         self._annotated_unit_service = annotated_unit_service
         self._trace_analyzer = trace_analyzer
@@ -257,13 +273,6 @@ class UnitService(UnitServiceAbstract):
         self._file_storage.remove_file(unit_file_location)
 
     def get_units(self, limit=100, page=0):
-        """
-        Find units
-
-        :param limit: number of mixes returned in one request, default 100
-        :param page: page id, starting from 0
-        :return: list of units
-        """
         q = self._session.query(ModelUnit)
 
         q = q.order_by(desc(ModelUnit.creation_time))

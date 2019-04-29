@@ -45,6 +45,12 @@ class AnnotatedUnitService:
     """
 
     def __init__(self, session_maker, file_storage: FileStorage, trace_analyzer: TraceAnalyzer, trace_normalizer: TraceNormalizer):
+        """
+        :param session_maker: SqlAlchemy session maker
+        :param file_storage: file storage used for storing datasets
+        :param trace_analyzer: trace analyzer tool
+        :param trace_normalizer: trace normalizer tool
+        """
         self._session_maker = session_maker
         self._file_storage = file_storage
         self._trace_analyzer = trace_analyzer

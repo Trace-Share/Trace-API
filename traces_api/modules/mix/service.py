@@ -43,6 +43,14 @@ class MixService:
     """
 
     def __init__(self, session_maker, engine, annotated_unit_service: AnnotatedUnitService, file_storage: FileStorage, trace_normalizer: TraceNormalizer, trace_mixing: TraceMixing):
+        """
+        :param session_maker: SqlAlchemy session maker
+        :param engine: SqlAlchemy engine
+        :param annotated_unit_service: AnnotatedUnitService
+        :param file_storage: file storage used for storing datasets
+        :param trace_normalizer: trace normalizer tool
+        :param trace_mixing: trace mixing tool
+        """
         self._session_maker = session_maker
         self._engine = engine
         self._annotated_unit_service = annotated_unit_service
