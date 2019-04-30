@@ -88,6 +88,52 @@ def test_unit_all_steps(client, file_hydra_1_binary):
     assert r3.json["id_annotated_unit"] > 0
 
 
+def test_unit_normalize_invalid_ip_details(client, file_hydra_1_binary):
+    r1 = client.post(
+        "/unit/upload",
+        buffered=True,
+        content_type='multipart/form-data',
+        data={"file": (BytesIO(file_hydra_1_binary), "hydra.pcap", "application/vnd.tcpdump.pcap")}
+    )
+    assert r1.status_code == 200
+
+    r2 = client.post("/unit/annotate", json={
+        "id_unit": r1.json["id_unit"],
+        "name": "My unit",
+    }, content_type="application/json")
+    assert r2.status_code == 200
+
+    r3 = client.post("/unit/normalize", json={
+        "id_unit": r1.json["id_unit"],
+        "ip_mapping": [
+            {
+                "original": "1.2.3.4",
+                "replacement": "172.16.0.0"
+            }
+        ],
+        "mac_mapping": [
+            {
+                "original": "00:A0:C9:14:C8:29",
+                "replacement": "00:A0:C9:14:C8:29"
+            }
+        ],
+        "ips": {
+            "target_nodes": [
+                "172.16.0.0"
+            ],
+            "intermediate_nodes": [
+                "172.16.0.1"
+            ],
+            "source_nodes": [
+                "172.16.0.0"
+            ]
+        },
+        "timestamp": 1541346574.1234,
+    }, content_type="application/json")
+    assert r3.status_code == 400
+    assert r3.json["message"] == "IP \"172.16.0.1\" in IPDetails does not exists in replacement IPs in ip_mapping"
+
+
 def test_delete(client, file_hydra_1_binary):
     r = client.post(
         "/unit/upload",
@@ -107,6 +153,13 @@ def test_delete(client, file_hydra_1_binary):
 def test_delete_invalid_id_unit(client):
     r = client.delete(
         "/unit/{}/delete".format(123)
+    )
+    assert r.status_code == 404
+
+
+def test_delete_invalid_id_unit2(client):
+    r = client.delete(
+        "/unit/{}/delete".format(2)
     )
     assert r.status_code == 404
 

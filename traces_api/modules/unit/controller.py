@@ -7,7 +7,7 @@ from traces_api.tools import escape
 from .schemas import unit_step1_fields, unit_step1_response, unit_step2_fields
 from .schemas import unit_step3_fields, unit_step3_response
 from .schemas import unit_find, unit_find_response
-from .service import UnitService, UnitDoesntExistsException, InvalidUnitStageException
+from .service import UnitService, UnitDoesntExistsException, InvalidUnitStageException, IPDetailsUnknownIPException
 from .service import Mapping, IPDetails
 
 ns = api.namespace("unit", description="Unit")
@@ -50,8 +50,8 @@ class UnitSaveStep2(Resource):
         self._service_unit.unit_annotate(
             id_unit=data["id_unit"],
             name=data["name"],
-            description=data["description"],
-            labels=data["labels"],
+            description=data["description"] if "description" in data else None,
+            labels=data["labels"] if "labels" in data else None,
         )
         return dict()
 
@@ -129,3 +129,8 @@ def handle_unit_doesnt_exits(error):
 @ns.errorhandler(InvalidUnitStageException)
 def handle_unit_invalid_stage(error):
     return {'message': "Unit is not not stage it should be use another method"}, 400, {}
+
+
+@ns.errorhandler(IPDetailsUnknownIPException)
+def handle_unit_invalid_ip_details(error):
+    return {'message': "IP \"%s\" in IPDetails does not exists in replacement IPs in ip_mapping" % error.ip}, 400, {}

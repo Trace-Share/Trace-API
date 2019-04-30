@@ -25,6 +25,14 @@ class InvalidUnitStageException(Exception):
     pass
 
 
+class IPDetailsUnknownIPException(Exception):
+    """
+    This exception is raised when IP in IPDetails object does not exists in mapping IPs.
+    """
+    def __init__(self, ip):
+        self.ip = ip
+
+
 class Mapping:
     """
     Class that holds information about mapping
@@ -242,6 +250,8 @@ class UnitService(UnitServiceAbstract):
 
         unit_annotation = json.loads(unit.annotation)
 
+        self._validate_ip_details(ip_details, ip_mapping)
+
         annotated_unit = self._annotated_unit_service.create_annotated_unit(
             name=unit_annotation["name"],
             description=unit_annotation["description"],
@@ -260,6 +270,28 @@ class UnitService(UnitServiceAbstract):
         self._file_storage.remove_file(unit_file_location)
 
         return annotated_unit
+
+    @staticmethod
+    def _validate_ip_details(ip_details, ip_mapping):
+        """
+        Validate IP details
+        IPs in IP details should exists in replacement IPs in ip_mapping object.
+        :param ip_details: IPDetails
+        :param ip_mapping: Mapping
+        """
+        new_ips = [ip[1] for ip in ip_mapping.data]
+
+        for ip in ip_details.target_nodes:
+            if ip not in new_ips:
+                raise IPDetailsUnknownIPException(ip)
+
+        for ip in ip_details.intermediate_nodes:
+            if ip not in new_ips:
+                raise IPDetailsUnknownIPException(ip)
+
+        for ip in ip_details.source_nodes:
+            if ip not in new_ips:
+                raise IPDetailsUnknownIPException(ip)
 
     def unit_delete(self, id_unit):
         unit = self._get_unit(id_unit)
