@@ -29,5 +29,8 @@ python3 app.py
 ##### 400 - Bad request
 Client sent invalid data. See response body for details.
 
+##### 404 - Object does not exists
+Object you are trying to work with does not exists.
+
 ##### 500 - Internal Server Error
 Unhandled error occurred. See logs for details.
