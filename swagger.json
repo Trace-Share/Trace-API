@@ -1,0 +1,1322 @@
+{
+    "swagger": "2.0",
+    "basePath": "/",
+    "paths": {
+        "/annotated_unit/find": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/AnnotatedUnitFindResponse"
+                        }
+                    }
+                },
+                "operationId": "post_ann_unit_find",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/AnnotatedUnitsFind"
+                        }
+                    },
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "annotated_unit"
+                ]
+            }
+        },
+        "/annotated_unit/{id_annotated_unit}/delete": {
+            "parameters": [
+                {
+                    "description": "ID of annotated unit",
+                    "name": "id_annotated_unit",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "responses": {
+                    "409": {
+                        "description": "Unable to remove annotated unit. There exists mix that contains this annotated unit"
+                    },
+                    "404": {
+                        "description": "Annotated unit not found"
+                    },
+                    "200": {
+                        "description": "Annotated unit deleted"
+                    }
+                },
+                "operationId": "delete_ann_unit_delete",
+                "tags": [
+                    "annotated_unit"
+                ]
+            }
+        },
+        "/annotated_unit/{id_annotated_unit}/download": {
+            "parameters": [
+                {
+                    "description": "ID of annotated unit",
+                    "name": "id_annotated_unit",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "404": {
+                        "description": "Annotated unit not found"
+                    },
+                    "200": {
+                        "description": "Annotated unit returned"
+                    }
+                },
+                "operationId": "get_ann_unit_download",
+                "produces": [
+                    "application/binary"
+                ],
+                "tags": [
+                    "annotated_unit"
+                ]
+            }
+        },
+        "/annotated_unit/{id_annotated_unit}/get": {
+            "parameters": [
+                {
+                    "description": "ID of annotated unit",
+                    "name": "id_annotated_unit",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "404": {
+                        "description": "Annotated unit not found"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/AnnotatedUnitDetailsResponse"
+                        }
+                    }
+                },
+                "operationId": "get_ann_unit_get",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "annotated_unit"
+                ]
+            }
+        },
+        "/annotated_unit/{id_annotated_unit}/update": {
+            "parameters": [
+                {
+                    "name": "id_annotated_unit",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "responses": {
+                    "404": {
+                        "description": "Annotated unit not found"
+                    },
+                    "200": {
+                        "description": "Annotated unit updated"
+                    }
+                },
+                "operationId": "post_ann_unit_update",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/AnnUnitUpdate"
+                        }
+                    }
+                ],
+                "tags": [
+                    "annotated_unit"
+                ]
+            }
+        },
+        "/mix/create": {
+            "post": {
+                "responses": {
+                    "404": {
+                        "description": "Mix not found"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/MixCreateResponse"
+                        }
+                    }
+                },
+                "operationId": "post_mix_create",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/MixCreate"
+                        }
+                    },
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "mix"
+                ]
+            }
+        },
+        "/mix/find": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/MixFindResponse"
+                        }
+                    }
+                },
+                "operationId": "post_mix_find",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/MixFind"
+                        }
+                    },
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "mix"
+                ]
+            }
+        },
+        "/mix/{id_mix}/delete": {
+            "parameters": [
+                {
+                    "description": "ID of mix",
+                    "name": "id_mix",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "responses": {
+                    "404": {
+                        "description": "Mix not found"
+                    },
+                    "200": {
+                        "description": "Mix deleted"
+                    }
+                },
+                "operationId": "delete_mix_delete",
+                "tags": [
+                    "mix"
+                ]
+            }
+        },
+        "/mix/{id_mix}/detail": {
+            "parameters": [
+                {
+                    "description": "ID of mix",
+                    "name": "id_mix",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "404": {
+                        "description": "Mix not found"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/MixDetailsResponse"
+                        }
+                    }
+                },
+                "operationId": "get_mix_detail",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "mix"
+                ]
+            }
+        },
+        "/mix/{id_mix}/download": {
+            "parameters": [
+                {
+                    "description": "ID of mix",
+                    "name": "id_mix",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "404": {
+                        "description": "Mix not found"
+                    },
+                    "200": {
+                        "description": "Mix returned"
+                    }
+                },
+                "operationId": "get_mix_download",
+                "produces": [
+                    "application/binary"
+                ],
+                "tags": [
+                    "mix"
+                ]
+            }
+        },
+        "/mix/{id_mix}/generate": {
+            "parameters": [
+                {
+                    "description": "ID of mix",
+                    "name": "id_mix",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "responses": {
+                    "404": {
+                        "description": "Mix not found"
+                    },
+                    "200": {
+                        "description": "Mix generation started"
+                    }
+                },
+                "operationId": "post_mix_generate",
+                "tags": [
+                    "mix"
+                ]
+            }
+        },
+        "/mix/{id_mix}/generate/status": {
+            "parameters": [
+                {
+                    "description": "ID of mix",
+                    "name": "id_mix",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "404": {
+                        "description": "Mix not found"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/MixGenerateStatus"
+                        }
+                    }
+                },
+                "operationId": "get_mix_generate_status",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "mix"
+                ]
+            }
+        },
+        "/mix/{id_mix}/update": {
+            "parameters": [
+                {
+                    "description": "ID of mix",
+                    "name": "id_mix",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "responses": {
+                    "404": {
+                        "description": "Mix not found"
+                    },
+                    "200": {
+                        "description": "Mix updated"
+                    }
+                },
+                "operationId": "post_mix_update",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/MixUpdate"
+                        }
+                    }
+                ],
+                "tags": [
+                    "mix"
+                ]
+            }
+        },
+        "/unit/annotate": {
+            "post": {
+                "responses": {
+                    "404": {
+                        "description": "Unit not found"
+                    },
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "operationId": "post_unit_save_step2",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/UnitStep2"
+                        }
+                    }
+                ],
+                "tags": [
+                    "unit"
+                ]
+            }
+        },
+        "/unit/find": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/UnitFindResponse"
+                        }
+                    }
+                },
+                "operationId": "post_unit_find",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/UnitFind"
+                        }
+                    },
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "unit"
+                ]
+            }
+        },
+        "/unit/normalize": {
+            "post": {
+                "responses": {
+                    "404": {
+                        "description": "Unit not found"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/UnitStep3Response"
+                        }
+                    }
+                },
+                "operationId": "post_unit_save_step3",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/UnitStep3"
+                        }
+                    },
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "unit"
+                ]
+            }
+        },
+        "/unit/upload": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/UnitStep1Response"
+                        }
+                    }
+                },
+                "operationId": "post_unit_save_step1",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "type": "file",
+                        "required": true,
+                        "description": "PCAP file"
+                    },
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "unit"
+                ]
+            }
+        },
+        "/unit/{id_unit}/delete": {
+            "parameters": [
+                {
+                    "description": "ID of unit",
+                    "name": "id_unit",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "delete": {
+                "responses": {
+                    "404": {
+                        "description": "Unit not found"
+                    },
+                    "200": {
+                        "description": "Unit deleted"
+                    }
+                },
+                "operationId": "delete_unit_delete",
+                "tags": [
+                    "unit"
+                ]
+            }
+        }
+    },
+    "info": {
+        "title": "API",
+        "version": "1.0"
+    },
+    "produces": [
+        "application/json"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "tags": [
+        {
+            "name": "unit",
+            "description": "Unit"
+        },
+        {
+            "name": "annotated_unit",
+            "description": "AnnotatedUnit"
+        },
+        {
+            "name": "mix",
+            "description": "Mix"
+        }
+    ],
+    "definitions": {
+        "UnitStep1Response": {
+            "required": [
+                "id_unit"
+            ],
+            "properties": {
+                "id_unit": {
+                    "type": "integer",
+                    "description": "ID of unit",
+                    "example": 112
+                },
+                "analytical_data": {
+                    "$ref": "#/definitions/AnalyticalData"
+                }
+            },
+            "type": "object"
+        },
+        "AnalyticalData": {
+            "properties": {
+                "tcp_conversations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TCPConversations"
+                    }
+                },
+                "pairs_mac_ip": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PairsMacIp"
+                    }
+                },
+                "capture_info": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CaptureInfo"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "TCPConversations": {
+            "properties": {
+                "IP A": {
+                    "type": "string"
+                },
+                "Port A": {
+                    "type": "integer"
+                },
+                "IP B": {
+                    "type": "string"
+                },
+                "Port B": {
+                    "type": "integer"
+                },
+                "Frames B-A": {
+                    "type": "integer"
+                },
+                "Bytes B-A": {
+                    "type": "integer"
+                },
+                "Frames A-B": {
+                    "type": "integer"
+                },
+                "Bytes A-B": {
+                    "type": "integer"
+                },
+                "Frames": {
+                    "type": "integer"
+                },
+                "Bytes": {
+                    "type": "integer"
+                },
+                "Relative start": {
+                    "type": "number",
+                    "example": 1541346574.1234
+                }
+            },
+            "type": "object"
+        },
+        "PairsMacIp": {
+            "required": [
+                "IP",
+                "MAC"
+            ],
+            "properties": {
+                "IP": {
+                    "type": "string",
+                    "description": "IP address",
+                    "example": "1.2.3.4"
+                },
+                "MAC": {
+                    "type": "string",
+                    "description": "MAC addess",
+                    "example": "00:A0:C9:14:C8:29"
+                }
+            },
+            "type": "object"
+        },
+        "CaptureInfo": {
+            "properties": {
+                "File name": {
+                    "type": "string"
+                },
+                "File type": {
+                    "type": "string"
+                },
+                "File encapsulation": {
+                    "type": "string"
+                },
+                "File timestamp precision": {
+                    "type": "string"
+                },
+                "Packet size limit": {
+                    "type": "string"
+                },
+                "Number of packets": {
+                    "type": "string"
+                },
+                "File size": {
+                    "type": "string"
+                },
+                "Capture duration": {
+                    "type": "string"
+                },
+                "First packet time": {
+                    "type": "string"
+                },
+                "Last packet time": {
+                    "type": "string"
+                },
+                "Data byte rate": {
+                    "type": "string"
+                },
+                "Data bit rate": {
+                    "type": "string"
+                },
+                "Average packet size": {
+                    "type": "string"
+                },
+                "Average packet rate": {
+                    "type": "string"
+                },
+                "SHA256": {
+                    "type": "string"
+                },
+                "RIPEMD160": {
+                    "type": "string"
+                },
+                "SHA1": {
+                    "type": "string"
+                },
+                "Strict time order": {
+                    "type": "string"
+                },
+                "Capture application": {
+                    "type": "string"
+                },
+                "Number of interfaces in file": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "UnitStep2": {
+            "required": [
+                "id_unit",
+                "name"
+            ],
+            "properties": {
+                "id_unit": {
+                    "type": "integer",
+                    "description": "ID of unit",
+                    "example": 112
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of unit",
+                    "example": "My unit"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "UnitStep3": {
+            "required": [
+                "id_unit",
+                "ip_mapping",
+                "ips",
+                "mac_mapping",
+                "timestamp"
+            ],
+            "properties": {
+                "id_unit": {
+                    "type": "integer",
+                    "description": "ID of unit",
+                    "example": 112
+                },
+                "ip_mapping": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IPPair"
+                    }
+                },
+                "mac_mapping": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/MacPair"
+                    }
+                },
+                "ips": {
+                    "description": "Classification of ip addresses, every IP address should belong to one of this categories",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/IPs"
+                        }
+                    ]
+                },
+                "timestamp": {
+                    "type": "number",
+                    "example": 1541346574.1234
+                }
+            },
+            "type": "object"
+        },
+        "IPPair": {
+            "required": [
+                "original",
+                "replacement"
+            ],
+            "properties": {
+                "original": {
+                    "type": "string",
+                    "description": "IP address",
+                    "example": "1.2.3.4"
+                },
+                "replacement": {
+                    "type": "string",
+                    "description": "IP address",
+                    "example": "172.16.0.0"
+                }
+            },
+            "type": "object"
+        },
+        "MacPair": {
+            "required": [
+                "original",
+                "replacement"
+            ],
+            "properties": {
+                "original": {
+                    "type": "string",
+                    "description": "MAC addess",
+                    "example": "00:A0:C9:14:C8:29"
+                },
+                "replacement": {
+                    "type": "string",
+                    "description": "MAC addess",
+                    "example": "00:A0:C9:14:C8:29"
+                }
+            },
+            "type": "object"
+        },
+        "IPs": {
+            "required": [
+                "intermediate_nodes",
+                "source_nodes",
+                "target_nodes"
+            ],
+            "properties": {
+                "target_nodes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "description": "IP address",
+                        "example": "172.16.0.0"
+                    }
+                },
+                "intermediate_nodes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "description": "IP address",
+                        "example": "172.16.0.0"
+                    }
+                },
+                "source_nodes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "description": "IP address",
+                        "example": "172.16.0.0"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "UnitStep3Response": {
+            "required": [
+                "id_annotated_unit"
+            ],
+            "properties": {
+                "id_annotated_unit": {
+                    "type": "integer",
+                    "description": "ID of newly created annotated unit based on unit",
+                    "example": 156
+                }
+            },
+            "type": "object"
+        },
+        "UnitFind": {
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "description": "Limit number of rows",
+                    "default": 100,
+                    "example": 25
+                },
+                "page": {
+                    "type": "integer",
+                    "description": "Number of page to return, counting from 0 (used in pagination)"
+                }
+            },
+            "type": "object"
+        },
+        "UnitFindResponse": {
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UnitBasic"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "UnitBasic": {
+            "required": [
+                "creation_time",
+                "id_unit",
+                "stage"
+            ],
+            "properties": {
+                "id_unit": {
+                    "type": "integer",
+                    "description": "ID of unit",
+                    "example": 23
+                },
+                "creation_time": {
+                    "type": "string",
+                    "description": "Creation time",
+                    "example": "2019-02-25 20:00:00"
+                },
+                "stage": {
+                    "type": "string",
+                    "description": "Last unit stage",
+                    "example": "upload"
+                }
+            },
+            "type": "object"
+        },
+        "AnnotatedUnitDetailsResponse": {
+            "required": [
+                "creation_time",
+                "id_annotated_unit",
+                "ip_details",
+                "name"
+            ],
+            "properties": {
+                "id_annotated_unit": {
+                    "type": "integer",
+                    "description": "ID of annotated unit",
+                    "example": 156
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of annotated unit",
+                    "example": "My annotated unit"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                },
+                "creation_time": {
+                    "type": "integer",
+                    "description": "Creation time of annotated unit in unixtime",
+                    "example": 1554076800
+                },
+                "ip_details": {
+                    "description": "Classification of ip addresses, every IP address should belong to one of this categories",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/IPs"
+                        }
+                    ]
+                },
+                "description": {
+                    "type": "string"
+                },
+                "stats": {
+                    "$ref": "#/definitions/AnalyticalData"
+                }
+            },
+            "type": "object"
+        },
+        "AnnUnitUpdate": {
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of annotated unit",
+                    "example": "My unit"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AnnotatedUnitsFind": {
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "description": "Limit number of rows",
+                    "default": 100,
+                    "example": 25
+                },
+                "page": {
+                    "type": "integer",
+                    "description": "Number of page to return, counting from 0 (used in pagination)"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Filter rows by name - fulltext"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Filter rows by description - fulltext"
+                },
+                "operator": {
+                    "type": "string",
+                    "description": "Operator. AND - all filter parameters has to match. OR - one filter should match.",
+                    "default": "AND",
+                    "example": "AND",
+                    "enum": [
+                        "AND",
+                        "OR"
+                    ]
+                }
+            },
+            "type": "object"
+        },
+        "AnnotatedUnitFindResponse": {
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AnnUnitBasic"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "AnnUnitBasic": {
+            "required": [
+                "creation_time",
+                "id_mix",
+                "name"
+            ],
+            "properties": {
+                "id_mix": {
+                    "type": "integer",
+                    "description": "ID of mix",
+                    "example": 834
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of mix",
+                    "example": "My mix"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                },
+                "creation_time": {
+                    "type": "integer",
+                    "description": "Creation time of mix in unixtime",
+                    "example": 1554076800
+                }
+            },
+            "type": "object"
+        },
+        "MixCreate": {
+            "required": [
+                "annotated_units",
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of mix",
+                    "example": "My mix"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "annotated_units": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AnnotatedUnits"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "AnnotatedUnits": {
+            "required": [
+                "id_annotated_unit",
+                "ip_mapping",
+                "mac_mapping",
+                "timestamp"
+            ],
+            "properties": {
+                "id_annotated_unit": {
+                    "type": "integer",
+                    "description": "ID of mix",
+                    "example": 834
+                },
+                "ip_mapping": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IPPair"
+                    }
+                },
+                "mac_mapping": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/MacPair"
+                    }
+                },
+                "timestamp": {
+                    "type": "number",
+                    "example": 1541346574.1234
+                }
+            },
+            "type": "object"
+        },
+        "MixCreateResponse": {
+            "required": [
+                "id_mix"
+            ],
+            "properties": {
+                "id_mix": {
+                    "type": "integer",
+                    "description": "ID of newly crated mix",
+                    "example": 834
+                }
+            },
+            "type": "object"
+        },
+        "MixUpdate": {
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of mix",
+                    "example": "My mix"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "MixDetailsResponse": {
+            "required": [
+                "creation_time",
+                "id_mix",
+                "name"
+            ],
+            "properties": {
+                "id_mix": {
+                    "type": "integer",
+                    "description": "ID of mix",
+                    "example": 834
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of mix",
+                    "example": "My mix"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                },
+                "creation_time": {
+                    "type": "integer",
+                    "description": "Creation time of mix in unixtime",
+                    "example": 1554076800
+                },
+                "description": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "MixFind": {
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "description": "Limit number of rows",
+                    "default": 100,
+                    "example": 25
+                },
+                "page": {
+                    "type": "integer",
+                    "description": "Number of page to return, counting from 0 (used in pagination)"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Filter rows by name - fulltext"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Filter rows by description - fulltext"
+                },
+                "operator": {
+                    "type": "string",
+                    "description": "Operator. AND - all filter parameters has to match. OR - one filter should match.",
+                    "default": "AND",
+                    "example": "AND",
+                    "enum": [
+                        "AND",
+                        "OR"
+                    ]
+                }
+            },
+            "type": "object"
+        },
+        "MixFindResponse": {
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AnnUnitBasic"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "MixGenerateStatus": {
+            "properties": {
+                "progress": {
+                    "type": "integer",
+                    "description": "Mix file generation progress in percent. (0-100%)",
+                    "example": 10,
+                    "minimum": 0,
+                    "maximum": 100
+                }
+            },
+            "type": "object"
+        }
+    },
+    "responses": {
+        "ParseError": {
+            "description": "When a mask can't be parsed"
+        },
+        "MaskError": {
+            "description": "When any error occurs on mask"
+        }
+    }
+}
