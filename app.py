@@ -8,7 +8,7 @@ from flask import Flask, Blueprint
 from flask_injector import FlaskInjector
 
 from traces_api.api.restplus import api
-from traces_api.database.tools import create_database
+from traces_api.database.tools import create_database, recreate_database
 from traces_api.config import Config
 
 from traces_api.modules.unit.controller import ns as dataset_namespace
@@ -51,17 +51,21 @@ def setup_database(engine):
     return session
 
 
-def prepare_database(url):
+def prepare_database(url, recreate=False):
     """
     Prepare database session
     :param url: database connection url
+    :param recreate: set True if database should be recreated, False otherwise
     :return: sqlalchemy session_maker
     """
 
     engine = create_engine(url)
     session_maker = setup_database(engine)
 
-    create_database(engine)
+    if recreate:
+        recreate_database(engine)
+    else:
+        create_database(engine)
 
     return engine, session_maker
 
@@ -168,7 +172,7 @@ def get_flask_application():
     """
     config = get_config()
 
-    engine, session = prepare_database(config.get("database", "connection_string"))
+    engine, session = prepare_database(config.get("database", "connection_string"), config.get("database", "recreate"))
 
     engine.dispose()
 
