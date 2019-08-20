@@ -145,21 +145,21 @@ def test_delete(client, file_hydra_1_binary):
     assert r.status_code == 200
 
     r = client.delete(
-        "/unit/{}/delete".format(r.json["id_unit"]),
+        "/unit/{}".format(r.json["id_unit"]),
     )
     assert r.status_code == 200
 
 
 def test_delete_invalid_id_unit(client):
     r = client.delete(
-        "/unit/{}/delete".format(123)
+        "/unit/{}".format(123)
     )
     assert r.status_code == 404
 
 
 def test_delete_invalid_id_unit2(client):
     r = client.delete(
-        "/unit/{}/delete".format(2)
+        "/unit/{}".format(2)
     )
     assert r.status_code == 404
 
