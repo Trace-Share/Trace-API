@@ -87,7 +87,7 @@ class UnitSaveStep3(Resource):
         return dict(id_annotated_unit=id_annotated_unit.id_annotated_unit)
 
 
-@ns.route('/<id_unit>/delete')
+@ns.route('/<id_unit>')
 @api.doc(params={'id_unit': 'ID of unit'})
 class UnitDelete(Resource):
 
