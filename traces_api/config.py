@@ -20,5 +20,6 @@ class Config:
         :param key:
         :return: Value in config
         """
-        return self.config[section][key]
+        section = self.config[section]
+        return section.get(key, False)
 
