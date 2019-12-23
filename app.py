@@ -172,7 +172,7 @@ def get_flask_application():
     """
     config = get_config()
 
-    engine, session = prepare_database(config.get("database", "connection_string"), config.get("database", "recreate"))
+    engine, session = prepare_database(config.get("database", "connection_string"), config.get("database", "recreate", fallback=False))
 
     engine.dispose()
 
