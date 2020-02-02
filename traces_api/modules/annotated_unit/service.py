@@ -60,7 +60,7 @@ class AnnotatedUnitService:
     def _session(self):
         return self._session_maker()
 
-    def create_annotated_unit(self, name, description, ip_mapping, mac_mapping, timestamp, ip_details, unit_file, labels):
+    def create_annotated_unit(self, name, description, ip_mapping, mac_mapping, tcp_timestamp_mapping, ip_details, unit_file, labels):
         """
         New annotated unit will be crated, normalized and saved into database
 
@@ -76,7 +76,7 @@ class AnnotatedUnitService:
         """
         new_ann_unit_file = File.create_new()
 
-        configuration = self._trace_normalizer.prepare_configuration(ip_mapping, mac_mapping, timestamp)
+        configuration = self._trace_normalizer.prepare_configuration(ip_details, mac_mapping, tcp_timestamp_mapping)
         self._trace_normalizer.normalize(unit_file.location, new_ann_unit_file.location, configuration)
 
         analyzed_data = escape(self._trace_analyzer.analyze(new_ann_unit_file.location))

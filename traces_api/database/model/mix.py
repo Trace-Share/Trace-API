@@ -56,6 +56,7 @@ class ModelMixOrigin(Base):
     )
     ip_mapping = Column(String(4000))
     mac_mapping = Column(String(4000))
+    config = Column(String(4000))
     timestamp = Column(Integer())
 
 

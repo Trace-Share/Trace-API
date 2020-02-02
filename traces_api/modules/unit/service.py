@@ -240,7 +240,7 @@ class UnitService(UnitServiceAbstract):
         self._session.commit()
         return unit
 
-    def unit_normalize(self, id_unit, ip_mapping, mac_mapping, ip_details, timestamp):
+    def unit_normalize(self, id_unit, ip_mapping, mac_mapping, ip_details, tcp_timestamp_mapping):
         unit = self._get_unit(id_unit)
         if not unit:
             raise UnitDoesntExistsException()
@@ -257,7 +257,7 @@ class UnitService(UnitServiceAbstract):
             description=unit_annotation["description"],
             ip_mapping=ip_mapping,
             mac_mapping=mac_mapping,
-            timestamp=timestamp,
+            timestamp=tcp_timestamp_mapping,
             ip_details=ip_details,
             unit_file=self._file_storage.get_file(unit.uploaded_file_location),
             labels=unit_annotation["labels"]

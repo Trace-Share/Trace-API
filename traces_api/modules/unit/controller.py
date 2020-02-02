@@ -66,7 +66,7 @@ class UnitSaveStep3(Resource):
 
     @api.expect(unit_step3_fields)
     @api.marshal_with(unit_step3_response)
-    @api.doc(responses={404: "Unit not found"})
+    @api.doc(responses={404: "Unit not found"}) # TODO
     def post(self):
         data = escape(request.json)
 
@@ -82,7 +82,7 @@ class UnitSaveStep3(Resource):
                 data["ips"]["intermediate_nodes"],
                 data["ips"]["source_nodes"]
             ),
-            timestamp=data["timestamp"]
+            tcp_timestamp_mapping=data["tcp_timestamp_mapping"]
         )
         return dict(id_annotated_unit=id_annotated_unit.id_annotated_unit)
 
