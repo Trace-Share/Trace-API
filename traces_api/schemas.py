@@ -25,6 +25,16 @@ mac_pair = api.model("MacPair", dict(
     replacement=mac
 ))
 
+port = fields.Integer(example="22", min=0, max=65535, description="TCP/UDP port number", required=True)
+port_pair = api.model("PortPair", dict(
+    original=port,
+    replacement=port
+))
+ip_port_map= api.model("PortMapping", dict(
+    ip=ip_original,
+    port_mappings=fields.List(fields.Nested(port_pair), required=True)
+))
+
 label_field = fields.String(name="Label", example="IMPORTANT")
 
 id_annotated_unit = fields.Integer(example=156, description="ID of annotated unit", required=True)

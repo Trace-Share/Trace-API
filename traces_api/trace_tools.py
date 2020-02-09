@@ -216,33 +216,6 @@ class TraceNormalizer:
 
         return configuration
 
-    # @staticmethod
-    # def prepare_configuration(ip_mapping, mac_mapping, timestamp):
-    #     """
-    #     Prepare configuration dict with given parameters
-
-    #     :param ip_mapping:
-    #     :param mac_mapping:
-    #     :param timestamp:
-    #     :return: configuration dict
-    #     """
-    #     configuration = {
-    #         "IP" : [],
-    #         "MAC" : [],
-            
-    #     }
-    #     if ip_mapping and ip_mapping.data:
-    #         configuration["IP"] = [dict(original=original, new=replacement) for original, replacement in
-    #                                ip_mapping.data]
-
-    #     if mac_mapping and mac_mapping.data:
-    #         configuration["MAC"] = [dict(original=original, new=replacement) for original, replacement in
-    #                                 mac_mapping.data]
-
-    #     if timestamp:
-    #         configuration["timestamp"] = timestamp
-
-    #     return configuration
 
 
 class TraceMixer:
@@ -321,6 +294,37 @@ class TraceMixer:
 
             if p.returncode != 0:
                 raise TraceMixerError("error_code: %s" % p.returncode)
+
+    @staticmethod
+    def prepare_configuration(
+            ip_mapping, 
+            mac_mapping, 
+            port_mapping,
+        ):
+        configuration = {
+            {
+            'timestamp':
+                'generation': 'tcp_avg_shift'
+                'postprocess': [                ]
+                'generation.alt': 'timestamp_dynamic_shift'
+                'random.treshold': 0.001
+            }
+            'ip.map' : [],
+            'mac.map' : [],
+            'port.ip.map' : [],
+        }
+        if ip_mapping and ip_mapping.data:
+            configuration["ip.map"] = [dict('ip'=dict(old=original, new=replacement)) for original, replacement in
+                                   ip_mapping.data]
+
+        if mac_mapping and mac_mapping.data:
+            configuration["mac.map"] = [dict('mac'=dict(old=original, new=replacement)) for original, replacement in
+                                    mac_mapping.data]
+
+        if port_mapping is not None:
+            configuration['port.ip.map'] = port_mapping
+
+        return configuration
 
     def get_mixed_file_location(self):
         return self._output_location

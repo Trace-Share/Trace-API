@@ -100,7 +100,9 @@ class MixService:
             # configuration = self._trace_normalizer.prepare_configuration(ann_unit["ip_mapping"], ann_unit["mac_mapping"], ann_unit["timestamp"])
             # self._trace_normalizer.normalize(ann_unit_file.location, new_ann_unit_file.location, configuration)
 
-            mixing.mix(ann_unit_file.location, ann_unit['config'], ann_unit['at_timestamp'])
+
+            config = mixing.prepare_configuration(ann_unit['ip_mapping'], ann_unit['mac_mapping'], ann_unit['port_mapping'])
+            mixing.mix(ann_unit_file.location, config, ann_unit['at_timestamp'])
 
             num_processed = num_processed + 1
             self._update_mix_generation_progress(mix_generation_id, int(99*(num_processed/num_ann_units)))
@@ -139,7 +141,7 @@ class MixService:
                     id_annotated_unit=ann_unit["id_annotated_unit"],
                     ip_mapping=json.dumps(ann_unit["ip_mapping"]),
                     mac_mapping=json.dumps(ann_unit["mac_mapping"]),
-                    config=json.dumps(ann_unit['config']),
+                    port_mapping=json.dumps(ann_unit["port_mapping"])
                     timestamp=ann_unit["timestamp"],
                 ) for ann_unit in annotated_units
             ],
@@ -196,7 +198,7 @@ class MixService:
                 id_annotated_unit=origin.id_annotated_unit,
                 ip_mapping=Mapping.create_from_dict(json.loads(origin.ip_mapping)),
                 mac_mapping=Mapping.create_from_dict(json.loads(origin.mac_mapping)),
-                config=json.loads(origin.config, Loader=yaml.FullLoader), 
+                port_mapping=json.loads(origin.port_mapping),
                 at_timestamp=origin.timestamp,
             ))
 
