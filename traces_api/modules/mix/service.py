@@ -4,7 +4,7 @@ from enum import Enum
 from datetime import datetime
 import multiprocessing
 
-from sqlalchemy import desc, update, and_, 
+from sqlalchemy import desc, update, and_ 
 import yaml
 
 from traces_api.database.model.mix import ModelMix, ModelMixLabel, ModelMixOrigin, ModelMixFileGeneration
@@ -141,7 +141,7 @@ class MixService:
                     id_annotated_unit=ann_unit["id_annotated_unit"],
                     ip_mapping=json.dumps(ann_unit["ip_mapping"]),
                     mac_mapping=json.dumps(ann_unit["mac_mapping"]),
-                    port_mapping=json.dumps(ann_unit["port_mapping"])
+                    port_mapping=json.dumps(ann_unit["port_mapping"]),
                     timestamp=ann_unit["timestamp"],
                 ) for ann_unit in annotated_units
             ],

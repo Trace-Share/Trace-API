@@ -3,7 +3,7 @@ from flask_restplus import fields
 from traces_api.api.restplus import api
 
 
-from traces_api.schemas import label_field, mac_pair, ip_pair
+from traces_api.schemas import label_field, mac_pair, ip_pair, ip_port_map
 from .service import OperatorEnum
 
 
@@ -24,6 +24,7 @@ annotated_units = api.model("AnnotatedUnits", dict(
     id_annotated_unit=fields.Integer(example=834, description="ID of mix", required=True),
     ip_mapping=fields.List(fields.Nested(ip_pair), required=True),
     mac_mapping=fields.List(fields.Nested(mac_pair), required=True),
+    port_mapping=fields.List(fields.Nested(ip_port_map), required=True),
     timestamp=fields.Float(example=1541346574.1234, required=True),
 ))
 

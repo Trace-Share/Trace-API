@@ -3,6 +3,7 @@ import re
 import subprocess
 import json
 import tempfile
+import shutil
 from pathlib import Path
 
 ## 3p libs
@@ -67,35 +68,34 @@ class TraceAnalyzer:
 
         parts = re.split(b"\n", stdout)
 
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                docker_params_crawler = (
+                        'sudo docker run '
+                            '-v "{pcap_file}":/data/target.pcap '
+                            '-v "{output_dir}":/data/out trace-tools'
+                    ).format(
+                        pcap_file=filepath,
+                        output_dir=tmpdir.name,
+                    )
+                cmd = (
+                        '{docker_params} '
+                        'python trace-git/trace-normalizer/crawler.py '
+                            '-p /data/target.pcap '
+                            '-o /data/out/out.yml'
+                    ).format(
+                        docker_params=docker_params_crawler
+                    )
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            docker_params_crawler = (
-                    'sudo docker run '
-                        '-v "{pcap_file}":/data/target.pcap '
-                        '-v "{output_dir}":/data/out trace-tools'
-                ).format(
-                    pcap_file=filepath,
-                    output_dir=tmpdir.name,
-                )
-            cmd = (
-                    '{docker_params} '
-                    'python trace-git/trace-normalizer/crawler.py '
-                        '-p /data/target.pcap '
-                        '-o /data/out/out.yml'
-                ).format(
-                    docker_params=docker_params_crawler
-                )
+                p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+                stdout, stderr = p.communicate()
 
-            stdout, stderr = p.communicate()
-
-            output = Path(tmpdir.name) / 'out.yml'
-            with output.open('r') as handle:
-                raw_crawler_stats = yaml.load(handle.read(), loader=yaml.FullLoader)
-
-        except Exception:
-            raise TraceAnalyzerError()
+                output = Path(tmpdir.name) / 'out.yml'
+                with output.open('r') as handle:
+                    raw_crawler_stats = yaml.load(handle.read(), Loader=yaml.FullLoader)
+        except:
+            raise TraceAnalyzerError("")
 
         try:
             out = dict(
@@ -241,13 +241,14 @@ class TraceMixer:
         :return:
         """
 
-        self._mix(annotated_unit_file)
+        self._mix(annotated_unit_file, config, at_timestamp)
 
         self._previous_pcap = self._output_location
 
     def _mix(self, annotated_unit_file, config, at_timestamp):
         with tempfile.NamedTemporaryFile(mode="wb") as f_tmp, \
-            tempfile.NamedTemporaryFile(mode="w") as tmp_config:
+            tempfile.NamedTemporaryFile(mode="w") as tmp_config, \
+            tempfile.TemporaryDirectory() as tmp_dir:
             with open(self._previous_pcap, "rb") as f_previouse:
                 f_tmp.write(f_previouse.read())
             f_tmp.flush()
@@ -257,6 +258,8 @@ class TraceMixer:
             tmp_config.write(yaml.dump(config))
             tmp_config_path = tmp_config.name
 
+            tmp_dir_name = tmp_dir.name
+
             config['atk.file'] = '/data/mix_file.pcap'
 
             docker_params = (
@@ -264,13 +267,13 @@ class TraceMixer:
                         '--rm '
                         '-v "{}":/data/target.pcap '
                         '-v "{}":/data/config.yaml '
-                        '-v "{}":/data/output.pcap ' 
+                        '-v "{}":/output ' 
                         '-v "{}":/data/mix_file.pcap '
                         'trace-tools'
                 ).format(
                     tmp_file, 
                     tmp_config_path,
-                    self._output_location, 
+                    tmp_dir_name, #pick from here 
                     annotated_unit_file
                 )
 
@@ -284,9 +287,9 @@ class TraceMixer:
                 ).format(
                     docker_params, 
                     "/data/target.pcap", 
-                    "/data/output.pcap",
+                    "/output/output.pcap",
                     "/data/config.yaml",
-                    timestamp
+                    at_timestamp
                 )
 
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
@@ -295,6 +298,12 @@ class TraceMixer:
             if p.returncode != 0:
                 raise TraceMixerError("error_code: %s" % p.returncode)
 
+            output_pcap = Path(tmp_dir_name) / 'output.pcap'
+            if not output_pcap.exists():
+                raise TraceMixerError("")
+
+            shutil.move(str(output_pcap), self._output_location)
+
     @staticmethod
     def prepare_configuration(
             ip_mapping, 
@@ -302,23 +311,23 @@ class TraceMixer:
             port_mapping,
         ):
         configuration = {
-            {
-            'timestamp':
-                'generation': 'tcp_avg_shift'
-                'postprocess': [                ]
-                'generation.alt': 'timestamp_dynamic_shift'
-                'random.treshold': 0.001
-            }
+            'timestamp': {
+                'generation': 'tcp_avg_shift',
+                'postprocess': [],
+                'generation.alt': 'timestamp_dynamic_shift',
+                'random.treshold': 0.001,
+            },
             'ip.map' : [],
             'mac.map' : [],
             'port.ip.map' : [],
+            'atk.file' : '/data/mix_file.pcap',
         }
         if ip_mapping and ip_mapping.data:
-            configuration["ip.map"] = [dict('ip'=dict(old=original, new=replacement)) for original, replacement in
+            configuration["ip.map"] = [dict(ip=dict(old=original, new=replacement)) for original, replacement in
                                    ip_mapping.data]
 
         if mac_mapping and mac_mapping.data:
-            configuration["mac.map"] = [dict('mac'=dict(old=original, new=replacement)) for original, replacement in
+            configuration["mac.map"] = [dict(mac=dict(old=original, new=replacement)) for original, replacement in
                                     mac_mapping.data]
 
         if port_mapping is not None:

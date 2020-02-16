@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.7
 
 RUN apt update
 RUN DEBIAN_FRONTEND=noninteractive apt install -y tshark tcpreplay bittwist apt-utils
@@ -14,6 +14,8 @@ RUN apt-get install -y git cmake libpcap-dev libssl-dev lsb-release libtins-dev
 RUN mkdir -p /home/trace/
 RUN mkdir -p /home/trace-git/
 RUN mkdir -p /home/dump/
+RUN mkdir -p /data/
+RUN chown trace /data
 
 COPY trace-analyzer /home/trace/trace-analyzer
 COPY trace-mixer /home/trace/trace-mixer
@@ -29,7 +31,6 @@ RUN git clone https://github.com/Trace-Share/ID2T.git
 WORKDIR /home/trace/trace-git/Trace-Normalizer
 RUN git submodule update --recursive --init --remote submodules/Trace-Manipulation
 RUN pip install -r /home/trace/trace-git/Trace-Normalizer/requirements.txt
-RUN ls -la /home/trace/trace-git/Trace-Normalizer/submodules/Trace-Manipulation
 RUN pip install -r /home/trace/trace-git/Trace-Normalizer/submodules/Trace-Manipulation/requirements.txt
 
 WORKDIR /home/trace/trace-git/ID2T
@@ -39,3 +40,4 @@ RUN pip install scapy==2.4.2 pyyaml==5.1.1 sqlalchemy==1.3.1 pandas==0.24.2 nump
 
 USER trace
 WORKDIR /home/trace
+
