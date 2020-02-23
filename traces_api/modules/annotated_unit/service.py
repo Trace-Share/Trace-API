@@ -60,13 +60,12 @@ class AnnotatedUnitService:
     def _session(self):
         return self._session_maker()
 
-    def create_annotated_unit(self, name, description, ip_mapping, mac_mapping, tcp_timestamp_mapping, ip_details, unit_file, labels):
+    def create_annotated_unit(self, name, description, mac_mapping, tcp_timestamp_mapping, ip_details, unit_file, labels):
         """
         New annotated unit will be crated, normalized and saved into database
 
         :param name: Name of annotated unit
         :param description: Description of annotated unit
-        :param ip_mapping:
         :param mac_mapping:
         :param timestamp:
         :param ip_details:
@@ -79,7 +78,8 @@ class AnnotatedUnitService:
         configuration = self._trace_normalizer.prepare_configuration(ip_details, mac_mapping, tcp_timestamp_mapping)
         self._trace_normalizer.normalize(unit_file.location, new_ann_unit_file.location, configuration)
 
-        analyzed_data = escape(self._trace_analyzer.analyze(new_ann_unit_file.location))
+        analyzed_data:dict = escape(self._trace_analyzer.analyze(new_ann_unit_file.location))
+        del analyzed_data['ip.groups']
 
         with open(new_ann_unit_file.location, "rb") as f:
             ann_unit_file_name = self._file_storage.save_file(f, format=unit_file.format)

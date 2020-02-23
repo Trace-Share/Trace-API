@@ -240,7 +240,7 @@ class UnitService(UnitServiceAbstract):
         self._session.commit()
         return unit
 
-    def unit_normalize(self, id_unit, ip_mapping, mac_mapping, ip_details, tcp_timestamp_mapping):
+    def unit_normalize(self, id_unit, mac_mapping, ip_details, tcp_timestamp_mapping):
         unit = self._get_unit(id_unit)
         if not unit:
             raise UnitDoesntExistsException()
@@ -250,12 +250,9 @@ class UnitService(UnitServiceAbstract):
 
         unit_annotation = json.loads(unit.annotation)
 
-        self._validate_ip_details(ip_details, ip_mapping)
-
         annotated_unit = self._annotated_unit_service.create_annotated_unit(
             name=unit_annotation["name"],
             description=unit_annotation["description"],
-            ip_mapping=ip_mapping,
             mac_mapping=mac_mapping,
             timestamp=tcp_timestamp_mapping,
             ip_details=ip_details,

@@ -2,6 +2,7 @@ from flask_restplus import fields
 
 from traces_api.api.restplus import api
 
+ip_address = fields.String(example='1.1.1.1', description="IP address", required=True)
 
 unit_id = fields.Integer(example=112, description="ID of unit", required=True)
 
@@ -39,8 +40,68 @@ label_field = fields.String(name="Label", example="IMPORTANT")
 
 id_annotated_unit = fields.Integer(example=156, description="ID of annotated unit", required=True)
 
-analytical_data = fields.Nested(api.model("AnalyticalData", dict(
-    tcp_conversations=fields.List(fields.Nested(api.model("TCPConversations", {
+ip_groups = fields.Nested(api.model("ip_groups", dict(
+    source=fields.List(ip_address, required=True),
+    intermediate=fields.List(ip_address, required=True),
+    destination=fields.List(ip_address, required=True),
+)), description="Classification of ip addresses, every IP address should belong to one of this categories", required=True)
+
+timestamp = fields.Integer(name='timestamp', example='432', required=True)
+
+tcp_timestamp_min = fields.Nested(
+    api.model(
+        'tcp.timestamp.min',
+        dict(
+            ip=ip_address,
+            min=timestamp,
+        )
+    ),
+    description='List of minimum observed timestamps',
+    required=True,
+)
+
+
+protocol = fields.String(name='Protocol', example="<class 'scapy.layers.inet6.IPv6'>", required=True)
+ip_searched_protocols = fields.Nested(
+    api.model(
+        'ip.searched_protocols',
+        dict(
+            ip=ip_address,
+            protocols=fields.Nested(fields.List(protocol)),
+        )
+    ),
+    description='Listing of protocols associated to ip addresses',
+    required=True
+)
+
+ip_occurrences = fields.Nested(
+    api.model(
+        'ip.occurence',
+        dict(
+            count=fields.Integer(name='count', description='Number of occurances'),
+            first_observed= fields.Integer(name='first_observed', description='First occurance of the IP address'),
+            ip=ip_address,
+        ),
+    ),
+    description='Occurance of IP address',
+    required=True
+)
+
+mac_associations = fields.Nested(
+    api.model(
+        'mac.association',
+        dict(
+            ips=fields.List(fields.Nested(ip_address)),
+            mac=mac
+        )
+    ),
+    description='Associations of all ip addresses to mac',
+    required=True
+)
+
+analytical_data = fields.Nested(api.model("AnalyticalData", 
+{
+    'tcp_conversations' : fields.List(fields.Nested(api.model("TCPConversations", {
         "IP A": fields.String(),
         "Port A": fields.Integer(),
         "IP B": fields.String(),
@@ -53,11 +114,11 @@ analytical_data = fields.Nested(api.model("AnalyticalData", dict(
         "Bytes": fields.Integer(),
         "Relative start": fields.Float(example=1541346574.1234),
     }))),
-    pairs_mac_ip=fields.List(fields.Nested(api.model("PairsMacIp", {
+    'pairs_mac_ip' : fields.List(fields.Nested(api.model("PairsMacIp", {
         "IP": ip_original,
         "MAC": mac,
     }))),
-    capture_info=fields.List(fields.Nested(api.model("CaptureInfo", {
+    'capture_info' : fields.List(fields.Nested(api.model("CaptureInfo", {
         "File name": fields.String(),
         "File type": fields.String(),
         "File encapsulation": fields.String(),
@@ -78,5 +139,12 @@ analytical_data = fields.Nested(api.model("AnalyticalData", dict(
         "Strict time order": fields.String(),
         "Capture application": fields.String(),
         "Number of interfaces in file": fields.String(),
-    })))
+    }))),
+    # Format from https://github.com/Trace-Share/Trace-Normalizer/blob/master/crawler.py
+    'ip.groups' : ip_groups,
+    'tcp.timestamp.min' : fields.List(tcp_timestamp_min),
+    'ip.searched_protocols' : fields.List(ip_searched_protocols),
+    'ip.occurrences' : fields.List(ip_occurrences),
+    'mac.associations' : fields.List(mac_associations),
+}
 )))

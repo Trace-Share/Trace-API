@@ -70,12 +70,10 @@ class UnitSaveStep3(Resource):
     def post(self):
         data = escape(request.json)
 
-        ip_mapping = Mapping.create_from_dict(data["ip_mapping"])
         mac_mapping = Mapping.create_from_dict(data["mac_mapping"])
 
         id_annotated_unit = self._service_unit.unit_normalize(
             id_unit=data["id_unit"],
-            ip_mapping=ip_mapping,
             mac_mapping=mac_mapping,
             ip_details=IPDetails(
                 data["ips"]["target_nodes"],

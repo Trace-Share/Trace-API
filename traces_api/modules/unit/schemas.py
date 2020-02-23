@@ -39,7 +39,6 @@ unit_step2_fields = api.model("UnitStep2", dict(
 
 unit_step3_fields = api.model("UnitStep3", dict(
     id_unit=unit_id,
-    ip_mapping=fields.List(fields.Nested(ip_pair), required=True),
     mac_mapping=fields.List(fields.Nested(mac_pair), required=True),
     ips=ips,
     timestamp=fields.Float(example=1541346574.1234, required=True)

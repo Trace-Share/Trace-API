@@ -29,10 +29,9 @@ def test_invalid_unit_normalize(service_unit):
     with pytest.raises(UnitDoesntExistsException):
         service_unit.unit_normalize(
             id_unit=123456789,
-            ip_mapping=Mapping(),
             mac_mapping=Mapping(),
             ip_details=IPDetails([], [], []),
-            timestamp=123456.12
+            timestamp=Mapping()
         )
 
 
@@ -65,12 +64,6 @@ def test_unit_upload_annotate_normalize(service_unit, file_hydra_1_binary):
 
     annotated_unit = service_unit.unit_normalize(
         id_unit=unit1.id_unit,
-        ip_mapping=Mapping.create_from_dict([
-            {
-                "original": "1.2.3.4",
-                "replacement": "172.16.0.0"
-            }
-        ]),
         mac_mapping=Mapping.create_from_dict([
             {
                 "original": "00:A0:C9:14:C8:29",
@@ -79,16 +72,12 @@ def test_unit_upload_annotate_normalize(service_unit, file_hydra_1_binary):
         ]),
         ip_details=IPDetails(
             target_nodes=[
-                "172.16.0.0"
+                "1.2.3.4"
             ],
-            intermediate_nodes=[
-                "172.16.0.0"
-            ],
-            source_nodes=[
-                "172.16.0.0"
-            ]
+            intermediate_nodes=[],
+            source_nodes=[]
         ),
-        timestamp=1541346574.1234
+        timestamp=Mapping()
     )
 
     assert annotated_unit.id_annotated_unit
@@ -103,75 +92,71 @@ def test_unit_normalize_invalid_ip_details(service_unit, file_hydra_1_binary):
     unit2 = service_unit.unit_annotate(unit1.id_unit, "Unit #1", "Desc unit #1", ["L1", "L2"])
     assert unit1.id_unit == unit2.id_unit
 
-    with pytest.raises(IPDetailsUnknownIPException):
-        service_unit.unit_normalize(
-            id_unit=unit1.id_unit,
-            ip_mapping=Mapping.create_from_dict([
-                {
-                    "original": "1.2.3.4",
-                    "replacement": "172.16.0.0"
-                }
-            ]),
-            mac_mapping=Mapping.create_from_dict([]),
-            ip_details=IPDetails(
-                target_nodes=["172.16.0.1"],
-                intermediate_nodes=["172.16.0.0"],
-                source_nodes=["172.16.0.0"]
-            ),
-            timestamp=1541346574.1234
-        )
+    # Outdated test, io_mapping no longer 
 
-    with pytest.raises(IPDetailsUnknownIPException):
-        service_unit.unit_normalize(
-            id_unit=unit1.id_unit,
-            ip_mapping=Mapping.create_from_dict([
-                {
-                    "original": "1.2.3.4",
-                    "replacement": "172.16.0.0"
-                }
-            ]),
-            mac_mapping=Mapping.create_from_dict([]),
-            ip_details=IPDetails(
-                target_nodes=["172.16.0.0"],
-                intermediate_nodes=["172.16.0.1"],
-                source_nodes=["172.16.0.0"]
-            ),
-            timestamp=1541346574.1234
-        )
+    # with pytest.raises(IPDetailsUnknownIPException):
+    #     service_unit.unit_normalize(
+    #         id_unit=unit1.id_unit,
+    #         ip_mapping=Mapping.create_from_dict([
+    #             {
+    #                 "original": "1.2.3.4",
+    #                 "replacement": "172.16.0.0"
+    #             }
+    #         ]),
+    #         mac_mapping=Mapping.create_from_dict([]),
+    #         ip_details=IPDetails(
+    #             target_nodes=["172.16.0.1"],
+    #             intermediate_nodes=["172.16.0.0"],
+    #             source_nodes=["172.16.0.0"]
+    #         ),
+    #         timestamp=Mapping()
+    #     )
 
-    with pytest.raises(IPDetailsUnknownIPException):
-        service_unit.unit_normalize(
-            id_unit=unit1.id_unit,
-            ip_mapping=Mapping.create_from_dict([
-                {
-                    "original": "1.2.3.4",
-                    "replacement": "172.16.0.0"
-                }
-            ]),
-            mac_mapping=Mapping.create_from_dict([]),
-            ip_details=IPDetails(
-                target_nodes=["172.16.0.0"],
-                intermediate_nodes=["172.16.0.0"],
-                source_nodes=["172.16.0.1"]
-            ),
-            timestamp=1541346574.1234
-        )
+    # with pytest.raises(IPDetailsUnknownIPException):
+    #     service_unit.unit_normalize(
+    #         id_unit=unit1.id_unit,
+    #         ip_mapping=Mapping.create_from_dict([
+    #             {
+    #                 "original": "1.2.3.4",
+    #                 "replacement": "172.16.0.0"
+    #             }
+    #         ]),
+    #         mac_mapping=Mapping.create_from_dict([]),
+    #         ip_details=IPDetails(
+    #             target_nodes=["172.16.0.0"],
+    #             intermediate_nodes=["172.16.0.1"],
+    #             source_nodes=["172.16.0.0"]
+    #         ),
+    #         timestamp=1541346574.1234
+    #     )
+
+    # with pytest.raises(IPDetailsUnknownIPException):
+    #     service_unit.unit_normalize(
+    #         id_unit=unit1.id_unit,
+    #         ip_mapping=Mapping.create_from_dict([
+    #             {
+    #                 "original": "1.2.3.4",
+    #                 "replacement": "172.16.0.0"
+    #             }
+    #         ]),
+    #         mac_mapping=Mapping.create_from_dict([]),
+    #         ip_details=IPDetails(
+    #             target_nodes=["172.16.0.0"],
+    #             intermediate_nodes=["172.16.0.0"],
+    #             source_nodes=["172.16.0.1"]
+    #         ),
+    #         timestamp=1541346574.1234
+    #     )
 
     annotated_unit = service_unit.unit_normalize(
         id_unit=unit1.id_unit,
-        ip_mapping=Mapping.create_from_dict([
-            {
-                "original": "1.2.3.4",
-                "replacement": "172.16.0.0"
-            }
-        ]),
         mac_mapping=Mapping.create_from_dict([]),
         ip_details=IPDetails(
-            target_nodes=["172.16.0.0"],
-            intermediate_nodes=["172.16.0.0"],
-            source_nodes=["172.16.0.0"]
+            target_nodes=["1.2.3.4"],
+            intermediate_nodes=[],
+            source_nodes=[]
         ),
-        timestamp=1541346574.1234
+        timestamp=Mapping()
     )
     assert annotated_unit.id_annotated_unit
 
@@ -196,7 +181,7 @@ def test_find(service_unit):
         ip_mapping=Mapping(),
         mac_mapping=Mapping(),
         ip_details=IPDetails([], [], []),
-        timestamp=123456.12
+        tcp_timestamp_mapping=Mapping()
     )
 
     units = service_unit.get_units()

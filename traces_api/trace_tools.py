@@ -193,7 +193,7 @@ class TraceNormalizer:
             if ip_details.intermediate_nodes:
                 ip_groups["intermediate"] = ip_details.intermediate_nodes.copy()
             if ip_details.target_nodes:
-                ip_groups["desitantion_nodes"] = ip_details.target_nodes.copy()
+                ip_groups["desitantion"] = ip_details.target_nodes.copy()
 
 
         if mac_mapping and mac_mapping.data:
