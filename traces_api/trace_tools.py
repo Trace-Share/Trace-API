@@ -76,7 +76,7 @@ class TraceAnalyzer:
                             '-v "{output_dir}":/data/out trace-tools'
                     ).format(
                         pcap_file=filepath,
-                        output_dir=tmpdir.name,
+                        output_dir=tmpdir,
                     )
                 cmd = (
                         '{docker_params} '
@@ -91,7 +91,7 @@ class TraceAnalyzer:
 
                 stdout, stderr = p.communicate()
 
-                output = Path(tmpdir.name) / 'out.yml'
+                output = Path(tmpdir) / 'out.yml'
                 with output.open('r') as handle:
                     raw_crawler_stats = yaml.load(handle.read(), Loader=yaml.FullLoader)
         except:
@@ -258,7 +258,7 @@ class TraceMixer:
             tmp_config.write(yaml.dump(config))
             tmp_config_path = tmp_config.name
 
-            tmp_dir_name = tmp_dir.name
+            tmp_dir_name = tmp_dir
 
             config['atk.file'] = '/data/mix_file.pcap'
 
