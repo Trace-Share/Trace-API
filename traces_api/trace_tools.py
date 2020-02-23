@@ -91,6 +91,9 @@ class TraceAnalyzer:
 
                 stdout, stderr = p.communicate()
 
+                if p.returncode != 0:
+                    raise TraceAnalyzerError("error_code: %s" % p.returncode)
+
                 output = Path(tmpdir) / 'out.yml'
                 with output.open('r') as handle:
                     raw_crawler_stats = yaml.load(handle.read(), Loader=yaml.FullLoader)
