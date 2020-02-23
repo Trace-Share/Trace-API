@@ -147,4 +147,4 @@ analytical_data = fields.Nested(api.model("AnalyticalData",
     'ip.occurrences' : fields.List(ip_occurrences),
     'mac.associations' : fields.List(mac_associations),
 }
-)))
+))
