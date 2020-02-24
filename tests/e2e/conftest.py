@@ -51,12 +51,6 @@ def create_ann_unit(client, name, description=None, labels=None):
 
     r3 = client.post("/unit/normalize", json={
         "id_unit": r1.json["id_unit"],
-        "ip_mapping": [
-            {
-                "original": "1.2.3.4",
-                "replacement": "172.16.0.0"
-            }
-        ],
         "mac_mapping": [
             {
                 "original": "00:A0:C9:14:C8:29",
@@ -65,16 +59,12 @@ def create_ann_unit(client, name, description=None, labels=None):
         ],
         "ips": {
             "target_nodes": [
-                "172.16.0.0"
+                "1.2.3.4"
             ],
-            "intermediate_nodes": [
-                "172.16.0.0"
-            ],
-            "source_nodes": [
-                "172.16.0.0"
-            ]
+            "intermediate_nodes": [],
+            "source_nodes": []
         },
-        "timestamp": 1541346574.1234,
+        "tcp_timestamp_mapping": [],
     }, content_type="application/json")
     assert r3.status_code == 200
     assert r3.json["id_annotated_unit"] > 0

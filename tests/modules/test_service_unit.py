@@ -31,7 +31,7 @@ def test_invalid_unit_normalize(service_unit):
             id_unit=123456789,
             mac_mapping=Mapping(),
             ip_details=IPDetails([], [], []),
-            timestamp=Mapping()
+            tcp_timestamp_mapping=Mapping()
         )
 
 

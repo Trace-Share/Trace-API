@@ -254,7 +254,7 @@ class UnitService(UnitServiceAbstract):
             name=unit_annotation["name"],
             description=unit_annotation["description"],
             mac_mapping=mac_mapping,
-            timestamp=tcp_timestamp_mapping,
+            tcp_timestamp_mapping=tcp_timestamp_mapping,
             ip_details=ip_details,
             unit_file=self._file_storage.get_file(unit.uploaded_file_location),
             labels=unit_annotation["labels"]
