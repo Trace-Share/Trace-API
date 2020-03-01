@@ -80,7 +80,7 @@ class TraceAnalyzer:
                     )
                 cmd = (
                         '{docker_params} '
-                        'python trace-git/trace-normalizer/crawler.py '
+                        'python trace-git/Trace-Normalizer/crawler.py '
                             '-p /data/target.pcap '
                             '-o /data/out/out.yml'
                     ).format(
@@ -149,7 +149,7 @@ class TraceNormalizer:
                     configuration_file
                 )
             cmd = (
-                    '{docker_param} python3 trace-git/trace-normalizer/normalizer.py '
+                    '{docker_param} python3 trace-git/Trace-Normalizer/normalizer.py '
                         '-p "{input_pcap}" '
                         '-o "{output_path}" '
                         '-l "/home/dump" '
