@@ -101,8 +101,8 @@ class TraceAnalyzer:
                 output = Path(tmpdir) / 'out.yml'
                 with output.open('r') as handle:
                     raw_crawler_stats = yaml.load(handle.read(), Loader=yaml.FullLoader)
-        except:
-            raise TraceAnalyzerError("")
+        except Exception as e:
+            raise TraceAnalyzerError(f"{stderr}") from e ## TODO cleanup
 
         try:
             out = dict(
