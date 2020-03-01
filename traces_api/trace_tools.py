@@ -95,8 +95,8 @@ class TraceAnalyzer:
                     raise TraceAnalyzerError("error_code: %s" % p.returncode)
 
                 # if __debug__: ## TODO Cleanup and update to logg
-                print("Mix stdout:", stdout)
-                print("Mix stderr:", stderr)
+                print("Analyzer stdout:", stdout)
+                print("Analyzer stderr:", stderr)
 
                 output = Path(tmpdir) / 'out.yml'
                 with output.open('r') as handle:
@@ -166,6 +166,7 @@ class TraceNormalizer:
             stdout, stderr = p.communicate()
 
             # if __debug__: ## TODO Cleanup and update to logg
+            print("Configuration:", configuration)
             print("Normlize stdout:", stdout)
             print("Normlize stderr:", stderr)
 
