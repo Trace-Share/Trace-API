@@ -87,12 +87,16 @@ class TraceAnalyzer:
                         docker_params=docker_params_crawler
                     )
 
-                p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+                p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
                 stdout, stderr = p.communicate()
 
                 if p.returncode != 0:
                     raise TraceAnalyzerError("error_code: %s" % p.returncode)
+
+                if __debug__: ## TODO Cleanup and update to logg
+                    print("Mix stdout:", stdout)
+                    print("Mix stderr:", stderr)
 
                 output = Path(tmpdir) / 'out.yml'
                 with output.open('r') as handle:
@@ -157,9 +161,13 @@ class TraceNormalizer:
                     config_path="/data/config.conf"
                 )
 
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             stdout, stderr = p.communicate()
+
+            if __debug__: ## TODO Cleanup and update to logg
+                print("Normlize stdout:", stdout)
+                print("Normlize stderr:", stderr)
 
             if p.returncode != 0:
                 raise TraceNormalizerError("error_code: %s" % p.returncode)
@@ -295,8 +303,12 @@ class TraceMixer:
                     at_timestamp
                 )
 
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = p.communicate()
+
+            if __debug__: ## TODO Cleanup and update to logg
+                print("Mix stdout:", stdout)
+                print("Mix stderr:", stderr)
 
             if p.returncode != 0:
                 raise TraceMixerError("error_code: %s" % p.returncode)
