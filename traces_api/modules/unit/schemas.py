@@ -4,7 +4,10 @@ from flask_restplus import fields, reqparse
 
 from traces_api.api.restplus import api
 
-from traces_api.schemas import unit_id, label_field, ip_pair, mac_pair, ips, analytical_data
+from traces_api.schemas import (
+    unit_id, label_field, ip_pair, mac_pair, ips,
+    analytical_data, tcp_timestamp_min
+)
 
 
 # Unit step 1
@@ -41,7 +44,7 @@ unit_step3_fields = api.model("UnitStep3", dict(
     id_unit=unit_id,
     mac_mapping=fields.List(fields.Nested(mac_pair), required=True),
     ips=ips,
-    timestamp=fields.Float(example=1541346574.1234, required=True)
+    tcp_timestamp_mapping=fields.List(fields.Nested(tcp_timestamp_min), required=True)
 ))
 
 unit_step3_response = api.model("UnitStep3Response", dict(
