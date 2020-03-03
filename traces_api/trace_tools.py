@@ -77,7 +77,7 @@ class TraceAnalyzer:
                 docker_params_crawler = (
                         'sudo docker run '
                             '-v "{pcap_file}":/data/target.pcap '
-                            '-v "{output_dir}":/data/out trace-tools'
+                            '-v "{output_dir}":/data/ trace-tools'
                     ).format(
                         pcap_file=target_path,
                         output_dir=tmpdir,
@@ -86,7 +86,7 @@ class TraceAnalyzer:
                         '{docker_params} '
                         'python trace-git/Trace-Normalizer/crawler.py '
                             '-p /data/target.pcap '
-                            '-o /data/out/out.yml'
+                            '-o /data/out.yml'
                     ).format(
                         docker_params=docker_params_crawler
                     )
