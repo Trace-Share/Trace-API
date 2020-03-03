@@ -3,7 +3,7 @@ Flask
 flask-restplus
 sqlalchemy
 psycopg2-binary
-pytest
+pytest>=5.2
 pytest-flask
 flask_injector
 flask_restful
