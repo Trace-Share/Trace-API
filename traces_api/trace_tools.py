@@ -71,7 +71,7 @@ class TraceAnalyzer:
 
         try:
             with tempfile.TemporaryDirectory() as tmpdir:
-                target_path = Path(filepath).parent / 'target.pcap
+                target_path = Path(filepath).parent / 'target.pcap'
                 with gzip.open(filepath, 'rb') as f_in:
                     with open(
                         target_path, 'wb'
