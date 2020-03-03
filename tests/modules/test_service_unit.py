@@ -37,8 +37,8 @@ def test_invalid_unit_normalize(service_unit):
         )
 
 
-def test_delete(service_unit):
-    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap", filename="1.pcap")
+def test_delete(service_unit, get_empty_pcap):
+    file = werkzeug.datastructures.FileStorage(stream=BytesIO(get_empty_pcap), content_type="application/vnd.tcpdump.pcap", filename="1.pcap")
 
     unit1, _ = service_unit.unit_upload(file)
 
@@ -163,8 +163,8 @@ def test_unit_normalize_invalid_ip_details(service_unit, file_hydra_1_binary):
     assert annotated_unit.id_annotated_unit
 
 
-def test_find(service_unit):
-    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap", filename="dump.pcap")
+def test_find(service_unit, get_empty_pcap):
+    werkzeug.datastructures.FileStorage(stream=BytesIO(get_empty_pcap), content_type="application/vnd.tcpdump.pcap", filename="dump.pcap")
 
     unit, _ = service_unit.unit_upload(file)
 
