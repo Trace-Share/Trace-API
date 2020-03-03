@@ -4,6 +4,7 @@ import subprocess
 import json
 import tempfile
 import shutil
+import gzip
 from pathlib import Path
 
 ## 3p libs
@@ -70,12 +71,18 @@ class TraceAnalyzer:
 
         try:
             with tempfile.TemporaryDirectory() as tmpdir:
+                target_path = Path(filepath).parent / 'target.pcap
+                with gzip.open(filepath, 'rb') as f_in:
+                    with open(
+                        target_path, 'wb'
+                        ) as f_out:
+                        shutil.copyfileobj(f_in, f_out)
                 docker_params_crawler = (
                         'sudo docker run '
                             '-v "{pcap_file}":/data/target.pcap '
                             '-v "{output_dir}":/data/out trace-tools'
                     ).format(
-                        pcap_file=filepath,
+                        pcap_file=target_path,
                         output_dir=tmpdir,
                     )
                 cmd = (
