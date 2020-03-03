@@ -20,7 +20,7 @@ APP_DIR = os.path.dirname(os.path.realpath(__file__)) + "/../.."
 @pytest.fixture()
 def get_empty_pcap():
     with (
-            Path(__file__).parent / '../../fixtures/empty.pcap'
+            Path(__file__).parent / '../fixtures/empty.pcap'
         ).open("rb") as f_r:
         return f_r.read()
 
