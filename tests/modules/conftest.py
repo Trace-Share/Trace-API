@@ -13,9 +13,16 @@ from traces_api.storage import FileStorage
 from traces_api.trace_tools import TraceNormalizer, TraceAnalyzer
 from traces_api.compression import Compression
 
+from pathlib import Path
 
 APP_DIR = os.path.dirname(os.path.realpath(__file__)) + "/../.."
 
+@pytest.fixture()
+def get_empty_pcap():
+    with (
+            Path(__file__) / '../fixtures/empty.pcap'
+        ).open("rb") as f_r:
+        return f_r.read()
 
 @pytest.fixture()
 def service_annotated_unit(sqlalchemy_session):

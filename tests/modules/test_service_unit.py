@@ -5,9 +5,11 @@ from traces_api.modules.unit.service import UnitDoesntExistsException, Mapping, 
 
 import werkzeug.datastructures
 
+from .conftest import get_empty_pcap
 
-def test_unit_upload(service_unit):
-    file = werkzeug.datastructures.FileStorage(content_type="application/vnd.tcpdump.pcap", filename="file.pcap")
+
+def test_unit_upload(service_unit, get_empty_pcap):
+    file = werkzeug.datastructures.FileStorage(stream=BytesIO(get_empty_pcap), content_type="application/vnd.tcpdump.pcap", filename="file.pcap")
 
     unit1, _ = service_unit.unit_upload(file)
     unit2 = service_unit._get_unit(unit1.id_unit)

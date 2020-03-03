@@ -77,7 +77,9 @@ class TraceAnalyzer:
                 docker_params_crawler = (
                         'sudo docker run '
                             '-v "{pcap_file}":/data/target.pcap '
-                            '-v "{output_dir}":/data/ trace-tools'
+                            '-v "{output_dir}":/data/ '
+                            ' --user $(id -u):$(id -g) '
+                            'trace-tools'
                     ).format(
                         pcap_file=target_path,
                         output_dir=tmpdir,
