@@ -44,7 +44,7 @@ unit_step3_fields = api.model("UnitStep3", dict(
     id_unit=unit_id,
     mac_mapping=fields.List(fields.Nested(mac_pair), required=True),
     ips=ips,
-    tcp_timestamp_mapping=fields.List(fields.Nested(tcp_timestamp_min), required=True)
+    tcp_timestamp_mapping=fields.List(tcp_timestamp_min, required=True)
 ))
 
 unit_step3_response = api.model("UnitStep3Response", dict(
