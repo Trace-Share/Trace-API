@@ -72,7 +72,7 @@ class TraceAnalyzer:
 
         try:
             with tempfile.TemporaryDirectory() as tmpdir:
-                target_path = Path(filepath).parent / 'target.pcap'
+                target_path = Path(tmpdir) / 'target.pcap'
                 Compression.decompress_file(filepath, str(target_path))
                 docker_params_crawler = (
                         'sudo docker run '
