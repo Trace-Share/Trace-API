@@ -4,7 +4,7 @@ import subprocess
 import json
 import tempfile
 import shutil
-from pathlib import 
+from pathlib import Path
 
 from traces_api.compression import Compression
 
