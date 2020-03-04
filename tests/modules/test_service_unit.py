@@ -1,7 +1,12 @@
 import pytest
 from io import BytesIO
 
-from traces_api.modules.unit.service import UnitDoesntExistsException, Mapping, IPDetails, IPDetailsUnknownIPException
+from traces_api.modules.unit.service import (
+    UnitDoesntExistsException, Mapping, IPDetails,
+    IPDetailsUnknownIPException, 
+)
+
+from traces_api.trace_tools import TraceNormalizerError
 
 import werkzeug.datastructures
 
@@ -132,23 +137,17 @@ def test_unit_normalize_invalid_ip_details(service_unit, file_hydra_1_binary):
     #         timestamp=1541346574.1234
     #     )
 
-    # with pytest.raises(IPDetailsUnknownIPException):
-    #     service_unit.unit_normalize(
-    #         id_unit=unit1.id_unit,
-    #         ip_mapping=Mapping.create_from_dict([
-    #             {
-    #                 "original": "1.2.3.4",
-    #                 "replacement": "172.16.0.0"
-    #             }
-    #         ]),
-    #         mac_mapping=Mapping.create_from_dict([]),
-    #         ip_details=IPDetails(
-    #             target_nodes=["172.16.0.0"],
-    #             intermediate_nodes=["172.16.0.0"],
-    #             source_nodes=["172.16.0.1"]
-    #         ),
-    #         timestamp=1541346574.1234
-    #     )
+    with pytest.raises(TraceNormalizerError):
+        service_unit.unit_normalize(
+            id_unit=unit1.id_unit,
+            mac_mapping=Mapping.create_from_dict([]),
+            ip_details=IPDetails(
+                target_nodes=["1.2.3.4"],
+                intermediate_nodes=[],
+                source_nodes=["1.2.3.4"]
+            ),
+            tcp_timestamp_mapping=Mapping()
+        )
 
     annotated_unit = service_unit.unit_normalize(
         id_unit=unit1.id_unit,
