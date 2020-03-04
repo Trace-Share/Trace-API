@@ -69,7 +69,7 @@ def test_unit_upload_annotate_normalize(service_unit, file_hydra_1_binary):
         mac_mapping=Mapping.create_from_dict([
             {
                 "original": "00:A0:C9:14:C8:29",
-                "replacement": "00:A0:C9:14:C8:29"
+                "replacement": ["1.2.3.4"]
             }
         ]),
         ip_details=IPDetails(
