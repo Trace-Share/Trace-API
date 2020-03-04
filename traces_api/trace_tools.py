@@ -78,7 +78,7 @@ class TraceAnalyzer:
                         'sudo docker run '
                             '-v "{pcap_file}":/data/target.pcap '
                             '-v "{output_dir}":/data/ '
-                            ' --user $(id -u):$(id -g) '
+                            '--user $(id -u):$(id -g) '
                             'trace-tools'
                     ).format(
                         pcap_file=target_path,
@@ -148,7 +148,9 @@ class TraceNormalizer:
                         '--rm '
                         '-v "{}":/data/target.pcap '
                         '-v "{}":/data/output.pcap '
-                        '-v "{}":/data/config.conf trace-tools'
+                        '-v "{}":/data/config.conf '
+                        '--user $(id -u):$(id -g) '
+                        'trace-tools'
                 ).format(
                     target_file_location,
                     output_file_location, 
@@ -287,6 +289,7 @@ class TraceMixer:
                         '-v "{}":/data/config.yaml '
                         '-v "{}":/output ' 
                         '-v "{}":/data/mix_file.pcap '
+                        '--user $(id -u):$(id -g) '
                         'trace-tools'
                 ).format(
                     tmp_file, 
