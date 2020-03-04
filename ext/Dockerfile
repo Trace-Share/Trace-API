@@ -36,8 +36,6 @@ RUN pip install -r /home/trace/trace-git/Trace-Normalizer/submodules/Trace-Manip
 WORKDIR /home/trace/trace-git/ID2T
 RUN ./build.sh
 
-RUN pip install scapy==2.4.2 pyyaml==5.1.1 sqlalchemy==1.3.1 pandas==0.24.2 numpy==1.16.2 coverage==4.5.1
-
 USER trace
 WORKDIR /home/trace
 
