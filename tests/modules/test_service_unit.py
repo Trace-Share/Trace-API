@@ -158,7 +158,7 @@ def test_unit_normalize_invalid_ip_details(service_unit, file_hydra_1_binary):
             intermediate_nodes=[],
             source_nodes=[]
         ),
-        timestamp=Mapping()
+        tcp_timestamp_mapping=Mapping()
     )
     assert annotated_unit.id_annotated_unit
 
