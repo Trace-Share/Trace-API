@@ -19,4 +19,4 @@ install:
   - bash build_docker_image.sh
 
 script:
-  - py.test --capture=sys -s -v .
+  - py.test --capture=sys -v .
