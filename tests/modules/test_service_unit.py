@@ -179,7 +179,6 @@ def test_find(service_unit, get_empty_pcap):
 
     service_unit.unit_normalize(
         id_unit=unit.id_unit,
-        ip_mapping=Mapping(),
         mac_mapping=Mapping(),
         ip_details=IPDetails([], [], []),
         tcp_timestamp_mapping=Mapping()
