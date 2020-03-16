@@ -1088,19 +1088,19 @@
         "AnnUnitBasic": {
             "required": [
                 "creation_time",
-                "id_mix",
+                "id_annotated_unit",
                 "name"
             ],
             "properties": {
-                "id_mix": {
+                "id_annotated_unit": {
                     "type": "integer",
-                    "description": "ID of mix",
+                    "description": "ID of annotated unit",
                     "example": 834
                 },
                 "name": {
                     "type": "string",
-                    "description": "Name of mix",
-                    "example": "My mix"
+                    "description": "Name of annotated unit",
+                    "example": "My annotated unit"
                 },
                 "labels": {
                     "type": "array",
@@ -1111,7 +1111,7 @@
                 },
                 "creation_time": {
                     "type": "integer",
-                    "description": "Creation time of mix in unixtime",
+                    "description": "Creation time of annotated unit in unixtime",
                     "example": 1554076800
                 }
             },
@@ -1292,8 +1292,40 @@
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/AnnUnitBasic"
+                        "$ref": "#/definitions/MixBasic"
                     }
+                }
+            },
+            "type": "object"
+        },
+        "MixBasic": {
+            "required": [
+                "creation_time",
+                "id_mix",
+                "name"
+            ],
+            "properties": {
+                "id_mix": {
+                    "type": "integer",
+                    "description": "ID of mix",
+                    "example": 834
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of mix",
+                    "example": "My mix"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "IMPORTANT"
+                    }
+                },
+                "creation_time": {
+                    "type": "integer",
+                    "description": "Creation time of mix in unixtime",
+                    "example": 1554076800
                 }
             },
             "type": "object"
