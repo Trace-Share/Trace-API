@@ -1,3 +1,4 @@
+Werkzeug==0.16.1
 Flask
 flask-restplus
 sqlalchemy
@@ -8,3 +9,4 @@ flask_injector
 flask_restful
 pathvalidate
 uwsgi
+pyyaml==5.1
