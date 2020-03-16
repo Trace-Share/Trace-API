@@ -20,4 +20,4 @@ install:
   - bash build_docker_image.sh
 
 script:
-  - py.test -v .
+  - python3 -m pytest --capture=sys -v .
