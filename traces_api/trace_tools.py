@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import os.path
 import re
 import subprocess
@@ -5,6 +8,7 @@ import json
 import tempfile
 import shutil
 from pathlib import Path
+import yaml
 
 from traces_api.compression import Compression
 
@@ -136,7 +140,8 @@ class TraceNormalizer:
     def normalize(self, target_file_location, output_file_location, configuration):
 
         with tempfile.NamedTemporaryFile(mode="w") as f:
-            f.write(json.dumps(configuration))
+            dumped_cfg = yaml.dump(configuration)
+            f.write(dumped_cfg)
             f.flush()
             f.file.close()
 
@@ -172,12 +177,11 @@ class TraceNormalizer:
 
             stdout, stderr = p.communicate()
 
-            # if __debug__: ## TODO Cleanup and update to logg
-            print("Configuration:", configuration)
-            print("Normlize stdout:", stdout)
-            print("Normlize stderr:", stderr)
-
             if p.returncode != 0:
+                logger.debug("Configuartion: %s", dumped_cfg)
+                logger.debug("Normalize stdout: %s", stdout.decode())
+                logger.debug("Normalize stderr: %s", stderr.decode())
+                logger.error("TraceNormalizerError error_code %s", p.returncode)
                 raise TraceNormalizerError("error_code: %s" % p.returncode)
 
 
@@ -315,15 +319,15 @@ class TraceMixer:
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = p.communicate()
 
-            # if __debug__: ## TODO Cleanup and update to logg
-            print("Mix stdout:", stdout)
-            print("Mix stderr:", stderr)
-
             if p.returncode != 0:
+                logger.debug("Mix stdout: %s", stdout.decode())
+                logger.debug("Mix stderr: %s", stderr.decode())
+                logger.error("TraceMixerError error_code %s", p.returncode)
                 raise TraceMixerError("error_code: %s" % p.returncode)
 
             output_pcap = Path(tmp_dir_name) / 'output.pcap'
             if not output_pcap.exists():
+                logger.error("Pcap file doesn't exist")
                 raise TraceMixerError("")
 
             shutil.move(str(output_pcap), self._output_location)

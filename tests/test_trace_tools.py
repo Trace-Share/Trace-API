@@ -59,26 +59,31 @@ def test_normalizer_invalid_input(normalizer):
 
 
 def test_normalizer(analyzer, normalizer, hydra_1_file):
-    configuration = dict(
-        IP=[
-            dict(original="240.0.1.2", new="172.16.0.1"),
-            dict(original="240.125.0.2", new="172.16.0.2"),
-            dict(original="240.125.1.2", new="172.16.0.3"),
-        ],
-        MAC=[
-            dict(original="08:00:27:bd:c2:37", new="00:00:00:00:00:00"),
-        ]
-    )
+    configuration = {
+        "ip.groups": {
+            "source" : [
+                "240.0.1.2"
+            ],
+            "intermediate" : [
+                "240.125.0.2"
+            ],
+            "destination" : [
+                "240.125.1.2"
+            ]
+        },
+        "mac.associations" : {},
+        "tcp.timestamp.min" : [] 
+    }
 
     with tempfile.NamedTemporaryFile() as f:
         f.file.close()
 
         normalizer.normalize(hydra_1_file, f.name, configuration)
 
-        expected = [{'MAC': '08:00:27:bd:c2:37', 'IP': '172.16.0.2'},
-                    {'MAC': '08:00:27:90:8f:c4', 'IP': '172.16.0.1'},
-                    {'MAC': '00:00:00:00:00:00', 'IP': '172.16.0.3'},
-                    {'MAC': '08:00:27:90:8f:c4', 'IP': '172.16.0.1'}]
+        expected = [{'MAC': '08:00:27:55:00:00', 'IP': '240.85.0.2'}, 
+                    {'MAC': '08:00:27:00:00:00', 'IP': '240.0.0.2'}, 
+                    {'MAC': '08:00:27:55:00:00', 'IP': '240.85.0.2'}, 
+                    {'MAC': '08:00:27:00:00:00', 'IP': '240.0.0.2'}]
         response = analyzer.analyze(f.name)
 
-        compare_list_dict(response["pairs_mac_ip"], expected)
+        assert compare_list_dict(response["pairs_mac_ip"], expected)
