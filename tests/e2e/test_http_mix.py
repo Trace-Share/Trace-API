@@ -15,12 +15,14 @@ def test_create(client):
                 id_annotated_unit=aunit1,
                 ip_mapping=[],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=134
             ),
             dict(
                 id_annotated_unit=aunit2,
                 ip_mapping=[],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=123
             ),
         ]

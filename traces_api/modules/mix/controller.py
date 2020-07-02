@@ -20,7 +20,7 @@ class MixCreate(Resource):
         super().__init__(*args, **kwargs)
         self._service_mix = service_mix
 
-    @api.expect(mix_create)
+    #@api.expect(mix_create)
     @api.marshal_with(mix_create_response)
     @api.doc(responses={404: "Mix not found"})
     def post(self):
