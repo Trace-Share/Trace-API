@@ -5,6 +5,7 @@ def test_get_ann_unit(client, id_ann_unit1):
     r = client.get(
         "/annotated_unit/%s/get" % id_ann_unit1
     )
+    #print(r.json)
     assert r.status_code == 200
 
     assert set(r.json.keys()) == {"name", "description", "ip_details", "labels", "id_annotated_unit", "stats", "creation_time"}
@@ -13,7 +14,7 @@ def test_get_ann_unit(client, id_ann_unit1):
     assert r.json["name"] == "My annotated unit"
     assert r.json["description"] == "Description My annotated unit"
     assert set(r.json["labels"]) == {"important", "second_label"}
-    assert r.json["ip_details"] == {'intermediate_nodes': ['172.16.0.0'], 'source_nodes': ['172.16.0.0'], 'target_nodes': ['172.16.0.0']}
+    assert r.json["ip_details"] == {'intermediate_nodes': [], 'source_nodes': ['240.0.0.2'], 'target_nodes': ['240.170.0.2']}
     assert r.json["creation_time"]
 
 

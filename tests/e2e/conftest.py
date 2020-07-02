@@ -53,16 +53,20 @@ def create_ann_unit(client, name, description=None, labels=None):
         "id_unit": r1.json["id_unit"],
         "mac_mapping": [
             {
-                "original": "00:A0:C9:14:C8:29",
-                "replacement": "00:A0:C9:14:C8:29"
+                "mac": "08:00:27:90:8f:c4",
+                "ips": [
+                    "240.0.1.2"
+                ]
             }
         ],
         "ips": {
             "target_nodes": [
-                "1.2.3.4"
+                "240.125.0.2"
             ],
             "intermediate_nodes": [],
-            "source_nodes": []
+            "source_nodes": [
+                "240.0.1.2"
+            ]
         },
         "tcp_timestamp_mapping": [],
     }, content_type="application/json")
