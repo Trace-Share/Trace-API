@@ -76,7 +76,7 @@ class AnnotatedUnitService:
         new_ann_unit_file = File.create_new()
 
         configuration = self._trace_normalizer.prepare_configuration(ip_details, mac_mapping, tcp_timestamp_mapping)
-        self._trace_normalizer.normalize(unit_file.location, new_ann_unit_file.location, configuration)
+        norm_out = self._trace_normalizer.normalize(unit_file.location, new_ann_unit_file.location, configuration)
 
         analyzed_data:dict = escape(self._trace_analyzer.analyze(new_ann_unit_file.location))
         del analyzed_data['ip.groups']
@@ -89,7 +89,13 @@ class AnnotatedUnitService:
             description=description,
             creation_time=datetime.now(),
             stats=json.dumps(analyzed_data),
-            ip_details=json.dumps(ip_details.dict()),
+            ip_details=json.dumps(
+                {
+                    "source_nodes" : norm_out["ip"]["ip.source"],
+                    "intermediate_nodes" : norm_out["ip"]["ip.intermediate"],
+                    "target_nodes" : norm_out["ip"]["ip.destination"]
+                }
+            ),
             file_location=ann_unit_file_name,
             labels=[ModelAnnotatedUnitLabel(label=l.lower()) for l in labels]
         )

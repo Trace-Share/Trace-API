@@ -60,15 +60,17 @@ class Mapping:
         return self._data
 
     @staticmethod
-    def create_from_dict(data_dict):
+    def create_from_dict(data_dict, keys=('original', 'replacement')):
         """
         Create new mapping object from dictionary
         :param data_dict:
         :return: Mapping
         """
         mapping = Mapping()
+        k1 = keys[0]
+        k2 = keys[1]
         for d in data_dict:
-            mapping.add_pair(d["original"], d["replacement"])
+            mapping.add_pair(d[k1], d[k2])
         return mapping
 
 

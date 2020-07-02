@@ -64,13 +64,13 @@ class UnitSaveStep3(Resource):
         super().__init__(*args, **kwargs)
         self._service_unit = service_unit
 
-    @api.expect(unit_step3_fields)
+    #@api.expect(unit_step3_fields) # TODO FIX in future
     @api.marshal_with(unit_step3_response)
-    @api.doc(responses={404: "Unit not found"}) # TODO
+    @api.doc(responses={404: "Unit not found"}) 
     def post(self):
         data = escape(request.json)
 
-        mac_mapping = Mapping.create_from_dict(data["mac_mapping"])
+        mac_mapping = Mapping.create_from_dict(data["mac_mapping"], keys=("mac","ips"))
 
         id_annotated_unit = self._service_unit.unit_normalize(
             id_unit=data["id_unit"],

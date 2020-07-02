@@ -139,7 +139,10 @@ class TraceNormalizer:
 
     def normalize(self, target_file_location, output_file_location, configuration):
 
-        with tempfile.NamedTemporaryFile(mode="w") as f:
+        with tempfile.NamedTemporaryFile(
+                mode="w"
+            ) as f, tempfile.TemporaryDirectory(
+            ) as tmpdir:
             dumped_cfg = yaml.dump(configuration)
             f.write(dumped_cfg)
             f.flush()
@@ -150,21 +153,23 @@ class TraceNormalizer:
             docker_params = (
                     'docker run '
                         '--rm '
-                        '-v "{}":/data/target.pcap '
-                        '-v "{}":/data/output.pcap '
-                        '-v "{}":/data/config.conf '
+                        '-v "{target_file_location}":/data/target.pcap '
+                        '-v "{output_file_location}":/data/output.pcap '
+                        '-v "{configuration_file}":/data/config.conf '
+                        '-v "{output_dir}":/data/ '
                         '--user $(id -u):$(id -g) '
                         'trace-tools'
                 ).format(
-                    target_file_location,
-                    output_file_location, 
-                    configuration_file
+                    target_file_location=target_file_location,
+                    output_file_location=output_file_location, 
+                    configuration_file=configuration_file,
+                    output_dir=tmpdir
                 )
             cmd = (
                     '{docker_param} python3 trace-git/Trace-Normalizer/normalizer.py '
                         '-p "{input_pcap}" '
                         '-o "{output_path}" '
-                        '-l "/home/dump" '
+                        '-l "/data/labels.yaml" '
                         '-c "{config_path}"'
                 ).format(
                     docker_param=docker_params, 
@@ -177,12 +182,23 @@ class TraceNormalizer:
 
             stdout, stderr = p.communicate()
 
+            # if __debug__: ## TODO Cleanup and update to logg
+
             if p.returncode != 0:
+                # print("Configuartion: %s" % dumped_cfg)
+                # print("Mix stdout: %s" % stdout.decode())
+                # print("Mix stderr: %s" % stderr.decode())
+                # print("TraceMixerError error_code %s" % p.returncode)
                 logger.debug("Configuartion: %s", dumped_cfg)
                 logger.debug("Normalize stdout: %s", stdout.decode())
                 logger.debug("Normalize stderr: %s", stderr.decode())
                 logger.error("TraceNormalizerError error_code %s", p.returncode)
                 raise TraceNormalizerError("error_code: %s" % p.returncode)
+            
+            output = Path(tmpdir) / 'labels.yaml'
+            with output.open('r') as handle:
+                output_data = yaml.load(handle.read(), Loader=yaml.FullLoader)
+        return output_data
 
 
     @staticmethod
