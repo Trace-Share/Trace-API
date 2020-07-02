@@ -43,6 +43,7 @@ def test_update(client):
                 id_annotated_unit=aunit1,
                 ip_mapping=[],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=134
             ),
         ]
@@ -102,12 +103,14 @@ def test_generate_and_download(client):
                   "original": "00:A0:C9:14:C8:29",
                   "replacement": "00:A0:C9:14:C8:29"
                 }],
+                port_mapping=[],
                 timestamp=134
             ),
             dict(
                 id_annotated_unit=aunit2,
                 ip_mapping=[],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=123
             ),
         ]
@@ -151,12 +154,14 @@ def test_create_invalid_ann_unit(client):
                 id_annotated_unit=345678,
                 ip_mapping=[],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=134
             ),
             dict(
                 id_annotated_unit=45678,
                 ip_mapping=[],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=123
             ),
         ]
@@ -234,6 +239,7 @@ def test_remove_annotated_unit_in_mix(client):
                     id_annotated_unit=aunit1,
                     ip_mapping=[],
                     mac_mapping=[],
+                    port_mapping=[],
                     timestamp=134
                 )
             ]
