@@ -228,7 +228,7 @@ class TraceNormalizer:
         if ip_details:
             ip_groups = configuration['ip.groups']
             if ip_details.source_nodes:
-                ip_groups["source"] = ip_details.target_nodes.copy()
+                ip_groups["source"] = ip_details.source_nodes.copy()
             if ip_details.intermediate_nodes:
                 ip_groups["intermediate"] = ip_details.intermediate_nodes.copy()
             if ip_details.target_nodes:
