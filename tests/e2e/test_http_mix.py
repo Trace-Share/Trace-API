@@ -133,7 +133,7 @@ def test_generate_and_download(client):
         if i == 19:
             raise TimeoutError()
 
-        time.sleep(1)
+        time.sleep(5)
 
     r4 = client.get("/mix/%s/download" % id_mix, content_type="application/json")
     assert r4.status_code == 200
