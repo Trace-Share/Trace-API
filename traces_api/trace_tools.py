@@ -303,7 +303,7 @@ class TraceMixer:
             config['atk.file'] = '/data/mix_file.pcap'
 
             dec_anot_unit_file = str(
-                pathlib.Path(tmp_dir_name) / 'decompressed_annotated_unit.pcap'
+                Path(tmp_dir_name) / 'decompressed_annotated_unit.pcap'
             )
             Compression.decompress_file(annotated_unit_file, dec_anot_unit_file)
 
