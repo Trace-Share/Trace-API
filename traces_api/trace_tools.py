@@ -295,11 +295,17 @@ class TraceMixer:
             tmp_file = f_tmp.name
 
             tmp_config.write(yaml.dump(config))
+            tmp_config.flush()
             tmp_config_path = tmp_config.name
 
             tmp_dir_name = tmp_dir
 
             config['atk.file'] = '/data/mix_file.pcap'
+
+            dec_anot_unit_file = str(
+                pathlib.Path(tmp_dir_name) / 'decompressed_annotated_unit.pcap'
+            )
+            Compression.decompress_file(annotated_unit_file, dec_anot_unit_file)
 
             docker_params = (
                     'docker run '
@@ -314,7 +320,7 @@ class TraceMixer:
                     tmp_file, 
                     tmp_config_path,
                     tmp_dir_name, #pick from here 
-                    annotated_unit_file
+                    dec_anot_unit_file
                 )
 
             cmd = (
@@ -361,6 +367,8 @@ class TraceMixer:
                 'generation.alt': 'timestamp_dynamic_shift',
                 'random.treshold': 0.001,
             },
+            'tcp.timestamp.shift' : [],
+            'tcp.timestamp.shift.default' : 0,
             'ip.map' : [],
             'mac.map' : [],
             'port.ip.map' : [],
