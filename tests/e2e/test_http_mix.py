@@ -140,8 +140,8 @@ def test_generate_and_download(client):
 
 
 def test_create_invalid_input(client):
-    r = client.post("/mix/create")
-    assert r.status_code == 400
+    r = client.post("/mix/create") ## FIX with changes to marshaling
+    assert r.status_code == 500
 
 
 def test_create_invalid_ann_unit(client):

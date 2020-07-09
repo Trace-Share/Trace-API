@@ -64,12 +64,17 @@ def create_ann_unit(service_unit, name, labels=None):
 
     annotated_unit = service_unit.unit_normalize(
         id_unit=unit1.id_unit,
-        mac_mapping=Mapping.create_from_dict([
-            {
-                "original": "00:A0:C9:14:C8:29",
-                "replacement": "00:A0:C9:14:C8:29"
-            }
-        ]),
+        mac_mapping=Mapping.create_from_dict(
+            [
+                {
+                    "mac": "00:A0:C9:14:C8:29",
+                    "ips": [
+                        "1.2.3.4"
+                    ]
+                }
+            ],
+             keys=("mac","ips")
+        ),
         ip_details=IPDetails(
             target_nodes=[
                 "1.2.3.4"
@@ -79,7 +84,10 @@ def create_ann_unit(service_unit, name, labels=None):
             source_nodes=[
             ]
         ),
-        timestamp=1541346574.1234
+        tcp_timestamp_mapping=Mapping.create_from_dict(
+                [], 
+                keys=("ip","min")
+            )
     )
     return annotated_unit
 

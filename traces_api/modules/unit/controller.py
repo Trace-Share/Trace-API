@@ -71,6 +71,7 @@ class UnitSaveStep3(Resource):
         data = escape(request.json)
 
         mac_mapping = Mapping.create_from_dict(data["mac_mapping"], keys=("mac","ips"))
+        tcp_timestamp_mapping = Mapping.create_from_dict(data["tcp_timestamp_mapping"], keys=("ip","min"))
 
         id_annotated_unit = self._service_unit.unit_normalize(
             id_unit=data["id_unit"],
@@ -80,7 +81,7 @@ class UnitSaveStep3(Resource):
                 data["ips"]["intermediate_nodes"],
                 data["ips"]["source_nodes"]
             ),
-            tcp_timestamp_mapping=data["tcp_timestamp_mapping"]
+            tcp_timestamp_mapping=tcp_timestamp_mapping
         )
         return dict(id_annotated_unit=id_annotated_unit.id_annotated_unit)
 
