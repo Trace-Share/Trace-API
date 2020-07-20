@@ -62,7 +62,7 @@ mix_find = api.model("MixFind", dict(
 ))
 
 mix_find_response = api.model("MixFindResponse",
-                              dict(data=fields.List(fields.Nested(api.model("AnnUnitBasic", mix_basic)))))
+                              dict(data=fields.List(fields.Nested(api.model("MixBasic", mix_basic)))))
 
 
 mix_generate_status_response = api.model("MixGenerateStatus", dict(
