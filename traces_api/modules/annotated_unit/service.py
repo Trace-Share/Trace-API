@@ -60,13 +60,12 @@ class AnnotatedUnitService:
     def _session(self):
         return self._session_maker()
 
-    def create_annotated_unit(self, name, description, ip_mapping, mac_mapping, timestamp, ip_details, unit_file, labels):
+    def create_annotated_unit(self, name, description, mac_mapping, tcp_timestamp_mapping, ip_details, unit_file, labels):
         """
         New annotated unit will be crated, normalized and saved into database
 
         :param name: Name of annotated unit
         :param description: Description of annotated unit
-        :param ip_mapping:
         :param mac_mapping:
         :param timestamp:
         :param ip_details:
@@ -76,10 +75,11 @@ class AnnotatedUnitService:
         """
         new_ann_unit_file = File.create_new()
 
-        configuration = self._trace_normalizer.prepare_configuration(ip_mapping, mac_mapping, timestamp)
-        self._trace_normalizer.normalize(unit_file.location, new_ann_unit_file.location, configuration)
+        configuration = self._trace_normalizer.prepare_configuration(ip_details, mac_mapping, tcp_timestamp_mapping)
+        norm_out = self._trace_normalizer.normalize(unit_file.location, new_ann_unit_file.location, configuration)
 
-        analyzed_data = escape(self._trace_analyzer.analyze(new_ann_unit_file.location))
+        analyzed_data:dict = escape(self._trace_analyzer.analyze(new_ann_unit_file.location))
+        del analyzed_data['ip.groups']
 
         with open(new_ann_unit_file.location, "rb") as f:
             ann_unit_file_name = self._file_storage.save_file(f, format=unit_file.format)
@@ -89,7 +89,13 @@ class AnnotatedUnitService:
             description=description,
             creation_time=datetime.now(),
             stats=json.dumps(analyzed_data),
-            ip_details=json.dumps(ip_details.dict()),
+            ip_details=json.dumps(
+                {
+                    "source_nodes" : norm_out["ip"]["ip.source"],
+                    "intermediate_nodes" : norm_out["ip"]["ip.intermediate"],
+                    "target_nodes" : norm_out["ip"]["ip.destination"]
+                }
+            ),
             file_location=ann_unit_file_name,
             labels=[ModelAnnotatedUnitLabel(label=l.lower()) for l in labels]
         )

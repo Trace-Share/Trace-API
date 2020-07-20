@@ -3,7 +3,9 @@ import json
 from enum import Enum
 from datetime import datetime
 import multiprocessing
-from sqlalchemy import desc, update, and_, or_
+
+from sqlalchemy import desc, update, and_ 
+import yaml
 
 from traces_api.database.model.mix import ModelMix, ModelMixLabel, ModelMixOrigin, ModelMixFileGeneration
 
@@ -93,12 +95,14 @@ class MixService:
         for ann_unit in annotated_units_data:
             id_annotated_unit = ann_unit["id_annotated_unit"]
 
-            new_ann_unit_file = File.create_new()
+            # new_ann_unit_file = File.create_new()
             ann_unit_file = self._annotated_unit_service.download_annotated_unit(id_annotated_unit)
-            configuration = self._trace_normalizer.prepare_configuration(ann_unit["ip_mapping"], ann_unit["mac_mapping"], ann_unit["timestamp"])
-            self._trace_normalizer.normalize(ann_unit_file.location, new_ann_unit_file.location, configuration)
+            # configuration = self._trace_normalizer.prepare_configuration(ann_unit["ip_mapping"], ann_unit["mac_mapping"], ann_unit["timestamp"])
+            # self._trace_normalizer.normalize(ann_unit_file.location, new_ann_unit_file.location, configuration)
 
-            mixing.mix(new_ann_unit_file.location)
+
+            config = mixing.prepare_configuration(ann_unit['ip_mapping'], ann_unit['mac_mapping'], ann_unit['port_mapping'])
+            mixing.mix(ann_unit_file.location, config, ann_unit['at_timestamp'])
 
             num_processed = num_processed + 1
             self._update_mix_generation_progress(mix_generation_id, int(99*(num_processed/num_ann_units)))
@@ -137,6 +141,7 @@ class MixService:
                     id_annotated_unit=ann_unit["id_annotated_unit"],
                     ip_mapping=json.dumps(ann_unit["ip_mapping"]),
                     mac_mapping=json.dumps(ann_unit["mac_mapping"]),
+                    port_mapping=json.dumps(ann_unit["port_mapping"]),
                     timestamp=ann_unit["timestamp"],
                 ) for ann_unit in annotated_units
             ],
@@ -193,7 +198,8 @@ class MixService:
                 id_annotated_unit=origin.id_annotated_unit,
                 ip_mapping=Mapping.create_from_dict(json.loads(origin.ip_mapping)),
                 mac_mapping=Mapping.create_from_dict(json.loads(origin.mac_mapping)),
-                timestamp=origin.timestamp,
+                port_mapping=json.loads(origin.port_mapping),
+                at_timestamp=origin.timestamp,
             ))
 
         if not (all([self._exits_ann_unit(ann_unit["id_annotated_unit"]) for ann_unit in annotated_units_data])):

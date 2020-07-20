@@ -51,30 +51,24 @@ def create_ann_unit(client, name, description=None, labels=None):
 
     r3 = client.post("/unit/normalize", json={
         "id_unit": r1.json["id_unit"],
-        "ip_mapping": [
-            {
-                "original": "1.2.3.4",
-                "replacement": "172.16.0.0"
-            }
-        ],
         "mac_mapping": [
             {
-                "original": "00:A0:C9:14:C8:29",
-                "replacement": "00:A0:C9:14:C8:29"
+                "mac": "08:00:27:90:8f:c4",
+                "ips": [
+                    "240.0.1.2"
+                ]
             }
         ],
         "ips": {
             "target_nodes": [
-                "172.16.0.0"
+                "240.125.0.2"
             ],
-            "intermediate_nodes": [
-                "172.16.0.0"
-            ],
+            "intermediate_nodes": [],
             "source_nodes": [
-                "172.16.0.0"
+                "240.0.1.2"
             ]
         },
-        "timestamp": 1541346574.1234,
+        "tcp_timestamp_mapping": [],
     }, content_type="application/json")
     assert r3.status_code == 200
     assert r3.json["id_annotated_unit"] > 0
@@ -95,12 +89,14 @@ def create_mix(client, name):
                 id_annotated_unit=aunit1,
                 ip_mapping=[],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=134
             ),
             dict(
                 id_annotated_unit=aunit2,
                 ip_mapping=[],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=123
             ),
         ]

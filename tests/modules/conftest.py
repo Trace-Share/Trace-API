@@ -13,9 +13,16 @@ from traces_api.storage import FileStorage
 from traces_api.trace_tools import TraceNormalizer, TraceAnalyzer
 from traces_api.compression import Compression
 
+from pathlib import Path
 
 APP_DIR = os.path.dirname(os.path.realpath(__file__)) + "/../.."
 
+@pytest.fixture()
+def get_empty_pcap():
+    with (
+            Path(__file__).parent / '../fixtures/empty.pcap'
+        ).open("rb") as f_r:
+        return f_r.read()
 
 @pytest.fixture()
 def service_annotated_unit(sqlalchemy_session):
@@ -57,30 +64,30 @@ def create_ann_unit(service_unit, name, labels=None):
 
     annotated_unit = service_unit.unit_normalize(
         id_unit=unit1.id_unit,
-        ip_mapping=Mapping.create_from_dict([
-            {
-                "original": "1.2.3.4",
-                "replacement": "172.16.0.0"
-            }
-        ]),
-        mac_mapping=Mapping.create_from_dict([
-            {
-                "original": "00:A0:C9:14:C8:29",
-                "replacement": "00:A0:C9:14:C8:29"
-            }
-        ]),
+        mac_mapping=Mapping.create_from_dict(
+            [
+                {
+                    "mac": "00:A0:C9:14:C8:29",
+                    "ips": [
+                        "1.2.3.4"
+                    ]
+                }
+            ],
+             keys=("mac","ips")
+        ),
         ip_details=IPDetails(
             target_nodes=[
-                "172.16.0.0"
+                "1.2.3.4"
             ],
             intermediate_nodes=[
-                "172.16.0.0"
             ],
             source_nodes=[
-                "172.16.0.0"
             ]
         ),
-        timestamp=1541346574.1234
+        tcp_timestamp_mapping=Mapping.create_from_dict(
+                [], 
+                keys=("ip","min")
+            )
     )
     return annotated_unit
 

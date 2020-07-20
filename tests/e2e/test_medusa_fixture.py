@@ -34,37 +34,31 @@ def create_medusa(client):
 
     r3 = client.post("/unit/normalize", json={
         "id_unit": r1.json["id_unit"],
-        "ip_mapping": [
-            {
-                "original": "240.0.2.2",
-                "replacement": "172.17.0.1"
-            },
-            {
-                "original": "240.125.0.2",
-                "replacement": "172.17.0.2"
-            }
-        ],
         "mac_mapping": [
             {
-                "original": "08:00:27:90:8f:c4",
-                "replacement": "00:00:00:00:00:01"
+                "mac": "08:00:27:90:8f:c4",
+                "ips": [
+                    "240.0.2.2"
+                ]
             },
             {
-                "original": "08:00:27:bd:c2:37",
-                "replacement": "00:00:00:00:00:02"
+                "mac": "08:00:27:bd:c2:37",
+                "ips": [
+                    "240.125.0.2"
+                ]
             }
         ],
         "ips": {
             "target_nodes": [
-                "172.17.0.1"
+                "240.0.2.2"
             ],
             "intermediate_nodes": [
             ],
             "source_nodes": [
-                "172.17.0.2"
+                "240.125.0.2"
             ]
         },
-        "timestamp": 0.093218,
+        "tcp_timestamp_mapping": [],
     }, content_type="application/json")
     assert r3.status_code == 200
     assert r3.json["id_annotated_unit"] > 0
@@ -72,12 +66,15 @@ def create_medusa(client):
     ra1 = client.get(
         "/annotated_unit/%s/get" % r3.json["id_annotated_unit"]
     )
-    assert compare_list_dict(ra1.json['stats']['pairs_mac_ip'], [
-        {'IP': '172.17.0.1', 'MAC': '00:00:00:00:00:01'},
-        {'IP': '172.17.0.2', 'MAC': '00:00:00:00:00:02'},
-        {'IP': '172.17.0.1', 'MAC': '00:00:00:00:00:01'},
-        {'IP': '172.17.0.2', 'MAC': '00:00:00:00:00:02'}
-    ])
+    assert compare_list_dict(
+        ra1.json['stats']['pairs_mac_ip'], 
+        [
+            {'IP': '240.0.0.2', 'MAC': '08:00:27:00:00:00'}, 
+            {'IP': '240.170.0.2', 'MAC': '08:00:27:aa:00:00'}, 
+            {'IP': '240.0.0.2', 'MAC': '08:00:27:00:00:00'}, 
+            {'IP': '240.170.0.2', 'MAC': '08:00:27:aa:00:00'}
+        ]
+    )
 
     return r3.json["id_annotated_unit"]
 
@@ -121,25 +118,29 @@ def create_hydra(client):
         ],
         "mac_mapping": [
             {
-                "original": "08:00:27:90:8f:c4",
-                "replacement": "00:00:00:00:02:01"
+                "mac": "08:00:27:90:8f:c4",
+                "ips": [
+                    "240.0.1.2"
+                ]
             },
             {
-                "original": "08:00:27:bd:c2:37",
-                "replacement": "00:00:00:00:02:02"
+                "mac": "08:00:27:bd:c2:37",
+                "ips": [
+                    "240.125.0.2"
+                ]
             }
         ],
         "ips": {
             "target_nodes": [
-                "172.18.0.1"
+                "240.0.1.2"
             ],
             "intermediate_nodes": [
             ],
             "source_nodes": [
-                "172.18.0.2"
+                "240.125.0.2"
             ]
         },
-        "timestamp": 0.093218,
+        "tcp_timestamp_mapping": []
     }, content_type="application/json")
     assert r3.status_code == 200
     assert r3.json["id_annotated_unit"] > 0
@@ -147,12 +148,15 @@ def create_hydra(client):
     ra1 = client.get(
         "/annotated_unit/%s/get" % r3.json["id_annotated_unit"]
     )
-    assert compare_list_dict(ra1.json['stats']['pairs_mac_ip'], [
-        {'IP': '172.18.0.1', 'MAC': '00:00:00:00:02:01'},
-        {'IP': '172.18.0.2', 'MAC': '00:00:00:00:02:02'},
-        {'IP': '172.18.0.1', 'MAC': '00:00:00:00:02:01'},
-        {'IP': '172.18.0.2', 'MAC': '00:00:00:00:02:02'}
-    ])
+    assert compare_list_dict(
+        ra1.json['stats']['pairs_mac_ip'], 
+        [
+            {'IP': '240.0.0.2', 'MAC': '08:00:27:00:00:00'}, 
+            {'IP': '240.170.0.2', 'MAC': '08:00:27:aa:00:00'}, 
+            {'IP': '240.0.0.2', 'MAC': '08:00:27:00:00:00'}, 
+            {'IP': '240.170.0.2', 'MAC': '08:00:27:aa:00:00'}
+        ]
+    )
 
     return r3.json["id_annotated_unit"]
 
@@ -169,7 +173,7 @@ def wait_for_generation(client, id_mix):
         if i == 19:
             raise TimeoutError()
 
-        time.sleep(1)
+        time.sleep(5)
 
 
 def test_mix_hydra_and_medusa(client):
@@ -185,30 +189,32 @@ def test_mix_hydra_and_medusa(client):
                 id_annotated_unit=hydra_id_ann_unit,
                 ip_mapping=[
                     {
-                        "original": "172.18.0.1",
+                        "original": "240.0.0.2",
                         "replacement": "172.18.1.1"
                     },
                     {
-                        "original": "172.18.0.2",
+                        "original": "240.170.0.2",
                         "replacement": "172.18.1.2"
                     }
                 ],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=0
             ),
             dict(
                 id_annotated_unit=medusa_id_ann_unit,
                 ip_mapping=[
                     {
-                        "original": "172.17.0.1",
+                        "original": "240.0.0.2",
                         "replacement": "172.17.1.1"
                     },
                     {
-                        "original": "172.17.0.2",
+                        "original": "240.170.0.2",
                         "replacement": "172.17.1.2"
                     }
                 ],
                 mac_mapping=[],
+                port_mapping=[],
                 timestamp=0
             ),
         ]
@@ -233,19 +239,24 @@ def test_mix_hydra_and_medusa(client):
 
         analyzed = TraceAnalyzer().analyze(f.name)
 
-    assert compare_list_dict(analyzed['pairs_mac_ip'], [
-        {'IP': '172.17.1.1', 'MAC': '00:00:00:00:00:01'},
-        {'IP': '172.18.1.2', 'MAC': '00:00:00:00:02:02'},
-        {'IP': '172.17.1.1', 'MAC': '00:00:00:00:00:01'},
-        {'IP': '172.18.1.1', 'MAC': '00:00:00:00:02:01'},
-        {'IP': '172.17.1.2', 'MAC': '00:00:00:00:00:02'},
-        {'IP': '172.18.1.2', 'MAC': '00:00:00:00:02:02'},
-        {'IP': '172.18.1.1', 'MAC': '00:00:00:00:02:01'},
-        {'IP': '172.17.1.2', 'MAC': '00:00:00:00:00:02'},
+    assert compare_list_dict(
+        analyzed['pairs_mac_ip'], 
+        [
+            {'MAC': '08:00:27:00:00:00', 'IP': '172.18.1.1'}, 
+            {'MAC': '08:00:27:00:00:00', 'IP': '172.18.1.1'},
+            {'MAC': '08:00:27:aa:00:00', 'IP': '172.18.1.2'}, 
+            {'MAC': '08:00:27:aa:00:00', 'IP': '172.18.1.2'}, 
+            
+            {'MAC': '08:00:27:00:00:00', 'IP': '172.17.1.1'}, 
+            {'MAC': '08:00:27:00:00:00', 'IP': '172.17.1.1'},
+            {'MAC': '08:00:27:aa:00:00', 'IP': '172.17.1.2'}, 
+            {'MAC': '08:00:27:aa:00:00', 'IP': '172.17.1.2'},
+            
 
-        # Base pcap
-        {'IP': '192.168.10.9', 'MAC': 'b8:ac:6f:1d:1f:6c'},
-        {'IP': '52.3.119.216', 'MAC': '00:c1:b1:14:eb:31'},
-        {'IP': '192.168.10.9', 'MAC': 'b8:ac:6f:1d:1f:6c'},
-        {'IP': '52.3.119.216', 'MAC': '00:c1:b1:14:eb:31'},
-    ])
+            # Base pcap
+            {'IP': '192.168.10.9', 'MAC': 'b8:ac:6f:1d:1f:6c'},
+            {'IP': '52.3.119.216', 'MAC': '00:c1:b1:14:eb:31'},
+            {'IP': '192.168.10.9', 'MAC': 'b8:ac:6f:1d:1f:6c'},
+            {'IP': '52.3.119.216', 'MAC': '00:c1:b1:14:eb:31'},
+        ]
+    )

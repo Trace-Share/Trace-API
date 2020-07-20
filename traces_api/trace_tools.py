@@ -1,8 +1,19 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import os.path
 import re
 import subprocess
 import json
 import tempfile
+import shutil
+from pathlib import Path
+import yaml
+
+from traces_api.compression import Compression
+
+## 3p libs
+import yaml
 
 EXT_FOLDER = os.path.dirname(os.path.realpath(__file__)) + "/../ext"
 
@@ -50,6 +61,7 @@ class TraceAnalyzer:
         :param filepath: path to file to be analyzed
         :return: dict that contains analyzed information
         """
+
         docker_params = "docker run --rm  -v \"{}\":/dumps/file.pcap trace-tools".format(filepath)
         cmd = '{} python3 trace-analyzer/trace-analyzer.py -f "{}" -tcp -q'.format(docker_params, "/dumps/file.pcap")
 
@@ -61,12 +73,53 @@ class TraceAnalyzer:
             raise TraceAnalyzerError("error_code: %s" % p.returncode)
 
         parts = re.split(b"\n", stdout)
+
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                target_path = filepath
+                docker_params_crawler = (
+                        'sudo docker run '
+                            '-v "{pcap_file}":/data/target.pcap '
+                            '-v "{output_dir}":/data/ '
+                            '--user $(id -u):$(id -g) '
+                            'trace-tools'
+                    ).format(
+                        pcap_file=target_path,
+                        output_dir=tmpdir,
+                    )
+                cmd = (
+                        '{docker_params} '
+                        'python trace-git/Trace-Normalizer/crawler.py '
+                            '-p /data/target.pcap '
+                            '-o /data/out.yml'
+                    ).format(
+                        docker_params=docker_params_crawler
+                    )
+
+                p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+                stdout, stderr = p.communicate()
+
+                if p.returncode != 0:
+                    raise TraceAnalyzerError("error_code: %s" % p.returncode)
+
+                # if __debug__: ## TODO Cleanup and update to logg
+                print("Analyzer stdout:", stdout)
+                print("Analyzer stderr:", stderr)
+
+                output = Path(tmpdir) / 'out.yml'
+                with output.open('r') as handle:
+                    raw_crawler_stats = yaml.load(handle.read(), Loader=yaml.FullLoader)
+        except Exception as e:
+            raise TraceAnalyzerError(f"{stderr}") from e ## TODO cleanup
+
         try:
             out = dict(
                 tcp_conversations=json.loads(parts[0].decode()),
                 pairs_mac_ip=json.loads(parts[1].decode()),
                 capture_info=json.loads(parts[2].decode()),
             )
+            out.update(raw_crawler_stats)
         except json.decoder.JSONDecodeError:
             raise TraceAnalyzerError()
 
@@ -86,50 +139,122 @@ class TraceNormalizer:
 
     def normalize(self, target_file_location, output_file_location, configuration):
 
-        with tempfile.NamedTemporaryFile(mode="w") as f:
-            f.write(json.dumps(configuration))
+        with tempfile.NamedTemporaryFile(
+                mode="w"
+            ) as f, tempfile.TemporaryDirectory(
+            ) as tmpdir:
+            dumped_cfg = yaml.dump(configuration)
+            f.write(dumped_cfg)
             f.flush()
             f.file.close()
 
             configuration_file = f.name
 
-            docker_params = 'docker run --rm -v "{}":/data/target.pcap -v "{}":/data/output.pcap ' \
-                            '-v "{}":/data/config.conf trace-tools'.format(
-                                target_file_location, output_file_location, configuration_file
-                            )
-            cmd = '{} python3 trace-normalizer/trace-normalizer.py -i "{}" -o "{}" -c "{}"'\
-                .format(docker_params, "/data/target.pcap", "/data/output.pcap", "/data/config.conf")
+            docker_params = (
+                    'docker run '
+                        '--rm '
+                        '-v "{target_file_location}":/data/target.pcap '
+                        '-v "{output_file_location}":/data/output.pcap '
+                        '-v "{configuration_file}":/data/config.conf '
+                        '-v "{output_dir}":/data/ '
+                        '--user $(id -u):$(id -g) '
+                        'trace-tools'
+                ).format(
+                    target_file_location=target_file_location,
+                    output_file_location=output_file_location, 
+                    configuration_file=configuration_file,
+                    output_dir=tmpdir
+                )
+            cmd = (
+                    '{docker_param} python3 trace-git/Trace-Normalizer/normalizer.py '
+                        '-p "{input_pcap}" '
+                        '-o "{output_path}" '
+                        '-l "/data/labels.yaml" '
+                        '-c "{config_path}"'
+                ).format(
+                    docker_param=docker_params, 
+                    input_pcap="/data/target.pcap", 
+                    output_path="/data/output.pcap", 
+                    config_path="/data/config.conf"
+                )
 
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             stdout, stderr = p.communicate()
 
+            # if __debug__: ## TODO Cleanup and update to logg
+
             if p.returncode != 0:
+                # print("Configuartion: %s" % dumped_cfg)
+                # print("Mix stdout: %s" % stdout.decode())
+                # print("Mix stderr: %s" % stderr.decode())
+                # print("TraceMixerError error_code %s" % p.returncode)
+                logger.debug("Configuartion: %s", dumped_cfg)
+                logger.debug("Normalize stdout: %s", stdout.decode())
+                logger.debug("Normalize stderr: %s", stderr.decode())
+                logger.error("TraceNormalizerError error_code %s", p.returncode)
                 raise TraceNormalizerError("error_code: %s" % p.returncode)
+            
+            output = Path(tmpdir) / 'labels.yaml'
+            with output.open('r') as handle:
+                output_data = yaml.load(handle.read(), Loader=yaml.FullLoader)
+        return output_data
+
 
     @staticmethod
-    def prepare_configuration(ip_mapping, mac_mapping, timestamp):
+    def prepare_configuration(
+            ip_details, 
+            mac_mapping, 
+            tcp_timestamp_mapping,
+        ):
         """
         Prepare configuration dict with given parameters
 
-        :param ip_mapping:
-        :param mac_mapping:
-        :param timestamp:
+        :param ip_details:  detials object containing source, inter and target addresses
+        :type ip_detail: IPDetails
+        :param mac_mapping: Mac mapping, with mac key, and list of related ips
+        :param tcp_timestamp_mapping: mapping of ip addresses to minimum tcp timestamp 
         :return: configuration dict
         """
-        configuration = {}
-        if ip_mapping and ip_mapping.data:
-            configuration["IP"] = [dict(original=original, new=replacement) for original, replacement in
-                                   ip_mapping.data]
+        configuration = {
+            "ip.groups" : {
+                "source" : [],
+                "intermediate" : [],
+                "destination" : []
+            },
+            "mac.associations" : {},
+            "tcp.timestamp.min" : []
+        }
+        if ip_details:
+            ip_groups = configuration['ip.groups']
+            if ip_details.source_nodes:
+                ip_groups["source"] = ip_details.source_nodes.copy()
+            if ip_details.intermediate_nodes:
+                ip_groups["intermediate"] = ip_details.intermediate_nodes.copy()
+            if ip_details.target_nodes:
+                ip_groups["destination"] = ip_details.target_nodes.copy()
+
 
         if mac_mapping and mac_mapping.data:
-            configuration["MAC"] = [dict(original=original, new=replacement) for original, replacement in
-                                    mac_mapping.data]
+            configuration[
+                "mac.associations"
+                ] = [
+                        dict(mac=mac, ips=ips) 
+                        for mac, ips 
+                        in mac_mapping.data
+                ]
 
-        if timestamp:
-            configuration["timestamp"] = timestamp
+        if tcp_timestamp_mapping and tcp_timestamp_mapping.data:
+            configuration[
+                    "tcp.timestamp.min"
+                ] = [
+                        dict(ip=ip, min=timestamp)
+                        for ip, timestamp
+                        in tcp_timestamp_mapping.data
+                ]
 
         return configuration
+
 
 
 class TraceMixer:
@@ -148,38 +273,119 @@ class TraceMixer:
         self._previous_pcap = self.BASE_PCAP_FILE
         self._output_location = output_location
 
-    def mix(self, annotated_unit_file):
+    def mix(self, annotated_unit_file, config, at_timestamp):
         """
         Add annotated unit to mix
         :param annotated_unit_file:
         :return:
         """
 
-        self._mix(annotated_unit_file)
+        self._mix(annotated_unit_file, config, at_timestamp)
 
         self._previous_pcap = self._output_location
 
-    def _mix(self, annotated_unit_file):
-        with tempfile.NamedTemporaryFile(mode="wb") as f_tmp:
+    def _mix(self, annotated_unit_file, config, at_timestamp):
+        with tempfile.NamedTemporaryFile(mode="wb") as f_tmp, \
+            tempfile.NamedTemporaryFile(mode="w") as tmp_config, \
+            tempfile.TemporaryDirectory() as tmp_dir:
             with open(self._previous_pcap, "rb") as f_previouse:
                 f_tmp.write(f_previouse.read())
             f_tmp.flush()
             f_tmp.file.close()
             tmp_file = f_tmp.name
 
-            docker_params = 'docker run --rm -v "{}":/data/target.pcap -v "{}":/data/output.pcap ' \
-                            '-v "{}":/data/mix_file.pcap trace-tools'.format(
-                                tmp_file, self._output_location, annotated_unit_file
-                            )
+            tmp_config.write(yaml.dump(config))
+            tmp_config.flush()
+            tmp_config_path = tmp_config.name
 
-            cmd = '{} python3 trace-mixer/trace-mixer.py -b "{}" -o "{}" -m "{}"'\
-                      .format(docker_params, "/data/target.pcap", "/data/output.pcap", "/data/mix_file.pcap")
+            tmp_dir_name = tmp_dir
 
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            config['atk.file'] = '/data/mix_file.pcap'
+
+            dec_anot_unit_file = str(
+                Path(tmp_dir_name) / 'decompressed_annotated_unit.pcap'
+            )
+            Compression.decompress_file(annotated_unit_file, dec_anot_unit_file)
+
+            docker_params = (
+                    'docker run '
+                        '--rm '
+                        '-v "{}":/data/target.pcap '
+                        '-v "{}":/data/config.yaml '
+                        '-v "{}":/output ' 
+                        '-v "{}":/data/mix_file.pcap '
+                        '--user $(id -u):$(id -g) '
+                        'trace-tools'
+                ).format(
+                    tmp_file, 
+                    tmp_config_path,
+                    tmp_dir_name, #pick from here 
+                    dec_anot_unit_file
+                )
+
+            cmd = (
+                    '{} ./trace-git/ID2T/id2t '
+                        '-i "{}" '
+                        '-o "{}" '
+                        '-a Mix '
+                            'custom.payload.file={} '
+                            'inject.at-timestamp={} '
+                ).format(
+                    docker_params, 
+                    "/data/target.pcap", 
+                    "/output/output.pcap",
+                    "/data/config.yaml",
+                    at_timestamp
+                )
+
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = p.communicate()
 
             if p.returncode != 0:
+                logger.debug("Mix stdout: %s", stdout.decode())
+                logger.debug("Mix stderr: %s", stderr.decode())
+                logger.error("TraceMixerError error_code %s", p.returncode)
                 raise TraceMixerError("error_code: %s" % p.returncode)
+
+            output_pcap = Path(tmp_dir_name) / 'output.pcap'
+            if not output_pcap.exists():
+                logger.error("Pcap file doesn't exist")
+                raise TraceMixerError("")
+
+            shutil.move(str(output_pcap), self._output_location)
+
+    @staticmethod
+    def prepare_configuration(
+            ip_mapping, 
+            mac_mapping, 
+            port_mapping,
+        ):
+        configuration = {
+            'timestamp': {
+                'generation': 'tcp_avg_shift',
+                'postprocess': [],
+                'generation.alt': 'timestamp_dynamic_shift',
+                'random.treshold': 0.001,
+            },
+            'tcp.timestamp.shift' : [],
+            'tcp.timestamp.shift.default' : 0,
+            'ip.map' : [],
+            'mac.map' : [],
+            'port.ip.map' : [],
+            'atk.file' : '/data/mix_file.pcap',
+        }
+        if ip_mapping and ip_mapping.data:
+            configuration["ip.map"] = [dict(ip=dict(old=original, new=replacement)) for original, replacement in
+                                   ip_mapping.data]
+
+        if mac_mapping and mac_mapping.data:
+            configuration["mac.map"] = [dict(mac=dict(old=original, new=replacement)) for original, replacement in
+                                    mac_mapping.data]
+
+        if port_mapping is not None:
+            configuration['port.ip.map'] = port_mapping
+
+        return configuration
 
     def get_mixed_file_location(self):
         return self._output_location
