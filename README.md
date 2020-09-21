@@ -2,7 +2,7 @@
 
 Full API to support handling of packet traces. 
 
-[![Build Status](https://travis-ci.org/Trace-Share/Trace-API.svg?branch=master)](https://travis-ci.org/Trace-Share/Trace-API)
+[![Build Status](https://travis-ci.com/Trace-Share/Trace-API.svg?branch=master)](https://travis-ci.com/Trace-Share/Trace-API)
 
 
 ## Requirements
