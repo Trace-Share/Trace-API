@@ -9,4 +9,4 @@ flask_injector
 flask_restful
 pathvalidate
 uwsgi
-pyyaml==5.1
+pyyaml==5.4
